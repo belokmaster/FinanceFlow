@@ -37,6 +37,17 @@ func CreateAccountHandler(w http.ResponseWriter, r *http.Request, db *gorm.DB) {
 	name := r.FormValue("Name")
 	name = strings.TrimSpace(name) // why it works????????
 
+	currency_id, err := strconv.Atoi(r.FormValue("currency_id"))
+	if err != nil {
+		http.Error(w, "problem with currency. use normal values", http.StatusBadRequest)
+		return
+	}
+
+	if currency_id < 0 {
+		http.Error(w, "problem with currency. use positive values", http.StatusBadRequest)
+		return
+	}
+
 	balance, err := strconv.ParseFloat(r.FormValue("Balance"), 64)
 	if err != nil {
 		http.Error(w, "problem with balance. use normal values", http.StatusBadRequest)
@@ -44,9 +55,9 @@ func CreateAccountHandler(w http.ResponseWriter, r *http.Request, db *gorm.DB) {
 	}
 
 	acc := database.Account{
-		ID:      uint(accountID),
-		Name:    name,
-		Balance: balance,
+		Name:         name,
+		Balance:      balance,
+		CurrencyCode: database.TypeCurrency(currency_id),
 	}
 
 	err = database.CreateNewAccount(db, acc)

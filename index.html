@@ -107,14 +107,13 @@
         {{range .}}
         <div class="account-card">
             <h3>{{.Name}}</h3>
-            <p class="balance">{{.Balance}} &#8381;</p>
+            <p class="balance">{{.Balance}} {{.CurrencySymbol}}</p>
         </div>
         {{else}}
         <p>Счетов пока нет. Создайте новый счет, используя форму ниже.</p>
         {{end}}
     </div>
 
-    <h1>Тест версия 1. Заносим инфу и смотрим чек с БД</h1>
     <h2>choise your option</h2>
     <form>
         <input type="button" value="Create new account" onclick="showForm('createAccountForm')"><br>
@@ -139,7 +138,6 @@
 
             <label for="Balance">Balance:</label>
             <input type="text" id="Balance" name="Balance" required><br>
-
 
             <button type="submit">create a new account</button>
         </form>
