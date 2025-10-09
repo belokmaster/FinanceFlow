@@ -1,6 +1,8 @@
 package main
 
 import (
+	"finance_flow/database"
+	"finance_flow/handlers"
 	"log"
 	"net/http"
 	"os"
@@ -11,7 +13,7 @@ import (
 )
 
 func main() {
-	dbPath := "database.db" // mb change this point later
+	dbPath := "database/database.db" // mb change this point later
 
 	// check if db exists
 	_, err := os.Stat(dbPath)
@@ -26,7 +28,7 @@ func main() {
 	// initialize a new db if it doesnt exist
 	if !dbExists {
 		log.Println("initialize a new bd")
-		err := InitDB(db)
+		err := database.InitDB(db)
 		if err != nil {
 			log.Fatalf("failed to initialize the bd: %v", err)
 		}
@@ -42,39 +44,40 @@ func main() {
 	log.Println("The database opens successfully")
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFile(w, r, "index.html")
+		path := "index.html"
+		handlers.HomeHandler(w, r, db, path)
 	})
 
 	http.HandleFunc("/create_account", func(w http.ResponseWriter, r *http.Request) {
-		CreateAccountHandler(w, r, db)
+		handlers.CreateAccountHandler(w, r, db)
 	})
 
 	http.HandleFunc("/delete_account", func(w http.ResponseWriter, r *http.Request) {
-		DeleteAccountHandler(w, r, db)
+		handlers.DeleteAccountHandler(w, r, db)
 	})
 
 	http.HandleFunc("/transfer", func(w http.ResponseWriter, r *http.Request) {
-		TransferHandler(w, r, db)
+		handlers.TransferHandler(w, r, db)
 	})
 
 	http.HandleFunc("/submit_transaction", func(w http.ResponseWriter, r *http.Request) {
-		TransactionHandler(w, r, db)
+		handlers.TransactionHandler(w, r, db)
 	})
 
 	http.HandleFunc("/add_category", func(w http.ResponseWriter, r *http.Request) {
-		CreateCategoryHandler(w, r, db)
+		handlers.CreateCategoryHandler(w, r, db)
 	})
 
 	http.HandleFunc("/delete_category", func(w http.ResponseWriter, r *http.Request) {
-		DeleteCategoryHandler(w, r, db)
+		handlers.DeleteCategoryHandler(w, r, db)
 	})
 
 	http.HandleFunc("/add_subcategory", func(w http.ResponseWriter, r *http.Request) {
-		CreateSubCategoryHandler(w, r, db)
+		handlers.CreateSubCategoryHandler(w, r, db)
 	})
 
 	http.HandleFunc("/delete_subcategory", func(w http.ResponseWriter, r *http.Request) {
-		DeleteSubCategoryHandler(w, r, db)
+		handlers.DeleteSubCategoryHandler(w, r, db)
 	})
 
 	log.Println("Server started at http://localhost:8080")

@@ -1,4 +1,4 @@
-package main
+package database
 
 import (
 	"fmt"
@@ -239,4 +239,15 @@ func AddTransaction(db *gorm.DB, tx Transaction) error {
 
 		return nil
 	})
+}
+
+func GetAccounts(db *gorm.DB) ([]Account, error) {
+	var accounts []Account
+	result := db.Find(&accounts)
+
+	if result.Error != nil {
+		return nil, fmt.Errorf("problem with get accounts in db: %v", result.Error)
+	}
+
+	return accounts, nil
 }

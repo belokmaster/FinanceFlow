@@ -5,9 +5,115 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FinanceFlow</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            background-color: #f4f6f8;
+            color: #333;
+        }
+
+        .header {
+            background-color: #333;
+            display: flex;
+            align-items: center;
+            padding: 15px 30px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .header .logo {
+            display: flex;
+            align-items: center;
+            margin-right: 25px;
+        }
+
+        .header .logo .icon-container {
+            background-color: #ACE1AF;
+            padding: 10px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .header .logo .icon-container i {
+            color: #fff;
+            font-size: 24px;
+        }
+
+        nav {
+            display: flex;
+            gap: 15px;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: #ffffff;
+            font-size: 16px;
+            padding: 5px 10px;
+        }
+
+        nav a.active {
+            background-color: #ACE1AF;
+            color: #ffffff;
+            border-radius: 5px;
+        }
+
+        .accounts-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            padding: 20px 30px;
+        }
+
+        .account-card {
+            background-color: #ffffff;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 6px;
+            min-width: 150px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .account-card h3 {
+            margin-top: 0;
+        }
+
+        .account-card .balance {
+            font-size: 16px;
+            font-weight: bold;
+            color: #ACE1AF;
+        }
+    </style>
 </head>
 
 <body>
+    <header class="header">
+        <div class="logo">
+            <div class="icon-container">
+                <i class="fa-solid fa-wallet"></i>
+            </div>
+        </div>
+        <nav>
+            <a href="#" class="active">Счета</a>
+            <a href="#">Записи</a>
+            <a href="#">Аналитика</a>
+            <a href="#">Нейронка</a>
+        </nav>
+    </header>
+
+    <div class="accounts-container">
+        {{range .}}
+        <div class="account-card">
+            <h3>{{.Name}}</h3>
+            <p class="balance">{{.Balance}} &#8381;</p>
+        </div>
+        {{else}}
+        <p>Счетов пока нет. Создайте новый счет, используя форму ниже.</p>
+        {{end}}
+    </div>
+
     <h1>Тест версия 1. Заносим инфу и смотрим чек с БД</h1>
     <h2>choise your option</h2>
     <form>
