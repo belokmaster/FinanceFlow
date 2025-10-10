@@ -56,6 +56,7 @@ func HomeHandler(w http.ResponseWriter, r *http.Request, db *gorm.DB, path strin
 		}
 
 		accountsForView = append(accountsForView, AccountView{
+			ID:             acc.ID,
 			Name:           acc.Name,
 			Balance:        acc.Balance,
 			CurrencySymbol: symbol,

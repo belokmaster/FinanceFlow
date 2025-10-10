@@ -5,6 +5,7 @@ import (
 )
 
 type AccountView struct {
+	ID             uint
 	Name           string
 	Balance        float64
 	CurrencySymbol string

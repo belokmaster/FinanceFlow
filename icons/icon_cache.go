@@ -34,5 +34,6 @@ func InitIcons() {
 		iconKey := strings.TrimSuffix(iconFile.Name(), filepath.Ext(iconFile.Name()))
 		IconCache[iconKey] = template.HTML(content)
 	}
-	log.Printf("downloaded %d icons to cash", len(IconCache))
+
+	log.Printf("downloaded %d account's icons to cash", len(IconCache))
 }

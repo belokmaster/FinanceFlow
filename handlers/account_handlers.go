@@ -147,45 +147,6 @@ func DeleteAccountHandler(w http.ResponseWriter, r *http.Request, db *gorm.DB) {
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
 
-func ChangeAccountColorHandler(w http.ResponseWriter, r *http.Request, db *gorm.DB) {
-	log.Printf("ChangeAccountColorHandler: Starting color change")
-
-	if r.Method != http.MethodPost {
-		log.Printf("ChangeAccountColorHandler: Invalid method %s, redirecting to /", r.Method)
-		http.Redirect(w, r, "/", http.StatusSeeOther)
-		return
-	}
-
-	err := r.ParseForm()
-	if err != nil {
-		log.Printf("ChangeAccountColorHandler: Error parsing form: %v", err)
-		http.Error(w, "invalid form", http.StatusBadRequest)
-		return
-	}
-
-	log.Printf("ChangeAccountColorHandler: Form data received - %+v", r.Form)
-
-	accountID, err := strconv.Atoi(r.FormValue("ID"))
-	if err != nil {
-		log.Printf("ChangeAccountColorHandler: Invalid account ID '%s': %v", r.FormValue("ID"), err)
-		http.Error(w, "problem with id. use normal values", http.StatusBadRequest)
-		return
-	}
-
-	color := r.FormValue("Color")
-	log.Printf("ChangeAccountColorHandler: Changing color for account ID %d to '%s'", accountID, color)
-
-	err = database.ChangeAccountColor(db, accountID, color)
-	if err != nil {
-		log.Printf("ChangeAccountColorHandler: Failed to change color for account ID %d: %v", accountID, err)
-		http.Error(w, fmt.Sprintf("failed to change account's color: %v", err), http.StatusInternalServerError)
-		return
-	}
-
-	log.Printf("ChangeAccountColorHandler: Color changed successfully for account ID %d", accountID)
-	http.Redirect(w, r, "/", http.StatusSeeOther)
-}
-
 func ChangeAccountIconHandler(w http.ResponseWriter, r *http.Request, db *gorm.DB) {
 	log.Printf("ChangeAccountIconHandler: Starting icon change")
 
@@ -228,5 +189,52 @@ func ChangeAccountIconHandler(w http.ResponseWriter, r *http.Request, db *gorm.D
 	}
 
 	log.Printf("ChangeAccountIconHandler: Icon changed successfully for account ID %d to icon ID %d", accountID, iconID)
+	http.Redirect(w, r, "/", http.StatusSeeOther)
+}
+
+func UpdateAccountHandler(w http.ResponseWriter, r *http.Request, db *gorm.DB) {
+	if r.Method != http.MethodPost {
+		log.Printf("UpdateAccountHandler: Invalid method %s, redirecting to /", r.Method)
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+		return
+	}
+
+	err := r.ParseForm()
+	if err != nil {
+		log.Printf("UpdateAccountHandler: Error parsing form: %v", err)
+		http.Error(w, "invalid form", http.StatusBadRequest)
+		return
+	}
+
+	log.Printf("UpdateAccountHandler: Form data received - %+v", r.Form)
+
+	accountID, err := strconv.Atoi(r.FormValue("ID"))
+	if err != nil {
+		log.Printf("UpdateAccountHandler: Invalid account ID '%s': %v", r.FormValue("ID"), err)
+		http.Error(w, "problem with id. use normal values", http.StatusBadRequest)
+		return
+	}
+
+	newColor := r.FormValue("Color")
+	if newColor != "" {
+		err = database.ChangeAccountColor(db, accountID, newColor)
+		if err != nil {
+			log.Printf("UpdateAccountHandler: Changing color to '%s' for account %d", newColor, accountID)
+			http.Error(w, fmt.Sprintf("failed to change account's color: %v", err), http.StatusInternalServerError)
+			return
+		}
+	}
+
+	newName := r.FormValue("Name")
+	if newName != "" {
+		err = database.ChangeAccountName(db, accountID, newName)
+		if err != nil {
+			log.Printf("UpdateAccountHandler: Changing name to '%s' for account %d", newName, accountID)
+			http.Error(w, fmt.Sprintf("failed to change account's name: %v", err), http.StatusInternalServerError)
+			return
+		}
+	}
+
+	log.Printf("UpdateAccountHandler: Successfully processed all changes for account %d", accountID)
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }

@@ -83,12 +83,12 @@ func main() {
 		handlers.DeleteSubCategoryHandler(w, r, db)
 	})
 
-	http.HandleFunc("/change_account_color", func(w http.ResponseWriter, r *http.Request) {
-		handlers.ChangeAccountColorHandler(w, r, db)
-	})
-
 	http.HandleFunc("/change_account_icon", func(w http.ResponseWriter, r *http.Request) {
 		handlers.ChangeAccountIconHandler(w, r, db)
+	})
+
+	http.HandleFunc("/update_account", func(w http.ResponseWriter, r *http.Request) {
+		handlers.UpdateAccountHandler(w, r, db)
 	})
 
 	log.Println("Server started at http://localhost:8080")

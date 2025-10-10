@@ -101,3 +101,22 @@ func ChangeAccountIcon(db *gorm.DB, id int, icon_id int) error {
 	log.Printf("Icon updated successfully for account ID %d", id)
 	return nil
 }
+
+func ChangeAccountName(db *gorm.DB, id int, newName string) error {
+	var acc Account
+	err := db.First(&acc, id).Error
+	if err != nil {
+		return fmt.Errorf("account with ID %d not found", id)
+	}
+
+	result := db.Model(&Account{}).Where("id = ?", id).Update("Name", newName)
+	if result.Error != nil {
+		return fmt.Errorf("problem with change name in db: %v", result.Error)
+	}
+
+	if result.RowsAffected == 0 {
+		return fmt.Errorf("no rows were updated - account may not exist")
+	}
+
+	return nil
+}

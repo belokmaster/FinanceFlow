@@ -42,7 +42,6 @@
             font-size: 24px;
         }
 
-        /* navigation menu block */
         nav {
             display: flex;
             gap: 15px;
@@ -61,7 +60,6 @@
             border-radius: 5px;
         }
 
-        /* accounts block */
         .accounts-container {
             display: flex;
             flex-wrap: wrap;
@@ -82,10 +80,29 @@
             align-items: center;
             gap: 10px;
             color: #ffffff;
+            position: relative;
+        }
+
+        .account-card:hover {
+            background-color: #f9f9f9;
+            border-color: #4cd67a;
+        }
+
+        .account-card:hover::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            pointer-events: none;
         }
 
         .account-info {
             flex: 1;
+            position: relative;
         }
 
         .account-icon {
@@ -94,6 +111,7 @@
             width: 40px;
             height: 40px;
             text-align: center;
+            position: relative;
         }
 
         .account-icon {
@@ -105,6 +123,7 @@
             font-size: 16px;
             color: #ffffff;
             align-items: center;
+            position: relative;
         }
 
         .account-info .balance {
@@ -112,28 +131,26 @@
             font-size: 16px;
             font-weight: bold;
             color: #ffffff;
+            position: relative;
         }
 
-        /* block add new account */
         .new_account-card {
             background-color: #ffffff;
             border: 1px solid #e0e0e0;
             border-radius: 8px;
             padding: 12px 15px;
-            height: 50px;
-            width: 320px;
+            height: 30px;
+            width: 300px;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
             font-weight: bold;
         }
 
-        /* the backlight of add account button */
         .new_account-card:hover {
             background-color: #f9f9f9;
             border-color: #4cd67a;
             color: #333;
         }
 
-        /* the backlight of window when you try to open new account button */
         .modal {
             display: none;
             position: fixed;
@@ -149,32 +166,150 @@
 
         .modal-content {
             background-color: #fff;
-            padding: 20px 30px;
-            border-radius: 10px;
-            width: 300px;
+            padding: 24px;
+            border-radius: 16px;
+            width: 420px;
             text-align: left;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            border: 1px solid #f0f0f0;
         }
 
-        /* text with button on one level size */
         .modal-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-top: -10px;
-            margin-bottom: 10px;
+            margin-bottom: 24px;
+            margin-top: 0;
         }
 
-        /* button of close the window */
-        .close {
-            float: right;
+        .modal-header h2 {
             font-size: 22px;
-            font-weight: bold;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .close {
+            font-size: 28px;
+            font-weight: normal;
+            color: #888;
             cursor: pointer;
+            line-height: 1;
+            float: none;
         }
 
         .close:hover {
-            color: red;
+            color: #333;
+        }
+
+        .form-row {
+            display: flex;
+            align-items: flex-end;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .form-group {
+            margin-bottom: 0;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            font-size: 14px;
+            color: #333;
+            height: 20px;
+            line-height: 20px;
+        }
+
+        .name-group {
+            flex: 1;
+        }
+
+        .form-control {
+            width: 100%;
+            height: 35px;
+            padding: 0 12px;
+            border: 1px solid #dcdcdc;
+            border-radius: 8px;
+            box-sizing: border-box;
+            font-size: 16px;
+            transition: border-color 0.2s;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #4cd67a;
+        }
+
+        .required {
+            color: #d9534f;
+        }
+
+        .custom-color-picker {
+            position: relative;
+            width: 150px;
+            height: 35px;
+        }
+
+        .custom-color-picker:focus-within .color-display {
+            outline: none;
+            border-color: #4cd67a;
+        }
+
+        .color-display {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            height: 100%;
+            border: 1px solid #dcdcdc;
+            border-radius: 8px;
+            padding: 0 12px;
+            background-color: #fff;
+            box-sizing: border-box;
+            cursor: pointer;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .color-dot {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            margin-right: 12px;
+        }
+
+        .color-hex {
+            font-family: monospace;
+            font-size: 16px;
+            color: #555;
+        }
+
+        .custom-color-picker input[type="color"] {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        form button[type="submit"] {
+            width: 100%;
+            height: 48px;
+            padding: 0;
+            background-color: #4cd67a;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        form button[type="submit"]:hover {
+            background-color: #45b96c;
         }
     </style>
 </head>
@@ -194,9 +329,43 @@
         </nav>
     </header>
 
+    <div id="accountModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Редактировать счет</h2>
+                <span class="close" onclick="closeModal('accountModal')">&times;</span>
+            </div>
+
+            <form action="/update_account" method="post">
+                <input type="hidden" id="editAccountId" name="ID">
+
+                <div class="form-row">
+                    <div class="form-group name-group">
+                        <label for="editAccountName">Название <span class="required">*</span></label>
+                        <input type="text" id="editAccountName" name="Name" class="form-control" required>
+                    </div>
+
+                    <div class="form-group color-group">
+                        <label>Цвет</label>
+                        <div class="custom-color-picker">
+                            <div class="color-display">
+                                <span id="colorPreview" class="color-dot"></span>
+                                <span id="colorHexValue" class="color-hex">#000000</span>
+                            </div>
+                            <input type="color" id="editAccountColor" name="Color">
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit">Сохранить</button>
+            </form>
+        </div>
+    </div>
+
     <div class="accounts-container">
         {{range .}}
-        <div class="account-card" style="background-color: {{.Color}};">
+        <div class="account-card" style="background-color: {{.Color}};"
+            onclick="openAccountModal({{.ID}}, '{{.Name}}', '{{.Color}}')">
             <div class="account-icon">{{.Icon}}</div>
             <div class="account-info">
                 <h3>{{.Name}}</h3>
@@ -254,7 +423,6 @@
         <input type="button" value="Delete category" onclick="showForm('deleteCategoryForm')"><br>
         <input type="button" value="Create new sub_category" onclick="showForm('createSubCategoryForm')"><br>
         <input type="button" value="Delete sub_category" onclick="showForm('deleteSubCategoryForm')"><br>
-        <input type="button" value="Change account's color" onclick="showForm('changeColorAccount')"><br>
         <input type="button" value="Change account's icon" onclick="showForm('changeIconAccount')"><br>
     </form>
 
@@ -364,19 +532,6 @@
         </form>
     </div>
 
-    <div id="changeColorAccount" style="display: none;">
-        <h2>change color account</h2>
-        <form action="/change_account_color" method="post">
-            <label for="ID">ID:</label>
-            <input type="ID" id="ID" name="ID" required><br>
-
-            <label for="Color">Color:</label>
-            <input type="Color" id="Color" name="Color" required><br>
-
-            <button type="submit">change account's color</button>
-        </form>
-    </div>
-
     <div id="changeIconAccount" style="display: none;">
         <h2>change icon account</h2>
         <form action="/change_account_icon" method="post">
@@ -399,7 +554,6 @@
             document.getElementById('deleteCategoryForm').style.display = 'none';
             document.getElementById('createSubCategoryForm').style.display = 'none';
             document.getElementById('deleteSubCategoryForm').style.display = 'none';
-            document.getElementById('changeColorAccount').style.display = 'none';
             document.getElementById('changeIconAccount').style.display = 'none';
 
             const form = document.getElementById(formId);
@@ -407,6 +561,22 @@
                 form.style.display = 'block';
             }
         }
+
+        const colorInput = document.getElementById('editAccountColor');
+        const colorPreview = document.getElementById('colorPreview');
+        const colorHexValue = document.getElementById('colorHexValue');
+
+        function updateColorDisplay(newColor) {
+            if (!newColor || !newColor.startsWith('#')) {
+                newColor = '#000000';
+            }
+            colorPreview.style.backgroundColor = newColor;
+            colorHexValue.textContent = newColor.toUpperCase();
+        }
+
+        colorInput.addEventListener('input', () => {
+            updateColorDisplay(colorInput.value);
+        });
 
         // open the modal window
         function openModal(modalId) {
@@ -423,11 +593,38 @@
             }
         }
 
+        function openAccountModal(accountId, accountName, accountColor) {
+            document.getElementById('editAccountId').value = accountId;
+            document.getElementById('editAccountName').value = accountName;
+
+            colorInput.value = accountColor;
+            updateColorDisplay(accountColor);
+
+            openModal('accountModal');
+        }
+
+        function showForm(formId) {
+            const formsToHide = ['transferForm', 'transactionForm', 'createCategoryForm', 'deleteCategoryForm', 'createSubCategoryForm', 'deleteSubCategoryForm', 'changeIconAccount'];
+            formsToHide.forEach(id => {
+                const formElement = document.getElementById(id);
+                if (formElement) {
+                    formElement.style.display = 'none';
+                }
+            });
+
+            const formToShow = document.getElementById(formId);
+            if (formToShow) {
+                formToShow.style.display = 'block';
+            }
+        }
+
         // close when click outside the window
         window.onclick = function (event) {
-            const modal = document.getElementById("createAccountModal");
-            if (event.target === modal) {
-                modal.style.display = "none";
+            const modals = document.getElementsByClassName("modal");
+            for (let i = 0; i < modals.length; i++) {
+                if (event.target == modals[i]) {
+                    modals[i].style.display = "none";
+                }
             }
         }
     </script>
