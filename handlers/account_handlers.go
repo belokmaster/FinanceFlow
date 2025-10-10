@@ -147,51 +147,6 @@ func DeleteAccountHandler(w http.ResponseWriter, r *http.Request, db *gorm.DB) {
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
 
-func ChangeAccountIconHandler(w http.ResponseWriter, r *http.Request, db *gorm.DB) {
-	log.Printf("ChangeAccountIconHandler: Starting icon change")
-
-	if r.Method != http.MethodPost {
-		log.Printf("ChangeAccountIconHandler: Invalid method %s, redirecting to /", r.Method)
-		http.Redirect(w, r, "/", http.StatusSeeOther)
-		return
-	}
-
-	err := r.ParseForm()
-	if err != nil {
-		log.Printf("ChangeAccountIconHandler: Error parsing form: %v", err)
-		http.Error(w, "invalid form", http.StatusBadRequest)
-		return
-	}
-
-	log.Printf("ChangeAccountIconHandler: Form data received - %+v", r.Form)
-
-	accountID, err := strconv.Atoi(r.FormValue("ID"))
-	if err != nil {
-		log.Printf("ChangeAccountIconHandler: Invalid account ID '%s': %v", r.FormValue("ID"), err)
-		http.Error(w, "problem with id. use normal values", http.StatusBadRequest)
-		return
-	}
-
-	iconID, err := strconv.Atoi(r.FormValue("IconID"))
-	if err != nil {
-		log.Printf("ChangeAccountIconHandler: Invalid icon ID '%s': %v", r.FormValue("IconID"), err)
-		http.Error(w, "problem with icon_id. use normal values", http.StatusBadRequest)
-		return
-	}
-
-	log.Printf("ChangeAccountIconHandler: Changing icon for account ID %d to icon ID %d", accountID, iconID)
-
-	err = database.ChangeAccountIcon(db, accountID, iconID)
-	if err != nil {
-		log.Printf("ChangeAccountIconHandler: Failed to change icon for account ID %d: %v", accountID, err)
-		http.Error(w, fmt.Sprintf("failed to change account's icon: %v", err), http.StatusInternalServerError)
-		return
-	}
-
-	log.Printf("ChangeAccountIconHandler: Icon changed successfully for account ID %d to icon ID %d", accountID, iconID)
-	http.Redirect(w, r, "/", http.StatusSeeOther)
-}
-
 func UpdateAccountHandler(w http.ResponseWriter, r *http.Request, db *gorm.DB) {
 	if r.Method != http.MethodPost {
 		log.Printf("UpdateAccountHandler: Invalid method %s, redirecting to /", r.Method)
@@ -236,7 +191,23 @@ func UpdateAccountHandler(w http.ResponseWriter, r *http.Request, db *gorm.DB) {
 	}
 
 	icon := r.FormValue("Icon")
-	log.Printf(icon)
+	if icon != "" {
+		iconCode, exists := database.IconNamesToIDs[icon]
+		if !exists {
+			log.Printf("UpdateAccountHandler: Unknown icon name '%s'", icon)
+			http.Error(w, "unknown icon name", http.StatusBadRequest)
+			return
+		}
+
+		log.Printf("UpdateAccountHandler: Changing icon for account ID %d to icon ID %d", accountID, int(iconCode))
+
+		err = database.ChangeAccountIcon(db, accountID, int(iconCode))
+		if err != nil {
+			log.Printf("UpdateAccountHandler: Failed to change icon for account ID %d: %v", accountID, err)
+			http.Error(w, fmt.Sprintf("failed to change account's icon: %v", err), http.StatusInternalServerError)
+			return
+		}
+	}
 
 	log.Printf("UpdateAccountHandler: Successfully processed all changes for account %d", accountID)
 	http.Redirect(w, r, "/", http.StatusSeeOther)

@@ -14,6 +14,16 @@ var iconsFS embed.FS
 
 var IconCache = make(map[string]template.HTML)
 
+var fileToName = map[string]string{
+	"wallet": "Общий счет",
+	"card":   "Карта",
+	"coin":   "Наличные",
+	"mark":   "Сберегательный счет",
+	"house":  "Ипотека",
+	"bag":    "Заем",
+	"bonus":  "Бонусы",
+}
+
 func InitIcons() {
 	icons, err := fs.ReadDir(iconsFS, ".")
 	if err != nil {
@@ -39,7 +49,8 @@ func InitIcons() {
 
 		// delete .svg in end
 		iconKey := strings.TrimSuffix(iconFile.Name(), filepath.Ext(iconFile.Name()))
-		IconCache[iconKey] = template.HTML(contentStr)
+		curName := fileToName[iconKey]
+		IconCache[curName] = template.HTML(contentStr)
 	}
 
 	log.Printf("downloaded %d account's icons to cash", len(IconCache))

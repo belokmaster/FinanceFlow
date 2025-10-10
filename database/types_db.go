@@ -90,11 +90,22 @@ const (
 )
 
 var IconFiles = map[TypeIcons]string{
-	Coin:   "coin",
-	Mark:   "mark",
-	Card:   "card",
-	Wallet: "wallet",
-	House:  "house",
-	Bag:    "bag",
-	Bonus:  "bonus",
+	Coin:   "Наличные",
+	Mark:   "Сберегательный счет",
+	Card:   "Карта",
+	Wallet: "Общий счет",
+	House:  "Ипотека",
+	Bag:    "Заем",
+	Bonus:  "Бонусы",
+}
+
+// kostil...
+var IconNamesToIDs = map[string]TypeIcons{
+	"Наличные":            Coin,
+	"Сберегательный счет": Mark,
+	"Карта":               Card,
+	"Общий счет":          Wallet,
+	"Ипотека":             House,
+	"Заем":                Bag,
+	"Бонусы":              Bonus,
 }

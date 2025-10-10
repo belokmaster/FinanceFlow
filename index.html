@@ -545,7 +545,6 @@
         <input type="button" value="Delete category" onclick="showForm('deleteCategoryForm')"><br>
         <input type="button" value="Create new sub_category" onclick="showForm('createSubCategoryForm')"><br>
         <input type="button" value="Delete sub_category" onclick="showForm('deleteSubCategoryForm')"><br>
-        <input type="button" value="Change account's icon" onclick="showForm('changeIconAccount')"><br>
     </form>
 
     <div id="deleteAccountForm" style="display: none;">
@@ -651,19 +650,6 @@
             <input type="ID" id="ID" name="ID" required><br>
 
             <button type="submit">delete sub_category</button>
-        </form>
-    </div>
-
-    <div id="changeIconAccount" style="display: none;">
-        <h2>change icon account</h2>
-        <form action="/change_account_icon" method="post">
-            <label for="ID">ID:</label>
-            <input type="ID" id="ID" name="ID" required><br>
-
-            <label for="IconID">IconID:</label>
-            <input type="IconID" id="IconID" name="IconID" required><br>
-
-            <button type="submit">change account's icon</button>
         </form>
     </div>
 
