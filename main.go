@@ -3,6 +3,7 @@ package main
 import (
 	"finance_flow/database"
 	"finance_flow/handlers"
+	"finance_flow/icons"
 	"log"
 	"net/http"
 	"os"
@@ -24,6 +25,8 @@ func main() {
 	if err != nil {
 		log.Fatalf("problem connecting to db: %v", err)
 	}
+
+	icons.InitIcons()
 
 	// initialize a new db if it doesnt exist
 	if !dbExists {
@@ -82,6 +85,10 @@ func main() {
 
 	http.HandleFunc("/change_account_color", func(w http.ResponseWriter, r *http.Request) {
 		handlers.ChangeAccountColorHandler(w, r, db)
+	})
+
+	http.HandleFunc("/change_account_icon", func(w http.ResponseWriter, r *http.Request) {
+		handlers.ChangeAccountIconHandler(w, r, db)
 	})
 
 	log.Println("Server started at http://localhost:8080")

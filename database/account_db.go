@@ -53,3 +53,26 @@ func ChangeAccountColor(db *gorm.DB, id int, newColor string) error {
 
 	return nil
 }
+
+func ChangeAccountIcon(db *gorm.DB, id int, icon_id int) error {
+	if _, ok := IconFiles[TypeIcons(icon_id)]; !ok {
+		return fmt.Errorf("icon with ID %d is not exist", icon_id)
+	}
+
+	var acc Account
+	err := db.First(&acc, id).Error
+	if err != nil {
+		return fmt.Errorf("account with ID %d not found", id)
+	}
+
+	result := db.Model(&Account{}).Where("id = ?", id).Update("icon_code", TypeIcons(icon_id))
+	if result.Error != nil {
+		return fmt.Errorf("problem with changing icon in db: %v", result.Error)
+	}
+
+	if result.RowsAffected == 0 {
+		return fmt.Errorf("no rows were updated - account may not exist")
+	}
+
+	return nil
+}

@@ -6,17 +6,10 @@ import (
 	"text/template"
 
 	"finance_flow/database"
+	"finance_flow/icons"
 
 	"gorm.io/gorm"
 )
-
-type AccountView struct {
-	Name           string
-	Balance        float64
-	CurrencySymbol string
-	Color          string
-	IconSymbol     string
-}
 
 func HomeHandler(w http.ResponseWriter, r *http.Request, db *gorm.DB, path string) {
 	if r.Method != http.MethodGet {
@@ -42,9 +35,14 @@ func HomeHandler(w http.ResponseWriter, r *http.Request, db *gorm.DB, path strin
 			color = "#b1afafff"
 		}
 
-		icon, ok := database.IconSymbols[acc.IconCode]
+		iconFileName, ok := database.IconFiles[acc.IconCode]
 		if !ok {
-			icon = "💵"
+			iconFileName = "default"
+		}
+
+		iconHTML, ok := icons.IconCache[iconFileName]
+		if !ok {
+			iconHTML = icons.IconCache["coin"]
 		}
 
 		accountsForView = append(accountsForView, AccountView{
@@ -52,7 +50,7 @@ func HomeHandler(w http.ResponseWriter, r *http.Request, db *gorm.DB, path strin
 			Balance:        acc.Balance,
 			CurrencySymbol: symbol,
 			Color:          color,
-			IconSymbol:     icon,
+			Icon:           iconHTML,
 		})
 	}
 

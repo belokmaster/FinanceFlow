@@ -64,51 +64,37 @@ const (
 	Dollar
 	Euro
 	Yuan
+	GBPound
+	Rupee
 )
 
 var CurrencySymbols = map[TypeCurrency]string{
-	Ruble:  "₽",
-	Dollar: "$",
-	Euro:   "€",
-	Yuan:   "¥",
+	Ruble:   "₽",
+	Dollar:  "$",
+	Euro:    "€",
+	Yuan:    "¥",
+	GBPound: "£",
+	Rupee:   "₹",
 }
 
 type TypeIcons int
 
 const (
-	Nothing TypeIcons = iota
-	Wallet
-	Card
-	Cash
-	Education
-	Shopping
+	Coin TypeIcons = iota
 	Mark
-	Invest
-	Money
-	Case
-	Coin
-	Gift
-	Heart
-	Diamond
-	Plane
-	Hova
+	Card
+	Wallet
+	House
+	Bag
+	Bonus
 )
 
-var IconSymbols = map[TypeIcons]string{
-	Nothing:   "",
-	Wallet:    "💰",
-	Card:      "💳",
-	Cash:      "💵",
-	Education: "🎓",
-	Shopping:  "🛍️",
-	Mark:      "🐷",
-	Invest:    "📈",
-	Money:     "💸",
-	Case:      "💼",
-	Coin:      "🪙",
-	Gift:      "🎁",
-	Heart:     "❤️",
-	Diamond:   "💎",
-	Plane:     "✈️",
-	Hova:      "🤿",
+var IconFiles = map[TypeIcons]string{
+	Coin:   "coin",
+	Mark:   "mark",
+	Card:   "card",
+	Wallet: "wallet",
+	House:  "house",
+	Bag:    "bag",
+	Bonus:  "bonus",
 }

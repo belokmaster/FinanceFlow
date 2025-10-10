@@ -29,7 +29,7 @@
         }
 
         .header .logo .icon-container {
-            background-color: #ACE1AF;
+            background-color: #4cd67a;
             padding: 10px;
             border-radius: 8px;
             display: flex;
@@ -56,7 +56,7 @@
         }
 
         nav a.active {
-            background-color: #ACE1AF;
+            background-color: #4cd67a;
             color: #ffffff;
             border-radius: 5px;
         }
@@ -74,13 +74,14 @@
             border: 1px solid #e0e0e0;
             border-radius: 8px;
             padding: 12px 15px;
-            height: 50px;
+            height: 30px;
             width: 320px;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
             font-weight: bold;
             display: flex;
             align-items: center;
             gap: 10px;
+            color: #ffffff;
         }
 
         .account-info {
@@ -88,21 +89,29 @@
         }
 
         .account-icon {
-            font-size: 32px;
+            margin: 8px 0 0 -10px;
+            font-size: 24px;
             width: 40px;
+            height: 40px;
             text-align: center;
         }
 
+        .account-icon {
+            color: white;
+        }
+
         .account-info h3 {
-            margin: 0 0 5px 0;
+            margin: 4px 0 0 -4px;
             font-size: 16px;
+            color: #ffffff;
+            align-items: center;
         }
 
         .account-info .balance {
-            margin: 0;
+            margin: 0 0 5px -4px;
             font-size: 16px;
             font-weight: bold;
-            color: #ACE1AF;
+            color: #ffffff;
         }
 
         /* block add new account */
@@ -120,7 +129,7 @@
         /* the backlight of add account button */
         .new_account-card:hover {
             background-color: #f9f9f9;
-            border-color: #ACE1AF;
+            border-color: #4cd67a;
             color: #333;
         }
 
@@ -188,7 +197,7 @@
     <div class="accounts-container">
         {{range .}}
         <div class="account-card" style="background-color: {{.Color}};">
-            <div class="account-icon">{{.IconSymbol}}</div>
+            <div class="account-icon">{{.Icon}}</div>
             <div class="account-info">
                 <h3>{{.Name}}</h3>
                 <p class="balance">{{.Balance}} {{.CurrencySymbol}}</p>
@@ -246,6 +255,7 @@
         <input type="button" value="Create new sub_category" onclick="showForm('createSubCategoryForm')"><br>
         <input type="button" value="Delete sub_category" onclick="showForm('deleteSubCategoryForm')"><br>
         <input type="button" value="Change account's color" onclick="showForm('changeColorAccount')"><br>
+        <input type="button" value="Change account's icon" onclick="showForm('changeIconAccount')"><br>
     </form>
 
     <div id="deleteAccountForm" style="display: none;">
@@ -367,6 +377,19 @@
         </form>
     </div>
 
+    <div id="changeIconAccount" style="display: none;">
+        <h2>change icon account</h2>
+        <form action="/change_account_icon" method="post">
+            <label for="ID">ID:</label>
+            <input type="ID" id="ID" name="ID" required><br>
+
+            <label for="IconID">IconID:</label>
+            <input type="IconID" id="IconID" name="IconID" required><br>
+
+            <button type="submit">change account's icon</button>
+        </form>
+    </div>
+
     <script>
         // show basic form for first test of working code
         function showForm(formId) {
@@ -377,7 +400,7 @@
             document.getElementById('createSubCategoryForm').style.display = 'none';
             document.getElementById('deleteSubCategoryForm').style.display = 'none';
             document.getElementById('changeColorAccount').style.display = 'none';
-
+            document.getElementById('changeIconAccount').style.display = 'none';
 
             const form = document.getElementById(formId);
             if (form) {

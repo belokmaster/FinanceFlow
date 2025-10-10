@@ -147,3 +147,37 @@ func ChangeAccountColorHandler(w http.ResponseWriter, r *http.Request, db *gorm.
 	log.Println("Color in account was changed successfully")
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
+
+func ChangeAccountIconHandler(w http.ResponseWriter, r *http.Request, db *gorm.DB) {
+	if r.Method != http.MethodPost {
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+		return
+	}
+
+	err := r.ParseForm()
+	if err != nil {
+		http.Error(w, "invalid form", http.StatusBadRequest)
+		return
+	}
+
+	accountID, err := strconv.Atoi(r.FormValue("ID"))
+	if err != nil {
+		http.Error(w, "problem with id. use normal values", http.StatusBadRequest)
+		return
+	}
+
+	iconID, err := strconv.Atoi(r.FormValue("IconID"))
+	if err != nil {
+		http.Error(w, "problem with icon_id. use normal values", http.StatusBadRequest)
+		return
+	}
+
+	err = database.ChangeAccountIcon(db, accountID, iconID)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("failed to change account's icon: %v", err), http.StatusInternalServerError)
+		return
+	}
+
+	log.Printf("Icon for account %d was changed successfully to %d", accountID, iconID)
+	http.Redirect(w, r, "/", http.StatusSeeOther)
+}
