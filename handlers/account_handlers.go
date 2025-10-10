@@ -235,6 +235,9 @@ func UpdateAccountHandler(w http.ResponseWriter, r *http.Request, db *gorm.DB) {
 		}
 	}
 
+	icon := r.FormValue("Icon")
+	log.Printf(icon)
+
 	log.Printf("UpdateAccountHandler: Successfully processed all changes for account %d", accountID)
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }

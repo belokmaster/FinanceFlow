@@ -10,5 +10,11 @@ type AccountView struct {
 	Balance        float64
 	CurrencySymbol string
 	Color          string
-	Icon           template.HTML
+	IconKey        string
+	IconHTML       template.HTML
+}
+
+type HomePageData struct {
+	Accounts []AccountView
+	Icons    map[string]template.HTML
 }

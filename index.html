@@ -311,6 +311,105 @@
         form button[type="submit"]:hover {
             background-color: #45b96c;
         }
+
+        .icon-group {
+            flex: 1;
+        }
+
+        .custom-icon-select {
+            position: relative;
+        }
+
+        .select-selected-icon {
+            display: flex;
+            align-items: center;
+            height: 48px;
+            padding: 0 12px;
+            border: 1px solid #dcdcdc;
+            border-radius: 8px;
+            background-color: #fff;
+            cursor: pointer;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .select-selected-icon:hover {
+            border-color: #aaa;
+        }
+
+        .custom-icon-select.active .select-selected-icon {
+            outline: none;
+            border-color: #4cd67a;
+            box-shadow: 0 0 0 3px rgba(76, 214, 122, 0.25);
+        }
+
+        .selected-icon-svg svg,
+        .option-icon-svg svg {
+            width: 24px;
+            height: 24px;
+            margin-right: 12px;
+            vertical-align: middle;
+        }
+
+        .selected-icon-key {
+            font-size: 16px;
+            color: #333;
+        }
+
+        .select-icon-options {
+            display: none;
+            position: absolute;
+            top: 105%;
+            left: 0;
+            right: 0;
+            background-color: #fff;
+            border: 1px solid #dcdcdc;
+            border-radius: 8px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+            z-index: 1001;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .select-icon-options.show {
+            display: block;
+        }
+
+        .select-icon-option {
+            display: flex;
+            align-items: center;
+            padding: 10px 12px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .select-icon-option:hover {
+            background-color: #f5f5f5;
+        }
+
+        .custom-icon-select .selected-icon-svg svg path {
+            fill: #333;
+        }
+
+        .custom-icon-select .select-icon-option:hover .option-icon-svg svg path {
+            fill: #888;
+            transition: fill 0.2s ease-in-out;
+        }
+
+        .select-icon-option:hover .option-icon-svg svg path {
+            fill: #000;
+        }
+
+        .select-icon-option:hover .option-icon-key {
+            color: #000;
+        }
+
+        .option-icon-key {
+            transition: color 0.2s ease-in-out;
+        }
+
+        .account-card .account-icon svg path {
+            fill: #FFF;
+        }
     </style>
 </head>
 
@@ -357,16 +456,39 @@
                     </div>
                 </div>
 
+                <div class="form-row">
+                    <div class="form-group icon-group">
+                        <label>Иконка</label>
+                        <div class="custom-icon-select">
+                            <input type="hidden" id="editAccountIcon" name="Icon">
+
+                            <div id="selectedIconDisplay" class="select-selected-icon">
+                                <span class="selected-icon-svg"></span>
+                                <span class="selected-icon-key">Выберите иконку</span>
+                            </div>
+
+                            <div id="iconOptions" class="select-icon-options">
+                                {{range $key, $svg := .Icons}}
+                                <div class="select-icon-option" data-key="{{$key}}">
+                                    <span class="option-icon-svg">{{$svg}}</span>
+                                    <span class="option-icon-key">{{$key}}</span>
+                                </div>
+                                {{end}}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <button type="submit">Сохранить</button>
             </form>
         </div>
     </div>
 
     <div class="accounts-container">
-        {{range .}}
+        {{range .Accounts}}
         <div class="account-card" style="background-color: {{.Color}};"
-            onclick="openAccountModal({{.ID}}, '{{.Name}}', '{{.Color}}')">
-            <div class="account-icon">{{.Icon}}</div>
+            onclick="openAccountModal({{.ID}}, '{{.Name}}', '{{.Color}}', '{{.IconKey}}')">
+            <div class="account-icon">{{.IconHTML}}</div>
             <div class="account-info">
                 <h3>{{.Name}}</h3>
                 <p class="balance">{{.Balance}} {{.CurrencySymbol}}</p>
@@ -566,6 +688,11 @@
         const colorPreview = document.getElementById('colorPreview');
         const colorHexValue = document.getElementById('colorHexValue');
 
+        const iconSelect = document.querySelector('.custom-icon-select');
+        const selectedIconDisplay = document.getElementById('selectedIconDisplay');
+        const iconOptionsContainer = document.getElementById('iconOptions');
+        const hiddenIconInput = document.getElementById('editAccountIcon');
+
         function updateColorDisplay(newColor) {
             if (!newColor || !newColor.startsWith('#')) {
                 newColor = '#000000';
@@ -576,6 +703,28 @@
 
         colorInput.addEventListener('input', () => {
             updateColorDisplay(colorInput.value);
+        });
+
+        iconOptionsContainer.addEventListener('click', (e) => {
+            const option = e.target.closest('.select-icon-option');
+            if (option) {
+                const iconKey = option.dataset.key;
+                const iconSvgHTML = option.querySelector('.option-icon-svg').innerHTML;
+
+                hiddenIconInput.value = iconKey;
+
+                selectedIconDisplay.querySelector('.selected-icon-svg').innerHTML = iconSvgHTML;
+                selectedIconDisplay.querySelector('.selected-icon-key').textContent = iconKey;
+
+                iconOptionsContainer.classList.remove('show');
+                iconSelect.classList.remove('active');
+            }
+        });
+
+        selectedIconDisplay.addEventListener('click', (e) => {
+            e.stopPropagation();
+            iconOptionsContainer.classList.toggle('show');
+            iconSelect.classList.toggle('active');
         });
 
         // open the modal window
@@ -593,12 +742,23 @@
             }
         }
 
-        function openAccountModal(accountId, accountName, accountColor) {
+        function openAccountModal(accountId, accountName, accountColor, accountIconKey) {
             document.getElementById('editAccountId').value = accountId;
             document.getElementById('editAccountName').value = accountName;
 
             colorInput.value = accountColor;
             updateColorDisplay(accountColor);
+
+            hiddenIconInput.value = accountIconKey;
+            const targetOption = iconOptionsContainer.querySelector(`.select-icon-option[data-key="${accountIconKey}"]`);
+            if (targetOption) {
+                const iconSvgHTML = targetOption.querySelector('.option-icon-svg').innerHTML;
+                selectedIconDisplay.querySelector('.selected-icon-svg').innerHTML = iconSvgHTML;
+                selectedIconDisplay.querySelector('.selected-icon-key').textContent = accountIconKey;
+            } else {
+                selectedIconDisplay.querySelector('.selected-icon-svg').innerHTML = '';
+                selectedIconDisplay.querySelector('.selected-icon-key').textContent = 'Выберите иконку';
+            }
 
             openModal('accountModal');
         }

@@ -61,7 +61,8 @@ func HomeHandler(w http.ResponseWriter, r *http.Request, db *gorm.DB, path strin
 			Balance:        acc.Balance,
 			CurrencySymbol: symbol,
 			Color:          color,
-			Icon:           iconHTML,
+			IconKey:        iconFileName,
+			IconHTML:       iconHTML,
 		})
 	}
 
@@ -74,7 +75,12 @@ func HomeHandler(w http.ResponseWriter, r *http.Request, db *gorm.DB, path strin
 		return
 	}
 
-	err = tmpl.Execute(w, accountsForView)
+	pageData := HomePageData{
+		Accounts: accountsForView,
+		Icons:    icons.IconCache,
+	}
+
+	err = tmpl.Execute(w, pageData)
 	if err != nil {
 		log.Printf("HomeHandler: Error executing template: %v", err)
 		log.Printf("error while proccess working: %v", err)
