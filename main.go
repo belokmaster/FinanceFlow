@@ -80,6 +80,10 @@ func main() {
 		handlers.DeleteSubCategoryHandler(w, r, db)
 	})
 
+	http.HandleFunc("/change_account_color", func(w http.ResponseWriter, r *http.Request) {
+		handlers.ChangeAccountColorHandler(w, r, db)
+	})
+
 	log.Println("Server started at http://localhost:8080")
 	if err := http.ListenAndServe(":8080", nil); err != nil {
 		log.Fatalf("server error: %v", err)

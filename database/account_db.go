@@ -2,6 +2,7 @@ package database
 
 import (
 	"fmt"
+	"strings"
 
 	"gorm.io/gorm"
 )
@@ -27,6 +28,27 @@ func DeleteAccount(db *gorm.DB, id int) error {
 
 	if result.RowsAffected == 0 {
 		return fmt.Errorf("account with id %d not found", id)
+	}
+
+	return nil
+}
+
+func ChangeAccountColor(db *gorm.DB, id int, newColor string) error {
+	if newColor == "" {
+		return fmt.Errorf("empty color")
+	}
+
+	newColor = strings.TrimPrefix(newColor, "#")
+
+	var acc Account
+	err := db.First(&acc, id).Error
+	if err != nil {
+		return fmt.Errorf("account with ID %d not found", id)
+	}
+
+	err = db.Model(&Account{}).Where("id = ?", id).Update("Color", newColor).Error
+	if err != nil {
+		return fmt.Errorf("problem with change color in db: %v", err)
 	}
 
 	return nil

@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"log"
 	"net/http"
 	"text/template"
 
@@ -13,6 +14,8 @@ type AccountView struct {
 	Name           string
 	Balance        float64
 	CurrencySymbol string
+	Color          string
+	IconSymbol     string
 }
 
 func HomeHandler(w http.ResponseWriter, r *http.Request, db *gorm.DB, path string) {
@@ -34,10 +37,22 @@ func HomeHandler(w http.ResponseWriter, r *http.Request, db *gorm.DB, path strin
 			symbol = "?"
 		}
 
+		color := "#" + acc.Color
+		if color == "" {
+			color = "#b1afafff"
+		}
+
+		icon, ok := database.IconSymbols[acc.IconCode]
+		if !ok {
+			icon = "💵"
+		}
+
 		accountsForView = append(accountsForView, AccountView{
 			Name:           acc.Name,
 			Balance:        acc.Balance,
 			CurrencySymbol: symbol,
+			Color:          color,
+			IconSymbol:     icon,
 		})
 	}
 
@@ -49,6 +64,6 @@ func HomeHandler(w http.ResponseWriter, r *http.Request, db *gorm.DB, path strin
 
 	err = tmpl.Execute(w, accountsForView)
 	if err != nil {
-		http.Error(w, "could not execute template", http.StatusInternalServerError)
+		log.Printf("error while proccess working: %v", err)
 	}
 }

@@ -7,6 +7,8 @@ type Account struct {
 	Name         string `gorm:"uniqueIndex;not null"`
 	Balance      float64
 	CurrencyCode TypeCurrency
+	Color        string
+	IconCode     TypeIcons
 }
 
 type Category struct {
@@ -69,4 +71,44 @@ var CurrencySymbols = map[TypeCurrency]string{
 	Dollar: "$",
 	Euro:   "€",
 	Yuan:   "¥",
+}
+
+type TypeIcons int
+
+const (
+	Nothing TypeIcons = iota
+	Wallet
+	Card
+	Cash
+	Education
+	Shopping
+	Mark
+	Invest
+	Money
+	Case
+	Coin
+	Gift
+	Heart
+	Diamond
+	Plane
+	Hova
+)
+
+var IconSymbols = map[TypeIcons]string{
+	Nothing:   "",
+	Wallet:    "💰",
+	Card:      "💳",
+	Cash:      "💵",
+	Education: "🎓",
+	Shopping:  "🛍️",
+	Mark:      "🐷",
+	Invest:    "📈",
+	Money:     "💸",
+	Case:      "💼",
+	Coin:      "🪙",
+	Gift:      "🎁",
+	Heart:     "❤️",
+	Diamond:   "💎",
+	Plane:     "✈️",
+	Hova:      "🤿",
 }
