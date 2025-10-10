@@ -37,7 +37,7 @@ func CreateAccountHandler(w http.ResponseWriter, r *http.Request, db *gorm.DB) {
 	name := r.FormValue("Name")
 	name = strings.TrimSpace(name) // why it works????????
 
-	currency_id, err := strconv.Atoi(r.FormValue("currency_id"))
+	currency_id, err := strconv.Atoi(r.FormValue("Currency"))
 	if err != nil {
 		http.Error(w, "problem with currency. use normal values", http.StatusBadRequest)
 		return
