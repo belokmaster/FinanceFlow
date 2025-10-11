@@ -1,7 +1,7 @@
 package handlers
 
 import (
-	"finance_flow/database"
+	"finance_flow/internal/database"
 	"fmt"
 	"log"
 	"net/http"
@@ -179,7 +179,7 @@ func UpdateAccountHandler(w http.ResponseWriter, r *http.Request, db *gorm.DB) {
 
 	icon := r.FormValue("Icon")
 	if icon != "" {
-		iconCode, exists := database.IconNamesToIDs[icon]
+		iconCode, exists := database.IconAccountNamesToIDs[icon]
 		if !exists {
 			log.Printf("UpdateAccountHandler: Unknown icon name '%s'", icon)
 			http.Error(w, "unknown icon name", http.StatusBadRequest)

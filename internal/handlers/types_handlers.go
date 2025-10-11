@@ -18,3 +18,16 @@ type HomePageData struct {
 	Accounts []AccountView
 	Icons    map[string]template.HTML
 }
+
+type CategoryView struct {
+	ID       uint
+	Name     string
+	Color    string
+	IconKey  string
+	IconHTML template.HTML
+}
+
+type CategoryPageData struct {
+	Categories []CategoryView
+	Icons      map[string]template.HTML
+}

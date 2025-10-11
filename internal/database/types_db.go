@@ -12,8 +12,10 @@ type Account struct {
 }
 
 type Category struct {
-	ID   uint   `gorm:"primaryKey;autoIncrement"`
-	Name string `gorm:"uniqueIndex;not null"`
+	ID       uint              `gorm:"primaryKey;autoIncrement"`
+	Name     string            `gorm:"uniqueIndex;not null"`
+	Color    string            `gorm:"column:color"`
+	IconCode TypeCategoryIcons `gorm:"column:icon_code"`
 }
 
 type SubCategory struct {
@@ -89,7 +91,7 @@ const (
 	Bonus
 )
 
-var IconFiles = map[TypeIcons]string{
+var IconAccountFiles = map[TypeIcons]string{
 	Coin:   "Наличные",
 	Mark:   "Сберегательный счет",
 	Card:   "Карта",
@@ -100,7 +102,7 @@ var IconFiles = map[TypeIcons]string{
 }
 
 // kostil...
-var IconNamesToIDs = map[string]TypeIcons{
+var IconAccountNamesToIDs = map[string]TypeIcons{
 	"Наличные":            Coin,
 	"Сберегательный счет": Mark,
 	"Карта":               Card,
@@ -108,4 +110,14 @@ var IconNamesToIDs = map[string]TypeIcons{
 	"Ипотека":             House,
 	"Заем":                Bag,
 	"Бонусы":              Bonus,
+}
+
+type TypeCategoryIcons int
+
+const (
+	Food TypeCategoryIcons = iota
+)
+
+var IconCategoryFiles = map[TypeCategoryIcons]string{
+	Food: "Еда",
 }

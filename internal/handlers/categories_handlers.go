@@ -1,7 +1,7 @@
 package handlers
 
 import (
-	"finance_flow/database"
+	"finance_flow/internal/database"
 	"fmt"
 	"log"
 	"net/http"

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FinanceFlow</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="static/css/style.css">
+</head>
+
+<body>
+    <header class="header">
+        <div class="logo">
+            <div class="icon-container">
+                <i class="fa-solid fa-wallet"></i>
+            </div>
+        </div>
+        <nav>
+            <a href="/">Счета</a>
+            <a href="/categories" class="active">Категории</a>
+            <a href="#">Записи</a>
+            <a href="#">Аналитика</a>
+            <a href="#">Нейронка</a>
+        </nav>
+    </header>
+
+    <div class="categories-container">
+        {{range .Categories}}
+        <div class="category-card" style="background-color: {{.Color}};"
+            onclick="openCategoryModal({{.ID}}, '{{.Name}}', '{{.Color}}', '{{.IconKey}}')">
+            <div class="category-icon">{{.IconHTML}}</div>
+            <div class="category-info">
+                <h3>{{.Name}}</h3>
+                <p class="subcategories-coun">
+                    {{.SubCategoriesCount}} подкатегорий
+                </p>
+            </div>
+        </div>
+        {{else}}
+        <p>Категорий пока нет. Создайте новую категорию!</p>
+        {{end}}
+        <div class="new_category-card" onclick="openCreateCategoryModal()">
+            <i class="fa-solid fa-plus"></i>
+            <span>Добавить категорию</span>
+        </div>
+    </div>
+
+    <script src="/static/js/app.js"></script>
+</body>
+
+</html>

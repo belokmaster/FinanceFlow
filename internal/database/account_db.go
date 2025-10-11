@@ -74,7 +74,7 @@ func ChangeAccountColor(db *gorm.DB, id int, newColor string) error {
 func ChangeAccountIcon(db *gorm.DB, id int, icon_id int) error {
 	log.Printf("Changing icon for account ID %d to icon ID: %d", id, icon_id)
 
-	if _, ok := IconFiles[TypeIcons(icon_id)]; !ok {
+	if _, ok := IconAccountFiles[TypeIcons(icon_id)]; !ok {
 		log.Printf("Error: icon ID %d does not exist", icon_id)
 		return fmt.Errorf("icon with ID %d does not exist", icon_id)
 	}

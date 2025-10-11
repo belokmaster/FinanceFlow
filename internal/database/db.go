@@ -31,6 +31,21 @@ func GetAccounts(db *gorm.DB) ([]Account, error) {
 		return nil, fmt.Errorf("problem with get accounts in db: %v", result.Error)
 	}
 
-	log.Printf("Successfully got %d accounts", len(accounts))
+	log.Printf("Successfully got %d accounts from db", len(accounts))
 	return accounts, nil
+}
+
+func GetCategories(db *gorm.DB) ([]Category, error) {
+	log.Println("Getting all categories from database")
+
+	var caregories []Category
+	result := db.Find(&caregories)
+
+	if result.Error != nil {
+		log.Printf("Error getting accounts: %v", result.Error)
+		return nil, fmt.Errorf("problem with get categories in db: %v", result.Error)
+	}
+
+	log.Printf("Successfully got %d categories from db", len(caregories))
+	return caregories, nil
 }

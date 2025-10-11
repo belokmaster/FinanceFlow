@@ -5,8 +5,8 @@ import (
 	"net/http"
 	"text/template"
 
-	"finance_flow/database"
-	"finance_flow/icons"
+	"finance_flow/internal/database"
+	"finance_flow/internal/icons"
 
 	"gorm.io/gorm"
 )
@@ -43,16 +43,16 @@ func HomeHandler(w http.ResponseWriter, r *http.Request, db *gorm.DB, path strin
 			color = "#4cd67a"
 		}
 
-		iconFileName, ok := database.IconFiles[acc.IconCode]
+		iconFileName, ok := database.IconAccountFiles[acc.IconCode]
 		if !ok {
 			log.Printf("HomeHandler: Unknown icon code %d for account %s, using default icon", acc.IconCode, acc.Name)
-			iconFileName = "default"
+			iconFileName = "Wallet"
 		}
 
-		iconHTML, ok := icons.IconCache[iconFileName]
+		iconHTML, ok := icons.AccountIconCache[iconFileName]
 		if !ok {
 			log.Printf("HomeHandler: Icon file %s not found in cache for account %s, using coin icon", iconFileName, acc.Name)
-			iconHTML = icons.IconCache["coin"]
+			iconHTML = icons.AccountIconCache["coin"]
 		}
 
 		accountsForView = append(accountsForView, AccountView{
@@ -77,7 +77,7 @@ func HomeHandler(w http.ResponseWriter, r *http.Request, db *gorm.DB, path strin
 
 	pageData := HomePageData{
 		Accounts: accountsForView,
-		Icons:    icons.IconCache,
+		Icons:    icons.AccountIconCache,
 	}
 
 	err = tmpl.Execute(w, pageData)

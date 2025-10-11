@@ -1,9 +1,9 @@
 package main
 
 import (
-	"finance_flow/database"
-	"finance_flow/handlers"
-	"finance_flow/icons"
+	"finance_flow/internal/database"
+	"finance_flow/internal/handlers"
+	"finance_flow/internal/icons"
 	"log"
 	"net/http"
 	"os"
@@ -14,7 +14,7 @@ import (
 )
 
 func main() {
-	dbPath := "database/database.db" // mb change this point later
+	dbPath := "internal/database/database.db" // mb change this point later
 
 	// check if db exists
 	_, err := os.Stat(dbPath)
@@ -46,9 +46,17 @@ func main() {
 
 	log.Println("The database opens successfully")
 
+	fs := http.FileServer(http.Dir("web/static"))
+	http.Handle("/static/", http.StripPrefix("/static/", fs))
+
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		path := "index.html"
+		path := "web/templates/index.html"
 		handlers.HomeHandler(w, r, db, path)
+	})
+
+	http.HandleFunc("/categories", func(w http.ResponseWriter, r *http.Request) {
+		path := "web/templates/categories.html"
+		handlers.CategoryPageHandler(w, r, db, path)
 	})
 
 	http.HandleFunc("/create_account", func(w http.ResponseWriter, r *http.Request) {

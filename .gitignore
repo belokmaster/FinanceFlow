@@ -1,0 +1,31 @@
+# exe
+/financeflow
+*.exe
+*.bin
+*.app
+*.dmg
+*.deb
+*.rpm
+
+# bin
+*.dll
+*.so
+*.dylib
+
+# db
+*.db
+
+# logs
+*.log
+*.tmp
+*.temp
+
+# ide
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# go files
+/bin/
+/pkg/
