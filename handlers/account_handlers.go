@@ -29,22 +29,8 @@ func CreateAccountHandler(w http.ResponseWriter, r *http.Request, db *gorm.DB) {
 
 	log.Printf("CreateAccountHandler: Form data received - %+v", r.Form)
 
-	accountID, err := strconv.Atoi(r.FormValue("ID"))
-	if err != nil {
-		log.Printf("CreateAccountHandler: Invalid account ID '%s': %v", r.FormValue("ID"), err)
-		http.Error(w, "problem with id. use normal values", http.StatusBadRequest)
-		return
-	}
-
-	if accountID < 0 {
-		log.Printf("CreateAccountHandler: Negative account ID %d", accountID)
-		http.Error(w, "problem with id. use positive values", http.StatusBadRequest)
-		return
-	}
-
 	name := r.FormValue("Name")
-	name = strings.TrimSpace(name) // why it works????????
-	log.Printf("CreateAccountHandler: Account name '%s' (trimmed)", name)
+	name = strings.TrimSpace(name) // why it works??
 
 	balance, err := strconv.ParseFloat(r.FormValue("Balance"), 64)
 	if err != nil {
@@ -68,6 +54,7 @@ func CreateAccountHandler(w http.ResponseWriter, r *http.Request, db *gorm.DB) {
 
 	color := r.FormValue("Color")
 	log.Printf("CreateAccountHandler: Color '%s'", color)
+	color = strings.TrimPrefix(color, "#")
 
 	icon_id, err := strconv.Atoi(r.FormValue("Icon"))
 	if err != nil {
@@ -76,7 +63,7 @@ func CreateAccountHandler(w http.ResponseWriter, r *http.Request, db *gorm.DB) {
 		return
 	}
 
-	if currency_id < 0 {
+	if icon_id < 0 {
 		log.Printf("CreateAccountHandler: Negative icon ID %d", icon_id)
 		http.Error(w, "problem with icon. use positive values", http.StatusBadRequest)
 		return
@@ -90,7 +77,7 @@ func CreateAccountHandler(w http.ResponseWriter, r *http.Request, db *gorm.DB) {
 		IconCode:     database.TypeIcons(icon_id),
 	}
 
-	log.Printf("CreateAccountHandler: Creating account with ID=%d, Name=%s, Balance=%.2f, Currency=%d, Icon=%d", accountID, name, balance, currency_id, icon_id)
+	log.Printf("CreateAccountHandler: Creating account with Name=%s, Balance=%.2f, Currency=%d, Icon=%d", name, balance, currency_id, icon_id)
 
 	err = database.CreateNewAccount(db, acc)
 	if err != nil {
@@ -99,7 +86,7 @@ func CreateAccountHandler(w http.ResponseWriter, r *http.Request, db *gorm.DB) {
 		return
 	}
 
-	log.Printf("CreateAccountHandler: Account created successfully - ID=%d, Name=%s", accountID, name)
+	log.Printf("CreateAccountHandler: Account created successfully - Name=%s", name)
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
 

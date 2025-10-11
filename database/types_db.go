@@ -3,12 +3,12 @@ package database
 import "time"
 
 type Account struct {
-	ID           uint    `gorm:"primaryKey;autoIncrement"`
-	Name         string  `gorm:"uniqueIndex;not null"`
-	Balance      float64 `gorm:"type:decimal(15,2)"`
-	CurrencyCode TypeCurrency
-	Color        string
-	IconCode     TypeIcons
+	ID           uint         `gorm:"primaryKey;autoIncrement"`
+	Name         string       `gorm:"uniqueIndex;not null"`
+	Balance      float64      `gorm:"type:decimal(15,2)"`
+	CurrencyCode TypeCurrency `gorm:"column:currency_code"`
+	Color        string       `gorm:"column:color"`
+	IconCode     TypeIcons    `gorm:"column:icon_code"`
 }
 
 type Category struct {

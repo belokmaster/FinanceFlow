@@ -322,7 +322,7 @@
 
         .delete-button {
             width: 100%;
-            height: 48px;
+            height: 46px;
             padding: 0;
             background-color: #ac4c4c;
             color: white;
@@ -341,7 +341,7 @@
 
         form button[type="submit"] {
             width: 100%;
-            height: 48px;
+            height: 46px;
             padding: 0;
             background-color: #4cd67a;
             color: white;
@@ -472,12 +472,14 @@
         </div>
         <nav>
             <a href="#" class="active">Счета</a>
+            <a href="#">Категории</a>
             <a href="#">Записи</a>
             <a href="#">Аналитика</a>
             <a href="#">Нейронка</a>
         </nav>
     </header>
 
+    <!-- redact account block -->
     <div id="accountModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
@@ -509,7 +511,7 @@
 
                 <div class="form-row">
                     <div class="form-group icon-group">
-                        <label>Иконка</label>
+                        <label>Иконка <span class="required">*</span></label>
                         <div class="custom-icon-select">
                             <input type="hidden" id="editAccountIcon" name="Icon">
 
@@ -589,7 +591,7 @@
         <p>Счетов пока нет. Создайте новый счет! Это не сложно.</p>
         {{end}}
 
-        <div class="new_account-card" onclick="openModal('createAccountModal')">
+        <div class="new_account-card" onclick="openCreateModal()">
             <i class="fa-solid fa-plus"></i>
             <span>Добавить счет</span>
         </div>
@@ -605,23 +607,88 @@
             </div>
 
             <form action="/create_account" method="post">
-                <label for="ID">ID:</label>
-                <input type="text" id="ID" name="ID" required><br>
+                <div class="form-row">
+                    <div class="form-group name-group">
+                        <label for="createAccountName">Название <span class="required">*</span></label>
+                        <input type="text" id="createAccountName" name="Name" class="form-control" required>
+                    </div>
 
-                <label for="Name">Name:</label>
-                <input type="text" id="Name" name="Name" required><br>
+                    <div class="form-group color-group">
+                        <label>Цвет</label>
+                        <div class="custom-color-picker">
+                            <div class="color-display">
+                                <span id="createColorPreview" class="color-dot"></span>
+                                <span id="createColorHexValue" class="color-hex">#000000</span>
+                            </div>
+                            <input type="color" id="createAccountColor" name="Color" value="#4cd67a">
+                        </div>
+                    </div>
+                </div>
 
-                <label for="Balance">Balance:</label>
-                <input type="text" id="Balance" name="Balance" required><br>
+                <div class="form-row">
+                    <div class="form-group icon-group">
+                        <label>Иконка <span class="required">*</span></label>
+                        <div class="custom-icon-select">
+                            <input type="hidden" id="createAccountIcon" name="Icon">
 
-                <label for="Currency">Currency:</label>
-                <input type="text" id="Currency" name="Currency" required><br>
+                            <div id="createSelectedIconDisplay" class="select-selected-icon">
+                                <span class="selected-icon-svg"></span>
+                                <span class="selected-icon-key">Выберите иконку</span>
+                            </div>
 
-                <label for="Color">Color:</label>
-                <input type="text" id="Color" name="Color" required><br>
+                            <div id="createIconOptions" class="select-icon-options">
+                                <div class="select-icon-option" data-key="0">
+                                    <span class="option-icon-svg">{{index .Icons "Наличные"}}</span>
+                                    <span class="option-icon-key">Наличные</span>
+                                </div>
+                                <div class="select-icon-option" data-key="1">
+                                    <span class="option-icon-svg">{{index .Icons "Сберегательный счет"}}</span>
+                                    <span class="option-icon-key">Сберегательный счет</span>
+                                </div>
+                                <div class="select-icon-option" data-key="2">
+                                    <span class="option-icon-svg">{{index .Icons "Карта"}}</span>
+                                    <span class="option-icon-key">Карта</span>
+                                </div>
+                                <div class="select-icon-option" data-key="3">
+                                    <span class="option-icon-svg">{{index .Icons "Общий счет"}}</span>
+                                    <span class="option-icon-key">Общий счет</span>
+                                </div>
+                                <div class="select-icon-option" data-key="4">
+                                    <span class="option-icon-svg">{{index .Icons "Ипотека"}}</span>
+                                    <span class="option-icon-key">Ипотека</span>
+                                </div>
+                                <div class="select-icon-option" data-key="5">
+                                    <span class="option-icon-svg">{{index .Icons "Заем"}}</span>
+                                    <span class="option-icon-key">Заем</span>
+                                </div>
+                                <div class="select-icon-option" data-key="6">
+                                    <span class="option-icon-svg">{{index .Icons "Бонусы"}}</span>
+                                    <span class="option-icon-key">Бонусы</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-                <label for="Icon">Icon:</label>
-                <input type="text" id="Icon" name="Icon" required><br>
+                <div class="form-row">
+                    <div class="form-group balance-group">
+                        <label for="createAccountBalance">Баланс</label>
+                        <input type="text" id="createAccountBalance" name="Balance" class="form-control"
+                            inputmode="decimal" required>
+                    </div>
+
+                    <div class="form-group currency-group">
+                        <label for="createAccountCurrency">Валюта</label>
+                        <select id="createAccountCurrency" name="Currency" class="form-control" required>
+                            <option value="0">₽ RUB</option>
+                            <option value="1">$ USD</option>
+                            <option value="2">€ EUR</option>
+                            <option value="3">¥ CNY</option>
+                            <option value="4">£ GBP</option>
+                            <option value="5">₹ INR</option>
+                        </select>
+                    </div>
+                </div>
 
                 <button type="submit">Создать</button>
             </form>
@@ -745,77 +812,26 @@
     </div>
 
     <script>
-        // show basic form for first test of working code
-        function showForm(formId) {
-            document.getElementById('transferForm').style.display = 'none';
-            document.getElementById('transactionForm').style.display = 'none';
-            document.getElementById('createCategoryForm').style.display = 'none';
-            document.getElementById('deleteCategoryForm').style.display = 'none';
-            document.getElementById('createSubCategoryForm').style.display = 'none';
-            document.getElementById('deleteSubCategoryForm').style.display = 'none';
-            document.getElementById('changeIconAccount').style.display = 'none';
+        const editModal = document.getElementById('accountModal');
+        const editColorInput = document.getElementById('editAccountColor');
+        const editColorPreview = document.getElementById('colorPreview');
+        const editColorHexValue = document.getElementById('colorHexValue');
+        const editIconSelect = editModal.querySelector('.custom-icon-select');
+        const editSelectedIconDisplay = document.getElementById('selectedIconDisplay');
+        const editIconOptionsContainer = document.getElementById('iconOptions');
+        const editHiddenIconInput = document.getElementById('editAccountIcon');
+        const editAccountBalanceInput = document.getElementById('editAccountBalance');
 
-            const form = document.getElementById(formId);
-            if (form) {
-                form.style.display = 'block';
-            }
-        }
+        const createModal = document.getElementById('createAccountModal');
+        const createColorInput = document.getElementById('createAccountColor');
+        const createColorPreview = document.getElementById('createColorPreview');
+        const createColorHexValue = document.getElementById('createColorHexValue');
+        const createIconSelect = createModal.querySelector('.custom-icon-select');
+        const createSelectedIconDisplay = document.getElementById('createSelectedIconDisplay');
+        const createIconOptionsContainer = document.getElementById('createIconOptions');
+        const createHiddenIconInput = document.getElementById('createAccountIcon');
+        const createAccountBalanceInput = document.getElementById('createAccountBalance');
 
-        const colorInput = document.getElementById('editAccountColor');
-        const colorPreview = document.getElementById('colorPreview');
-        const colorHexValue = document.getElementById('colorHexValue');
-
-        const iconSelect = document.querySelector('.custom-icon-select');
-        const selectedIconDisplay = document.getElementById('selectedIconDisplay');
-        const iconOptionsContainer = document.getElementById('iconOptions');
-        const hiddenIconInput = document.getElementById('editAccountIcon');
-
-        function updateColorDisplay(newColor) {
-            if (!newColor || !newColor.startsWith('#')) {
-                newColor = '#000000';
-            }
-            colorPreview.style.backgroundColor = newColor;
-            colorHexValue.textContent = newColor.toUpperCase();
-        }
-
-        colorInput.addEventListener('input', () => {
-            updateColorDisplay(colorInput.value);
-        });
-
-        iconOptionsContainer.addEventListener('click', (e) => {
-            const option = e.target.closest('.select-icon-option');
-            if (option) {
-                const iconKey = option.dataset.key;
-                const iconSvgHTML = option.querySelector('.option-icon-svg').innerHTML;
-
-                hiddenIconInput.value = iconKey;
-
-                selectedIconDisplay.querySelector('.selected-icon-svg').innerHTML = iconSvgHTML;
-                selectedIconDisplay.querySelector('.selected-icon-key').textContent = iconKey;
-
-                iconOptionsContainer.classList.remove('show');
-                iconSelect.classList.remove('active');
-            }
-        });
-
-        selectedIconDisplay.addEventListener('click', (e) => {
-            e.stopPropagation();
-            iconOptionsContainer.classList.toggle('show');
-            iconSelect.classList.toggle('active');
-        });
-
-        // close icons outside the window
-        document.addEventListener('click', function (e) {
-            const iconSelect = document.querySelector('.custom-icon-select');
-            const iconOptions = document.getElementById('iconOptions');
-
-            if (!iconSelect.contains(e.target)) {
-                iconOptions.classList.remove('show');
-                iconSelect.classList.remove('active');
-            }
-        });
-
-        // open the modal window
         function openModal(modalId) {
             const modal = document.getElementById(modalId);
             if (modal) {
@@ -830,96 +846,168 @@
             }
         }
 
-        function openAccountModal(accountId, accountName, accountColor, accountIconKey, accountBalance, accountCurrency) {
-            document.getElementById('editAccountId').value = accountId;
-            document.getElementById('editAccountName').value = accountName;
-
-            let formattedBalance = parseFloat(accountBalance);
-            if (!isNaN(formattedBalance) && accountBalance !== '') {
-                formattedBalance = formattedBalance.toFixed(2);
-            } else {
-                formattedBalance = '0.00';
-            }
-            document.getElementById('editAccountBalance').value = formattedBalance;
-
-            document.getElementById('editAccountCurrency').value = accountCurrency;
-
-            colorInput.value = accountColor;
-            updateColorDisplay(accountColor);
-
-            hiddenIconInput.value = accountIconKey;
-            const targetOption = iconOptionsContainer.querySelector(`.select-icon-option[data-key="${accountIconKey}"]`);
-            if (targetOption) {
-                const iconSvgHTML = targetOption.querySelector('.option-icon-svg').innerHTML;
-                selectedIconDisplay.querySelector('.selected-icon-svg').innerHTML = iconSvgHTML;
-                selectedIconDisplay.querySelector('.selected-icon-key').textContent = accountIconKey;
-            } else {
-                selectedIconDisplay.querySelector('.selected-icon-svg').innerHTML = '';
-                selectedIconDisplay.querySelector('.selected-icon-key').textContent = 'Выберите иконку';
-            }
-
-            openModal('accountModal');
-        }
-
         function showForm(formId) {
-            const formsToHide = ['transferForm', 'transactionForm', 'createCategoryForm', 'deleteCategoryForm', 'createSubCategoryForm', 'deleteSubCategoryForm', 'changeIconAccount'];
+            const formsToHide = ['transferForm', 'transactionForm', 'createCategoryForm', 'deleteCategoryForm', 'createSubCategoryForm', 'deleteSubCategoryForm', 'deleteAccountForm'];
             formsToHide.forEach(id => {
                 const formElement = document.getElementById(id);
                 if (formElement) {
                     formElement.style.display = 'none';
                 }
             });
-
             const formToShow = document.getElementById(formId);
             if (formToShow) {
                 formToShow.style.display = 'block';
             }
         }
 
-        document.getElementById('editAccountBalance').addEventListener('input', function (e) {
-            let value = this.value;
+        function updateColorDisplay(newColor, previewEl, hexEl) {
+            if (!newColor || !newColor.startsWith('#')) {
+                newColor = '#000000';
+            }
+            previewEl.style.backgroundColor = newColor;
+            hexEl.textContent = newColor.toUpperCase();
+        }
 
+        function openCreateModal() {
+            document.getElementById('createAccountName').value = '';
+            createAccountBalanceInput.value = '0.00';
+            document.getElementById('createAccountCurrency').value = '0';
+            createColorInput.value = '#4cd67a';
+            createHiddenIconInput.value = '';
+
+            createSelectedIconDisplay.querySelector('.selected-icon-svg').innerHTML = '';
+            createSelectedIconDisplay.querySelector('.selected-icon-key').textContent = 'Выберите иконку';
+            updateColorDisplay('#4cd67a', createColorPreview, createColorHexValue);
+
+            openModal('createAccountModal');
+        }
+
+        function openAccountModal(accountId, accountName, accountColor, accountIconKey, accountBalance, accountCurrency) {
+            document.getElementById('editAccountId').value = accountId;
+            document.getElementById('editAccountName').value = accountName;
+            document.getElementById('editAccountCurrency').value = accountCurrency;
+
+            let formattedBalance = parseFloat(accountBalance);
+            editAccountBalanceInput.value = !isNaN(formattedBalance) ? formattedBalance.toFixed(2) : '0.00';
+
+            editColorInput.value = accountColor;
+            updateColorDisplay(accountColor, editColorPreview, editColorHexValue);
+            editHiddenIconInput.value = accountIconKey;
+
+            const targetOption = editIconOptionsContainer.querySelector(`.select-icon-option[data-key="${accountIconKey}"]`);
+            if (targetOption) {
+                const iconSvgHTML = targetOption.querySelector('.option-icon-svg').innerHTML;
+                editSelectedIconDisplay.querySelector('.selected-icon-svg').innerHTML = iconSvgHTML;
+                editSelectedIconDisplay.querySelector('.selected-icon-key').textContent = accountIconKey;
+            } else {
+                editSelectedIconDisplay.querySelector('.selected-icon-svg').innerHTML = '';
+                editSelectedIconDisplay.querySelector('.selected-icon-key').textContent = 'Выберите иконку';
+            }
+
+            openModal('accountModal');
+        }
+
+        function deleteAccount() {
+            const accountId = document.getElementById('editAccountId').value;
+            if (confirm('Вы уверены, что хотите удалить этот счет? Это действие необратимо.')) {
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = '/delete_account';
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = 'ID';
+                input.value = accountId;
+                form.appendChild(input);
+                document.body.appendChild(form);
+                form.submit();
+            }
+        }
+
+        function formatBalanceInput(e) {
+            let value = e.target.value;
             value = value.replace(/[^\d.]/g, '');
-
             const parts = value.split('.');
             if (parts.length > 2) {
                 value = parts[0] + '.' + parts.slice(1).join('');
             }
-
-            if (parts.length === 2) {
+            if (parts.length === 2 && parts[1].length > 2) {
                 value = parts[0] + '.' + parts[1].substring(0, 2);
             }
+            e.target.value = value;
+        }
 
-            this.value = value;
+        createColorInput.addEventListener('input', () => {
+            updateColorDisplay(createColorInput.value, createColorPreview, createColorHexValue);
         });
 
-        document.getElementById('editAccountBalance').addEventListener('paste', function (e) {
-            e.preventDefault();
-            const pastedText = (e.clipboardData || window.clipboardData).getData('text');
-
-            let value = pastedText.replace(/[^\d.]/g, '');
-            const parts = value.split('.');
-
-            if (parts.length > 2) {
-                value = parts[0] + '.' + parts.slice(1).join('');
-            }
-
-            if (parts.length === 2) {
-                value = parts[0] + '.' + parts[1].substring(0, 2);
-            }
-
-            this.value = value;
+        createSelectedIconDisplay.addEventListener('click', (e) => {
+            e.stopPropagation();
+            createIconOptionsContainer.classList.toggle('show');
+            createIconSelect.classList.toggle('active');
         });
 
-        // close when click outside the window
-        window.onclick = function (event) {
+        createIconOptionsContainer.addEventListener('click', (e) => {
+            const option = e.target.closest('.select-icon-option');
+            if (option) {
+                const iconKey = option.dataset.key;
+                const iconSvgHTML = option.querySelector('.option-icon-svg').innerHTML;
+                const iconText = option.querySelector('.option-icon-key').textContent;
+
+                createHiddenIconInput.value = iconKey;
+                createSelectedIconDisplay.querySelector('.selected-icon-svg').innerHTML = iconSvgHTML;
+                createSelectedIconDisplay.querySelector('.selected-icon-key').textContent = iconText;
+
+                createIconOptionsContainer.classList.remove('show');
+                createIconSelect.classList.remove('active');
+            }
+        });
+
+        editColorInput.addEventListener('input', () => {
+            updateColorDisplay(editColorInput.value, editColorPreview, editColorHexValue);
+        });
+
+        editSelectedIconDisplay.addEventListener('click', (e) => {
+            e.stopPropagation();
+            editIconOptionsContainer.classList.toggle('show');
+            editIconSelect.classList.toggle('active');
+        });
+
+        editIconOptionsContainer.addEventListener('click', (e) => {
+            const option = e.target.closest('.select-icon-option');
+            if (option) {
+                const iconKey = option.dataset.key;
+                const iconSvgHTML = option.querySelector('.option-icon-svg').innerHTML;
+
+                editHiddenIconInput.value = iconKey;
+                editSelectedIconDisplay.querySelector('.selected-icon-svg').innerHTML = iconSvgHTML;
+                editSelectedIconDisplay.querySelector('.selected-icon-key').textContent = iconKey;
+
+                editIconOptionsContainer.classList.remove('show');
+                editIconSelect.classList.remove('active');
+            }
+        });
+
+        createAccountBalanceInput.addEventListener('input', formatBalanceInput);
+        editAccountBalanceInput.addEventListener('input', formatBalanceInput);
+
+        document.addEventListener('click', function (e) {
             const modals = document.getElementsByClassName("modal");
             for (let i = 0; i < modals.length; i++) {
-                if (event.target == modals[i]) {
+                if (e.target == modals[i]) {
                     modals[i].style.display = "none";
                 }
             }
-        }
+
+            if (editIconSelect && !editIconSelect.contains(e.target)) {
+                editIconOptionsContainer.classList.remove('show');
+                editIconSelect.classList.remove('active');
+            }
+
+            if (createIconSelect && !createIconSelect.contains(e.target)) {
+                createIconOptionsContainer.classList.remove('show');
+                createIconSelect.classList.remove('active');
+            }
+        });
     </script>
 
 </body>
