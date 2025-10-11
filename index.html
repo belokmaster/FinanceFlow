@@ -7,8 +7,11 @@
     <title>FinanceFlow</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        /* style for page */
         body {
+            /* installing the font */
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            /* remove padding from the body */
             margin: 0;
             background-color: #f4f6f8;
             color: #333;
@@ -19,7 +22,8 @@
             display: flex;
             align-items: center;
             padding: 15px 30px;
-            border-bottom: 1px solid #e0e0e0;
+            /* line under the header*/
+            border-bottom: 10px solid #e0e0e0;
         }
 
         .header .logo {
@@ -37,6 +41,7 @@
             justify-content: center;
         }
 
+        /* navigation block */
         .header .logo .icon-container i {
             color: #fff;
             font-size: 24px;
@@ -60,6 +65,7 @@
             border-radius: 5px;
         }
 
+        /* account container block */
         .accounts-container {
             display: flex;
             flex-wrap: wrap;
@@ -83,6 +89,7 @@
             position: relative;
         }
 
+        /* hovering the cursor */
         .account-card:hover {
             background-color: #f9f9f9;
             border-color: #4cd67a;
@@ -153,12 +160,14 @@
 
         .modal {
             display: none;
+            /* the window is on top of all the content */
             position: fixed;
             z-index: 1000;
             left: 0;
             top: 0;
             width: 100%;
             height: 100%;
+            /* make background behind modal more dark*/
             background-color: rgba(0, 0, 0, 0.5);
             justify-content: center;
             align-items: center;
@@ -205,7 +214,7 @@
             display: flex;
             align-items: flex-end;
             gap: 16px;
-            margin-bottom: 24px;
+            margin-bottom: 15px;
         }
 
         .form-group {
@@ -220,6 +229,21 @@
             color: #333;
             height: 20px;
             line-height: 20px;
+        }
+
+        .balance-group {
+            flex: 1;
+        }
+
+        .currency-group {
+            width: 150px;
+            flex-shrink: 0
+        }
+
+        .form-control[readonly] {
+            background-color: #f5f5f5;
+            cursor: not-allowed;
+            color: #666;
         }
 
         .name-group {
@@ -242,6 +266,7 @@
             border-color: #4cd67a;
         }
 
+        /* the red start near the name */
         .required {
             color: #d9534f;
         }
@@ -279,6 +304,7 @@
         }
 
         .color-hex {
+            /* mb change this font to another lately? */
             font-family: monospace;
             font-size: 16px;
             color: #555;
@@ -306,12 +332,14 @@
             font-weight: 500;
             cursor: pointer;
             transition: background-color 0.2s;
+            margin-top: 20px;
         }
 
         form button[type="submit"]:hover {
             background-color: #45b96c;
         }
 
+        /* icon block */
         .icon-group {
             flex: 1;
         }
@@ -323,7 +351,7 @@
         .select-selected-icon {
             display: flex;
             align-items: center;
-            height: 48px;
+            height: 35px;
             padding: 0 12px;
             border: 1px solid #dcdcdc;
             border-radius: 8px;
@@ -355,6 +383,7 @@
             color: #333;
         }
 
+        /* a good list with icons */
         .select-icon-options {
             display: none;
             position: absolute;
@@ -367,6 +396,7 @@
             box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
             z-index: 1001;
             max-height: 200px;
+            /* scroll add in icons choice */
             overflow-y: auto;
         }
 
@@ -386,6 +416,7 @@
             background-color: #f5f5f5;
         }
 
+        /* colors for icons */
         .custom-icon-select .selected-icon-svg svg path {
             fill: #333;
         }
@@ -436,6 +467,7 @@
             </div>
 
             <form action="/update_account" method="post">
+                <!-- id only for server -->
                 <input type="hidden" id="editAccountId" name="ID">
 
                 <div class="form-row">
@@ -479,6 +511,20 @@
                     </div>
                 </div>
 
+                <div class="form-row">
+                    <div class="form-group balance-group">
+                        <label for="editAccountBalance">Баланс</label>
+                        <input type="text" id="editAccountBalance" name="Balance" class="form-control"
+                            inputmode="decimal" required>
+                    </div>
+
+                    <div class="form-group currency-group">
+                        <label for="editAccountCurrency">Валюта</label>
+                        <input type="text" id="editAccountCurrency" name="Currency" class="form-control" readonly
+                            style="background-color: #f5f5f5; cursor: not-allowed;">
+                    </div>
+                </div>
+
                 <button type="submit">Сохранить</button>
             </form>
         </div>
@@ -487,11 +533,14 @@
     <div class="accounts-container">
         {{range .Accounts}}
         <div class="account-card" style="background-color: {{.Color}};"
-            onclick="openAccountModal({{.ID}}, '{{.Name}}', '{{.Color}}', '{{.IconKey}}')">
+            onclick="openAccountModal({{.ID}}, '{{.Name}}', '{{.Color}}', '{{.IconKey}}', '{{.Balance}}', '{{.CurrencySymbol}}')">
             <div class="account-icon">{{.IconHTML}}</div>
             <div class="account-info">
                 <h3>{{.Name}}</h3>
-                <p class="balance">{{.Balance}} {{.CurrencySymbol}}</p>
+                <p class="balance">
+                    {{$balance := printf "%.2f" .Balance}}
+                    {{$balance}} {{.CurrencySymbol}}
+                </p>
             </div>
         </div>
         {{else}}
@@ -713,6 +762,17 @@
             iconSelect.classList.toggle('active');
         });
 
+        // close icons outside the window
+        document.addEventListener('click', function (e) {
+            const iconSelect = document.querySelector('.custom-icon-select');
+            const iconOptions = document.getElementById('iconOptions');
+
+            if (!iconSelect.contains(e.target)) {
+                iconOptions.classList.remove('show');
+                iconSelect.classList.remove('active');
+            }
+        });
+
         // open the modal window
         function openModal(modalId) {
             const modal = document.getElementById(modalId);
@@ -728,9 +788,19 @@
             }
         }
 
-        function openAccountModal(accountId, accountName, accountColor, accountIconKey) {
+        function openAccountModal(accountId, accountName, accountColor, accountIconKey, accountBalance, accountCurrency) {
             document.getElementById('editAccountId').value = accountId;
             document.getElementById('editAccountName').value = accountName;
+
+            let formattedBalance = parseFloat(accountBalance);
+            if (!isNaN(formattedBalance) && accountBalance !== '') {
+                formattedBalance = formattedBalance.toFixed(2);
+            } else {
+                formattedBalance = '0.00';
+            }
+            document.getElementById('editAccountBalance').value = formattedBalance;
+
+            document.getElementById('editAccountCurrency').value = accountCurrency;
 
             colorInput.value = accountColor;
             updateColorDisplay(accountColor);
@@ -763,6 +833,41 @@
                 formToShow.style.display = 'block';
             }
         }
+
+        document.getElementById('editAccountBalance').addEventListener('input', function (e) {
+            let value = this.value;
+
+            value = value.replace(/[^\d.]/g, '');
+
+            const parts = value.split('.');
+            if (parts.length > 2) {
+                value = parts[0] + '.' + parts.slice(1).join('');
+            }
+
+            if (parts.length === 2) {
+                value = parts[0] + '.' + parts[1].substring(0, 2);
+            }
+
+            this.value = value;
+        });
+
+        document.getElementById('editAccountBalance').addEventListener('paste', function (e) {
+            e.preventDefault();
+            const pastedText = (e.clipboardData || window.clipboardData).getData('text');
+
+            let value = pastedText.replace(/[^\d.]/g, '');
+            const parts = value.split('.');
+
+            if (parts.length > 2) {
+                value = parts[0] + '.' + parts.slice(1).join('');
+            }
+
+            if (parts.length === 2) {
+                value = parts[0] + '.' + parts[1].substring(0, 2);
+            }
+
+            this.value = value;
+        });
 
         // close when click outside the window
         window.onclick = function (event) {

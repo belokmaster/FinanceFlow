@@ -5,6 +5,7 @@ import (
 	"log"
 	"strings"
 
+	"github.com/shopspring/decimal"
 	"gorm.io/gorm"
 )
 
@@ -112,6 +113,26 @@ func ChangeAccountName(db *gorm.DB, id int, newName string) error {
 	result := db.Model(&Account{}).Where("id = ?", id).Update("Name", newName)
 	if result.Error != nil {
 		return fmt.Errorf("problem with change name in db: %v", result.Error)
+	}
+
+	if result.RowsAffected == 0 {
+		return fmt.Errorf("no rows were updated - account may not exist")
+	}
+
+	return nil
+}
+
+func ChangeAccountBalance(db *gorm.DB, id int, newBalance float64) error {
+	var acc Account
+	err := db.First(&acc, id).Error
+	if err != nil {
+		return fmt.Errorf("account with ID %d not found", id)
+	}
+
+	balance := decimal.NewFromFloat(newBalance)
+	result := db.Model(&Account{}).Where("id = ?", id).Update("Balance", balance)
+	if result.Error != nil {
+		return fmt.Errorf("problem with change balance in db: %v", result.Error)
 	}
 
 	if result.RowsAffected == 0 {

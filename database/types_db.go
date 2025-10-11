@@ -3,9 +3,9 @@ package database
 import "time"
 
 type Account struct {
-	ID           uint   `gorm:"primaryKey;autoIncrement"`
-	Name         string `gorm:"uniqueIndex;not null"`
-	Balance      float64
+	ID           uint    `gorm:"primaryKey;autoIncrement"`
+	Name         string  `gorm:"uniqueIndex;not null"`
+	Balance      float64 `gorm:"type:decimal(15,2)"`
 	CurrencyCode TypeCurrency
 	Color        string
 	IconCode     TypeIcons

@@ -5,6 +5,7 @@ go 1.23.0
 toolchain go1.23.5
 
 require (
+	github.com/shopspring/decimal v1.4.0
 	gorm.io/driver/sqlite v1.6.0
 	gorm.io/gorm v1.31.0
 	modernc.org/sqlite v1.39.0

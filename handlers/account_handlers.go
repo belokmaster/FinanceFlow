@@ -209,6 +209,20 @@ func UpdateAccountHandler(w http.ResponseWriter, r *http.Request, db *gorm.DB) {
 		}
 	}
 
+	newBalance, err := strconv.ParseFloat(r.FormValue("Balance"), 64)
+	if err != nil {
+		log.Printf("UpdateAccountHandler: Invalid amount '%s': %v", r.FormValue("Balance"), err)
+		http.Error(w, "problem with balance. use normal values", http.StatusBadRequest)
+		return
+	}
+
+	err = database.ChangeAccountBalance(db, accountID, newBalance)
+	if err != nil {
+		log.Printf("UpdateAccountHandler: Failed to change balance for account ID %d: %v", accountID, err)
+		http.Error(w, fmt.Sprintf("failed to change account's balance: %v", err), http.StatusInternalServerError)
+		return
+	}
+
 	log.Printf("UpdateAccountHandler: Successfully processed all changes for account %d", accountID)
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
