@@ -116,8 +116,15 @@ type TypeCategoryIcons int
 
 const (
 	Food TypeCategoryIcons = iota
+	Housing
 )
 
 var IconCategoryFiles = map[TypeCategoryIcons]string{
-	Food: "Еда",
+	Food:    "Еда",
+	Housing: "Жилье",
+}
+
+var IconCategoryNamesToIDs = map[string]TypeCategoryIcons{
+	"Еда":   Food,
+	"Жилье": Housing,
 }

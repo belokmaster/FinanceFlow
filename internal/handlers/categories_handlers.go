@@ -65,7 +65,7 @@ func CreateCategoryHandler(w http.ResponseWriter, r *http.Request, db *gorm.DB) 
 	}
 
 	log.Printf("CreateCategoryHandler: Category created successfully")
-	http.Redirect(w, r, "/", http.StatusSeeOther)
+	http.Redirect(w, r, "/categories", http.StatusSeeOther)
 }
 
 func DeleteCategoryHandler(w http.ResponseWriter, r *http.Request, db *gorm.DB) {
@@ -109,5 +109,71 @@ func DeleteCategoryHandler(w http.ResponseWriter, r *http.Request, db *gorm.DB) 
 	}
 
 	log.Printf("DeleteCategoryHandler: Category ID %d deleted successfully", categoryID)
-	http.Redirect(w, r, "/", http.StatusSeeOther)
+	http.Redirect(w, r, "/categories", http.StatusSeeOther)
+}
+
+func UpdateCategoryHandler(w http.ResponseWriter, r *http.Request, db *gorm.DB) {
+	if r.Method != http.MethodPost {
+		log.Printf("UpdateCategoryHandler: Invalid method %s, redirecting to /", r.Method)
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+		return
+	}
+
+	err := r.ParseForm()
+	if err != nil {
+		log.Printf("UpdateCategoryHandler: Error parsing form: %v", err)
+		http.Error(w, "invalid form", http.StatusBadRequest)
+		return
+	}
+
+	log.Printf("UpdateCategoryHandler: Form data received - %+v", r.Form)
+
+	categoryID, err := strconv.Atoi(r.FormValue("ID"))
+	if err != nil {
+		log.Printf("UpdateCategoryHandler: Invalid account ID '%s': %v", r.FormValue("ID"), err)
+		http.Error(w, "problem with id. use normal values", http.StatusBadRequest)
+		return
+	}
+
+	newColor := r.FormValue("Color")
+	if newColor != "" {
+		err = database.ChangeCategoryColor(db, categoryID, newColor)
+		if err != nil {
+			log.Printf("UpdateCategoryHandler: Changing color to '%s' for category %d", newColor, categoryID)
+			http.Error(w, fmt.Sprintf("failed to change category color: %v", err), http.StatusInternalServerError)
+			return
+		}
+	}
+
+	newName := r.FormValue("Name")
+	if newName != "" {
+		err = database.ChangeCategoryName(db, categoryID, newName)
+		if err != nil {
+			log.Printf("UpdateCategoryHandler: Changing name to '%s' for category %d", newName, categoryID)
+			http.Error(w, fmt.Sprintf("failed to change category name: %v", err), http.StatusInternalServerError)
+			return
+		}
+	}
+
+	icon := r.FormValue("Icon")
+	if icon != "" {
+		iconCode, exists := database.IconCategoryNamesToIDs[icon]
+		if !exists {
+			log.Printf("UpdateCategoryHandler: Unknown icon name '%s'", icon)
+			http.Error(w, "unknown icon name", http.StatusBadRequest)
+			return
+		}
+
+		log.Printf("UpdateCategoryHandler: Changing icon for category ID %d to icon ID %d", categoryID, int(iconCode))
+
+		err = database.ChangeCategoryIcon(db, categoryID, int(iconCode))
+		if err != nil {
+			log.Printf("UpdateCategoryHandler: Failed to change icon for category ID %d: %v", categoryID, err)
+			http.Error(w, fmt.Sprintf("failed to change category's icon: %v", err), http.StatusInternalServerError)
+			return
+		}
+	}
+
+	log.Printf("UpdateAccountHandler: Successfully processed all changes for category %d", categoryID)
+	http.Redirect(w, r, "/categories", http.StatusSeeOther)
 }

@@ -95,6 +95,10 @@ func main() {
 		handlers.UpdateAccountHandler(w, r, db)
 	})
 
+	http.HandleFunc("/update_category", func(w http.ResponseWriter, r *http.Request) {
+		handlers.UpdateCategoryHandler(w, r, db)
+	})
+
 	log.Println("Server started at http://localhost:8080")
 	if err := http.ListenAndServe(":8080", nil); err != nil {
 		log.Fatalf("server error: %v", err)

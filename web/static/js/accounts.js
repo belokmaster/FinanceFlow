@@ -1,14 +1,3 @@
-// for edit account
-const editModal = document.getElementById('accountModal');
-const editColorInput = document.getElementById('editAccountColor');
-const editColorPreview = document.getElementById('colorPreview');
-const editColorHexValue = document.getElementById('colorHexValue');
-const editIconSelect = editModal.querySelector('.custom-icon-select');
-const editSelectedIconDisplay = document.getElementById('selectedIconDisplay');
-const editIconOptionsContainer = document.getElementById('iconOptions');
-const editHiddenIconInput = document.getElementById('editAccountIcon');
-const editAccountBalanceInput = document.getElementById('editAccountBalance');
-
 // creating account
 const createModal = document.getElementById('createAccountModal');
 const createColorInput = document.getElementById('createAccountColor');
@@ -19,6 +8,17 @@ const createSelectedIconDisplay = document.getElementById('createSelectedIconDis
 const createIconOptionsContainer = document.getElementById('createIconOptions');
 const createHiddenIconInput = document.getElementById('createAccountIcon');
 const createAccountBalanceInput = document.getElementById('createAccountBalance');
+
+// for edit account
+const editModal = document.getElementById('accountModal');
+const editColorInput = document.getElementById('editAccountColor');
+const editColorPreview = document.getElementById('colorPreview');
+const editColorHexValue = document.getElementById('colorHexValue');
+const editIconSelect = editModal.querySelector('.custom-icon-select');
+const editSelectedIconDisplay = document.getElementById('selectedIconDisplay');
+const editIconOptionsContainer = document.getElementById('iconOptions');
+const editHiddenIconInput = document.getElementById('editAccountIcon');
+const editAccountBalanceInput = document.getElementById('editAccountBalance');
 
 function openModal(modalId) {
     const modal = document.getElementById(modalId);
@@ -31,21 +31,6 @@ function closeModal(modalId) {
     const modal = document.getElementById(modalId);
     if (modal) {
         modal.style.display = "none";
-    }
-}
-
-// delete it later when account will done
-function showForm(formId) {
-    const formsToHide = ['transferForm', 'transactionForm', 'createCategoryForm', 'deleteCategoryForm', 'createSubCategoryForm', 'deleteSubCategoryForm', 'deleteAccountForm'];
-    formsToHide.forEach(id => {
-        const formElement = document.getElementById(id);
-        if (formElement) {
-            formElement.style.display = 'none';
-        }
-    });
-    const formToShow = document.getElementById(formId);
-    if (formToShow) {
-        formToShow.style.display = 'block';
     }
 }
 
@@ -74,7 +59,6 @@ function openCreateModal() {
 }
 
 function openAccountModal(accountId, accountName, accountColor, accountIconKey, accountBalance, accountCurrency) {
-    // fil
     document.getElementById('editAccountId').value = accountId;
     document.getElementById('editAccountName').value = accountName;
     document.getElementById('editAccountCurrency').value = accountCurrency;
@@ -229,3 +213,18 @@ document.addEventListener('keydown', function (e) {
         }
     }
 });
+
+// delete it later when account will done
+function showForm(formId) {
+    const formsToHide = ['transferForm', 'transactionForm', 'createCategoryForm', 'deleteCategoryForm', 'createSubCategoryForm', 'deleteSubCategoryForm', 'deleteAccountForm'];
+    formsToHide.forEach(id => {
+        const formElement = document.getElementById(id);
+        if (formElement) {
+            formElement.style.display = 'none';
+        }
+    });
+    const formToShow = document.getElementById(formId);
+    if (formToShow) {
+        formToShow.style.display = 'block';
+    }
+}

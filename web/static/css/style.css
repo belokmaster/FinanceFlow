@@ -507,6 +507,7 @@ form button[type="submit"]:hover {
 }
 
 .category-icon {
+    margin: 8px 0 0 0px;
     font-size: 24px;
     color: white;
 }
