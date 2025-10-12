@@ -32,12 +32,12 @@ body {
     justify-content: center;
 }
 
-/* navigation block */
 .header .logo .icon-container i {
     color: #fff;
     font-size: 24px;
 }
 
+/* navigation block */
 nav {
     display: flex;
     gap: 15px;
@@ -55,6 +55,13 @@ nav a.active {
     color: #ffffff;
     border-radius: 5px;
 }
+
+nav a:hover {
+    background-color: rgba(76, 214, 122, 0.7);
+    color: #ffffff;
+    border-radius: 5px;
+}
+
 
 /* account container block */
 .accounts-container {
@@ -453,6 +460,7 @@ form button[type="submit"]:hover {
     fill: #FFF;
 }
 
+/* categories block */
 .categories-container {
     display: flex;
     flex-wrap: wrap;
