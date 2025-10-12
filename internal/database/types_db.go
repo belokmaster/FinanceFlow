@@ -116,15 +116,54 @@ type TypeCategoryIcons int
 
 const (
 	Food TypeCategoryIcons = iota
-	Housing
+	Housing1
+	Housing2
+	Car_Repair1
+	Car_Repair2
+	Coin_cat
+	Computer1
+	Computer2
+	Bus1
+	Bus2
+	Community1
+	Community2
+	Community3
+	Expense1
+	Expense2
 )
 
 var IconCategoryFiles = map[TypeCategoryIcons]string{
-	Food:    "Еда",
-	Housing: "Жилье",
+	Food:        "Еда",
+	Housing1:    "Жилье1",
+	Housing2:    "Жилье2",
+	Car_Repair1: "Транспортное средство1",
+	Car_Repair2: "Транспортное средство2",
+	Coin_cat:    "Доход",
+	Computer1:   "Связь, ПК1",
+	Computer2:   "Связь, ПК2",
+	Bus1:        "Общественный транспорт1",
+	Bus2:        "Общественный транспорт2",
+	Community1:  "Жизнь и развлечения1",
+	Community2:  "Жизнь и развлечения2",
+	Community3:  "Жизнь и развлечения3",
+	Expense1:    "Финансовые расходы1",
+	Expense2:    "Финансовые расходы2",
 }
 
 var IconCategoryNamesToIDs = map[string]TypeCategoryIcons{
-	"Еда":   Food,
-	"Жилье": Housing,
+	"Еда":    Food,
+	"Жилье1": Housing1,
+	"Жилье2": Housing2,
+	"Транспортное средство1": Car_Repair1,
+	"Транспортное средство2": Car_Repair2,
+	"Доход":      Coin_cat,
+	"Связь, ПК1": Computer1,
+	"Связь, ПК2": Computer2,
+	"Общественный транспорт1": Bus1,
+	"Общественный транспорт2": Bus2,
+	"Жизнь и развлечения1":    Community1,
+	"Жизнь и развлечения2":    Community2,
+	"Жизнь и развлечения3":    Community3,
+	"Финансовые расходы1":     Expense1,
+	"Финансовые расходы2":     Expense2,
 }

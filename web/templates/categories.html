@@ -79,15 +79,12 @@
                                 <span class="selected-icon-key">Выберите иконку</span>
                             </div>
                             <div id="createCategoryIconOptionsContainer" class="select-icon-options">
-                                <div class="select-icon-option" data-key="0">
-                                    <span class="option-icon-svg">{{index .Icons "Еда"}}</span>
-                                    <span class="option-icon-key">Еда</span>
+                                {{range $key, $svg := .Icons}}
+                                <div class="select-icon-option" data-key="{{$key}}">
+                                    <span class="option-icon-svg">{{$svg}}</span>
+                                    <span class="option-icon-key">{{$key}}</span>
                                 </div>
-
-                                <div class="select-icon-option" data-key="0">
-                                    <span class="option-icon-svg">{{index .Icons "Жилье"}}</span>
-                                    <span class="option-icon-key">Жилье</span>
-                                </div>
+                                {{end}}
                             </div>
                         </div>
                     </div>
@@ -145,6 +142,7 @@
                     </div>
                 </div>
 
+                <button type="button" class="delete-button" onclick="deleteCategory()">Удалить категорию</button>
                 <button type="submit">Сохранить</button>
             </form>
         </div>

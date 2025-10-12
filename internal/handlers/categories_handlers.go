@@ -16,7 +16,7 @@ func CreateCategoryHandler(w http.ResponseWriter, r *http.Request, db *gorm.DB) 
 
 	if r.Method != http.MethodPost {
 		log.Printf("CreateCategoryHandler: Invalid method %s, redirecting to /", r.Method)
-		http.Redirect(w, r, "/", http.StatusSeeOther)
+		http.Redirect(w, r, "/categories", http.StatusSeeOther)
 		return
 	}
 
@@ -36,18 +36,8 @@ func CreateCategoryHandler(w http.ResponseWriter, r *http.Request, db *gorm.DB) 
 	log.Printf("CreateCategoryHandler: Color '%s'", color)
 	color = strings.TrimPrefix(color, "#")
 
-	icon_id, err := strconv.Atoi(r.FormValue("Icon"))
-	if err != nil {
-		log.Printf("CreateCategoryHandler: Invalid icon ID '%s': %v", r.FormValue("Icon"), err)
-		http.Error(w, "problem with icon. use normal values", http.StatusBadRequest)
-		return
-	}
-
-	if icon_id < 0 {
-		log.Printf("CreateCategoryHandler: Negative icon ID %d", icon_id)
-		http.Error(w, "problem with icon. use positive values", http.StatusBadRequest)
-		return
-	}
+	str_icon_id := r.FormValue("Icon")
+	icon_id := database.IconCategoryNamesToIDs[str_icon_id]
 
 	category := database.Category{
 		Name:     name,
@@ -73,7 +63,7 @@ func DeleteCategoryHandler(w http.ResponseWriter, r *http.Request, db *gorm.DB) 
 
 	if r.Method != http.MethodPost {
 		log.Printf("DeleteCategoryHandler: Invalid method %s, redirecting to /", r.Method)
-		http.Redirect(w, r, "/", http.StatusSeeOther)
+		http.Redirect(w, r, "/categories", http.StatusSeeOther)
 		return
 	}
 
@@ -115,7 +105,7 @@ func DeleteCategoryHandler(w http.ResponseWriter, r *http.Request, db *gorm.DB) 
 func UpdateCategoryHandler(w http.ResponseWriter, r *http.Request, db *gorm.DB) {
 	if r.Method != http.MethodPost {
 		log.Printf("UpdateCategoryHandler: Invalid method %s, redirecting to /", r.Method)
-		http.Redirect(w, r, "/", http.StatusSeeOther)
+		http.Redirect(w, r, "/categories", http.StatusSeeOther)
 		return
 	}
 

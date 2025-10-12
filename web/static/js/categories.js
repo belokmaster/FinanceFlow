@@ -144,3 +144,22 @@ document.addEventListener('keydown', function (e) {
         closeModal('categoryModal');
     }
 });
+
+function deleteCategory() {
+    const categoryId = document.getElementById('editCategoryId').value;
+
+    if (confirm('Вы уверены, что хотите удалить эту категорию? Это действие необратимо.')) {
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = '/delete_category';
+
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = 'ID';
+        input.value = categoryId;
+
+        form.appendChild(input);
+        document.body.appendChild(form);
+        form.submit();
+    }
+}

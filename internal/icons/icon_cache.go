@@ -26,8 +26,21 @@ var accountFileToName = map[string]string{
 }
 
 var categoryFileToName = map[string]string{
-	"food":    "Еда",
-	"housing": "Жилье",
+	"food":        "Еда",
+	"housing1":    "Жилье1",
+	"housing2":    "Жилье2",
+	"car_repair1": "Транспортное средство1",
+	"car_repair2": "Транспортное средство2",
+	"coin_cat":    "Доход",
+	"computer1":   "Связь, ПК1",
+	"computer2":   "Связь, ПК2",
+	"bus1":        "Общественный транспорт1",
+	"bus2":        "Общественный транспорт2",
+	"community1":  "Жизнь и развлечения1",
+	"community2":  "Жизнь и развлечения2",
+	"community3":  "Жизнь и развлечения3",
+	"expense1":    "Финансовые расходы1",
+	"expense2":    "Финансовые расходы2",
 }
 
 var AccountIconCache = make(map[string]template.HTML)

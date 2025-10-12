@@ -223,14 +223,6 @@
         <input type="button" value="Create new sub_category" onclick="showForm('createSubCategoryForm')"><br>
         <input type="button" value="Delete sub_category" onclick="showForm('deleteSubCategoryForm')"><br>
     </form>
-    <div id="deleteAccountForm" style="display: none;">
-        <h2>delete account</h2>
-        <form action="/delete_account" method="post">
-            <label for="ID">ID:</label>
-            <input type="ID" id="ID" name="ID" required><br>
-            <button type="submit">delete account</button>
-        </form>
-    </div>
     <div id="transactionForm" style="display: none;">
         <h2>test add the transaction</h2>
         <form action="/submit_transaction" method="post">
