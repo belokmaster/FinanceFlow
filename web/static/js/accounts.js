@@ -189,8 +189,8 @@ editIconOptionsContainer.addEventListener('click', (e) => {
 createAccountBalanceInput.addEventListener('input', formatBalanceInput);
 editAccountBalanceInput.addEventListener('input', formatBalanceInput);
 
+// close when click non a model window
 document.addEventListener('click', function (e) {
-    // slosing windows when clicking non a model
     const modals = document.getElementsByClassName("modal");
     for (let i = 0; i < modals.length; i++) {
         if (e.target == modals[i]) {
@@ -207,5 +207,25 @@ document.addEventListener('click', function (e) {
     if (createIconSelect && !createIconSelect.contains(e.target)) {
         createIconOptionsContainer.classList.remove('show');
         createIconSelect.classList.remove('active');
+    }
+});
+
+// close when tap escape
+document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' || e.key === 'Esc') {
+        const modals = document.getElementsByClassName("modal");
+        for (let i = 0; i < modals.length; i++) {
+            modals[i].style.display = "none";
+        }
+
+        if (editIconSelect) {
+            editIconOptionsContainer.classList.remove('show');
+            editIconSelect.classList.remove('active');
+        }
+
+        if (createIconSelect) {
+            createIconOptionsContainer.classList.remove('show');
+            createIconSelect.classList.remove('active');
+        }
     }
 });

@@ -29,29 +29,33 @@ func CreateCategoryHandler(w http.ResponseWriter, r *http.Request, db *gorm.DB) 
 
 	log.Printf("CreateCategoryHandler: Form data received - %+v", r.Form)
 
-	categoryID, err := strconv.Atoi(r.FormValue("ID"))
-	if err != nil {
-		log.Printf("CreateCategoryHandler: Invalid category ID '%s': %v", r.FormValue("ID"), err)
-		http.Error(w, "problem with id. use normal values", http.StatusBadRequest)
-		return
-	}
-
-	if categoryID < 0 {
-		log.Printf("CreateCategoryHandler: Negative category ID %d", categoryID)
-		http.Error(w, "problem with id. use positive values", http.StatusBadRequest)
-		return
-	}
-
 	name := r.FormValue("Name")
 	name = strings.TrimSpace(name)
-	log.Printf("CreateCategoryHandler: Category name '%s' (trimmed)", name)
 
-	category := database.Category{
-		ID:   uint(categoryID),
-		Name: name,
+	color := r.FormValue("Color")
+	log.Printf("CreateCategoryHandler: Color '%s'", color)
+	color = strings.TrimPrefix(color, "#")
+
+	icon_id, err := strconv.Atoi(r.FormValue("Icon"))
+	if err != nil {
+		log.Printf("CreateCategoryHandler: Invalid icon ID '%s': %v", r.FormValue("Icon"), err)
+		http.Error(w, "problem with icon. use normal values", http.StatusBadRequest)
+		return
 	}
 
-	log.Printf("CreateCategoryHandler: Creating category with ID=%d, Name=%s", categoryID, name)
+	if icon_id < 0 {
+		log.Printf("CreateCategoryHandler: Negative icon ID %d", icon_id)
+		http.Error(w, "problem with icon. use positive values", http.StatusBadRequest)
+		return
+	}
+
+	category := database.Category{
+		Name:     name,
+		Color:    color,
+		IconCode: database.TypeCategoryIcons(icon_id),
+	}
+
+	log.Printf("CreateCategoryHandler: Creating category  Name=%s, Color=%s, Icon=%d", name, color, icon_id)
 
 	err = database.AddCategory(db, category)
 	if err != nil {
@@ -60,7 +64,7 @@ func CreateCategoryHandler(w http.ResponseWriter, r *http.Request, db *gorm.DB) 
 		return
 	}
 
-	log.Printf("CreateCategoryHandler: Category created successfully - ID=%d, Name=%s", categoryID, name)
+	log.Printf("CreateCategoryHandler: Category created successfully")
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
 

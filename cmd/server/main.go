@@ -75,7 +75,7 @@ func main() {
 		handlers.TransactionHandler(w, r, db)
 	})
 
-	http.HandleFunc("/add_category", func(w http.ResponseWriter, r *http.Request) {
+	http.HandleFunc("/create_category", func(w http.ResponseWriter, r *http.Request) {
 		handlers.CreateCategoryHandler(w, r, db)
 	})
 
