@@ -34,9 +34,28 @@
                 <h3>{{.Name}}</h3>
             </div>
         </div>
+
+        <div class="subcategories-container">
+            {{range .Subcategories}}
+            <div class="subcategory-card" style="background-color: {{.Color}};"
+                onclick="openSubcategoryModal({{.ID}}, '{{.Name}}', '{{.Color}}', '{{.IconKey}}', {{.ParentID}})">
+                <div class="subcategory-icon">{{.IconHTML}}</div>
+                <div class="subcategory-info">
+                    <h4>{{.Name}}</h4>
+                </div>
+            </div>
+            {{end}}
+
+            <div class="new_subcategory-card" onclick="openCreateSubcategoryModal({{.ID}})">
+                <i class="fa-solid fa-plus"></i>
+                <span>Добавить подкатегорию</span>
+            </div>
+        </div>
+
         {{else}}
         <p>Категорий пока нет. Создайте новую категорию!</p>
         {{end}}
+
         <div class="new_category-card" onclick="openCreateCategoryModal()">
             <i class="fa-solid fa-plus"></i>
             <span>Добавить категорию</span>
@@ -79,7 +98,59 @@
                                 <span class="selected-icon-key">Выберите иконку</span>
                             </div>
                             <div id="createCategoryIconOptionsContainer" class="select-icon-options">
-                                {{range $key, $svg := .Icons}}
+                                {{range $key, $svg := .CategoryIcons}}
+                                <div class="select-icon-option" data-key="{{$key}}">
+                                    <span class="option-icon-svg">{{$svg}}</span>
+                                    <span class="option-icon-key">{{$key}}</span>
+                                </div>
+                                {{end}}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <button type="submit">Создать</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="createSubcategoryModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Создать новую подкатегорию</h2>
+                <span class="close" onclick="closeModal('createSubcategoryModal')">&times;</span>
+            </div>
+            <form action="/create_subcategory" method="post">
+                <input type="hidden" id="createSubcategoryParentId" name="ParentID">
+
+                <div class="form-row">
+                    <div class="form-group name-group">
+                        <label for="createSubcategoryName">Название <span class="required">*</span></label>
+                        <input type="text" id="createSubcategoryName" name="Name" class="form-control" required>
+                    </div>
+
+                    <div class="form-group color-group">
+                        <label>Цвет</label>
+                        <div class="custom-color-picker">
+                            <div class="color-display">
+                                <span id="createSubcategoryColorPreview" class="color-dot"></span>
+                                <span id="createSubcategoryColorHexValue" class="color-hex">#000000</span>
+                            </div>
+                            <input type="color" id="createSubcategoryColor" name="Color" value="#4cd67a">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group icon-group">
+                        <label>Иконка <span class="required">*</span></label>
+                        <div class="custom-icon-select">
+                            <input type="hidden" id="createSubcategoryIcon" name="Icon">
+                            <div id="createSubcategorySelectedIconDisplay" class="select-selected-icon">
+                                <span class="selected-icon-svg"></span>
+                                <span class="selected-icon-key">Выберите иконку</span>
+                            </div>
+                            <div id="createSubcategoryIconOptionsContainer" class="select-icon-options">
+                                {{range $key, $svg := .SubcategoryIcons}}
                                 <div class="select-icon-option" data-key="{{$key}}">
                                     <span class="option-icon-svg">{{$svg}}</span>
                                     <span class="option-icon-key">{{$key}}</span>
@@ -102,7 +173,6 @@
                 <span class="close" onclick="closeModal('categoryModal')">&times;</span>
             </div>
             <form action="/update_category" method="post">
-                <!-- id only for server -->
                 <input type="hidden" id="editCategoryId" name="ID">
                 <div class="form-row">
                     <div class="form-group name-group">
@@ -131,7 +201,7 @@
                                 <span class="selected-icon-key">Выберите иконку</span>
                             </div>
                             <div id="categoryIconOptions" class="select-icon-options">
-                                {{range $key, $svg := .Icons}}
+                                {{range $key, $svg := .CategoryIcons}}
                                 <div class="select-icon-option" data-key="{{$key}}">
                                     <span class="option-icon-svg">{{$svg}}</span>
                                     <span class="option-icon-key">{{$key}}</span>

@@ -15,6 +15,9 @@ var accountIconsFS embed.FS
 //go:embed category_icons/*.svg
 var categoryIconsFS embed.FS
 
+//go:embed subcategory_icons/*.svg
+var subCategoryIconsFS embed.FS
+
 var accountFileToName = map[string]string{
 	"wallet": "Общий счет",
 	"card":   "Карта",
@@ -43,12 +46,18 @@ var categoryFileToName = map[string]string{
 	"expense2":    "Финансовые расходы2",
 }
 
+var subCategoryFileToName = map[string]string{
+	"restaurant1": "Ресторан1",
+}
+
 var AccountIconCache = make(map[string]template.HTML)
 var CategoryIconCache = make(map[string]template.HTML)
+var SubCategoryIconCache = make(map[string]template.HTML)
 
 func InitIcons() {
 	initAccountIcons()
 	initCategoryIcons()
+	initSubCategoryIcons()
 	log.Printf("Initialized %d account icons and %d category icons",
 		len(AccountIconCache), len(CategoryIconCache))
 }
@@ -107,6 +116,32 @@ func initCategoryIcons() {
 	}
 }
 
+func initSubCategoryIcons() {
+	icons, err := fs.ReadDir(subCategoryIconsFS, "subcategory_icons")
+	if err != nil {
+		log.Printf("Error loading category icons: %v", err)
+		return
+	}
+
+	for _, iconFile := range icons {
+		if iconFile.IsDir() {
+			continue
+		}
+
+		filePath := filepath.Join("subcategory_icons", iconFile.Name())
+		content, err := fs.ReadFile(subCategoryIconsFS, filePath)
+		if err != nil {
+			log.Printf("Error reading icon %s: %v", iconFile.Name(), err)
+			continue
+		}
+
+		contentStr := string(content)
+		iconKey := strings.TrimSuffix(iconFile.Name(), filepath.Ext(iconFile.Name()))
+		curName := subCategoryFileToName[iconKey]
+		SubCategoryIconCache[curName] = template.HTML(contentStr)
+	}
+}
+
 // getters
 func GetAccountIcon(name string) template.HTML {
 	return AccountIconCache[name]
@@ -116,10 +151,18 @@ func GetCategoryIcon(name string) template.HTML {
 	return CategoryIconCache[name]
 }
 
+func GetSubCategoryIcon(name string) template.HTML {
+	return SubCategoryIconCache[name]
+}
+
 func GetAccountIcons() map[string]template.HTML {
 	return AccountIconCache
 }
 
 func GetCategoryIcons() map[string]template.HTML {
 	return CategoryIconCache
+}
+
+func GetSubCategoryIcons() map[string]template.HTML {
+	return SubCategoryIconCache
 }

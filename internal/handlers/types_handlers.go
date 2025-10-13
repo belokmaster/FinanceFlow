@@ -20,14 +20,30 @@ type HomePageData struct {
 }
 
 type CategoryView struct {
+	ID            uint
+	Name          string
+	Color         string
+	IconKey       string
+	IconHTML      template.HTML
+	Subcategories []SubCategoryView
+}
+
+type CategoryPageData struct {
+	Categories       []CategoryView
+	CategoryIcons    map[string]template.HTML
+	SubcategoryIcons map[string]template.HTML
+}
+
+type SubCategoryView struct {
 	ID       uint
 	Name     string
 	Color    string
 	IconKey  string
 	IconHTML template.HTML
+	ParentID uint
 }
 
-type CategoryPageData struct {
-	Categories []CategoryView
+type SubCategoryPageData struct {
+	Categories []SubCategoryView
 	Icons      map[string]template.HTML
 }

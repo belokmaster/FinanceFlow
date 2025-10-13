@@ -83,7 +83,7 @@ func main() {
 		handlers.DeleteCategoryHandler(w, r, db)
 	})
 
-	http.HandleFunc("/add_subcategory", func(w http.ResponseWriter, r *http.Request) {
+	http.HandleFunc("/create_subcategory", func(w http.ResponseWriter, r *http.Request) {
 		handlers.CreateSubCategoryHandler(w, r, db)
 	})
 

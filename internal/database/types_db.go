@@ -12,15 +12,18 @@ type Account struct {
 }
 
 type Category struct {
-	ID       uint              `gorm:"primaryKey;autoIncrement"`
-	Name     string            `gorm:"uniqueIndex;not null"`
-	Color    string            `gorm:"column:color"`
-	IconCode TypeCategoryIcons `gorm:"column:icon_code"`
+	ID            uint              `gorm:"primaryKey;autoIncrement"`
+	Name          string            `gorm:"uniqueIndex;not null"`
+	Color         string            `gorm:"column:color"`
+	IconCode      TypeCategoryIcons `gorm:"column:icon_code"`
+	SubCategories []SubCategory     `gorm:"foreignKey:CategoryID"`
 }
 
 type SubCategory struct {
-	ID         uint   `gorm:"primaryKey;autoIncrement"`
-	Name       string `gorm:"uniqueIndex;not null"`
+	ID         uint                 `gorm:"primaryKey;autoIncrement"`
+	Name       string               `gorm:"uniqueIndex;not null"`
+	Color      string               `gorm:"column:color"`
+	IconCode   TypeSubCategoryIcons `gorm:"column:icon_code"`
 	CategoryID uint
 	Category   Category `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 }
@@ -166,4 +169,18 @@ var IconCategoryNamesToIDs = map[string]TypeCategoryIcons{
 	"Жизнь и развлечения3":    Community3,
 	"Финансовые расходы1":     Expense1,
 	"Финансовые расходы2":     Expense2,
+}
+
+type TypeSubCategoryIcons int
+
+const (
+	Restaurant TypeSubCategoryIcons = iota
+)
+
+var IconSubCategoryFiles = map[TypeSubCategoryIcons]string{
+	Restaurant: "Ресторан1",
+}
+
+var IconSubCategoryNamesToIDs = map[string]TypeSubCategoryIcons{
+	"Ресторан1": Restaurant,
 }

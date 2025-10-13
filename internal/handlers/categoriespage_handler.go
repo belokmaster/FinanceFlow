@@ -14,7 +14,7 @@ func CategoryPageHandler(w http.ResponseWriter, r *http.Request, db *gorm.DB, pa
 	log.Printf("CategoryPageHandler: Processing categories page request")
 
 	if r.Method != http.MethodGet {
-		http.Redirect(w, r, "/", http.StatusSeeOther)
+		http.Redirect(w, r, "/categories", http.StatusSeeOther)
 		return
 	}
 
@@ -27,6 +27,49 @@ func CategoryPageHandler(w http.ResponseWriter, r *http.Request, db *gorm.DB, pa
 	}
 
 	log.Printf("CategoryPageHandler: Retrieved %d categories from database", len(categories))
+
+	log.Printf("CategoryPageHandler: Getting categories from database")
+	subCategories, err := database.GetSubCategories(db)
+	if err != nil {
+		log.Printf("CreateCategoryPageHandler: Error getting sub_categories: %v", err)
+		http.Error(w, "could not get sub_categories", http.StatusInternalServerError)
+		return
+	}
+
+	log.Printf("CategoryPageHandler: Retrieved %d sub_categories from database", len(categories))
+
+	subcategoriesByParent := make(map[uint][]SubCategoryView)
+
+	for _, subCat := range subCategories {
+		color := "#" + subCat.Color
+		if color == "" {
+			log.Printf("CategoryPageHandler: Empty color for sub_category %s, using default", subCat.Name)
+			color = "#4cd67a"
+		}
+
+		iconFileName, ok := database.IconSubCategoryFiles[subCat.IconCode]
+		if !ok {
+			log.Printf("CategoryPageHandler: Unknown icon code %d for sub_category %s, using default icon", subCat.IconCode, subCat.Name)
+			iconFileName = "Restaraunt1"
+		}
+
+		iconHTML, ok := icons.SubCategoryIconCache[iconFileName]
+		if !ok {
+			log.Printf("CategoryPageHandler: Icon file %s not found in cache for sub_category %s, using food icon", iconFileName, subCat.Name)
+			iconHTML = icons.SubCategoryIconCache["Restaraunt1"]
+		}
+
+		subcategoryView := SubCategoryView{
+			ID:       subCat.ID,
+			Name:     subCat.Name,
+			Color:    color,
+			IconKey:  iconFileName,
+			IconHTML: iconHTML,
+			ParentID: subCat.CategoryID,
+		}
+
+		subcategoriesByParent[subCat.CategoryID] = append(subcategoriesByParent[subCat.CategoryID], subcategoryView)
+	}
 
 	var categoriesForView []CategoryView
 	for _, cat := range categories {
@@ -48,12 +91,18 @@ func CategoryPageHandler(w http.ResponseWriter, r *http.Request, db *gorm.DB, pa
 			iconHTML = icons.CategoryIconCache["Food"]
 		}
 
+		subcats := subcategoriesByParent[cat.ID]
+		if subcats == nil {
+			subcats = []SubCategoryView{}
+		}
+
 		categoriesForView = append(categoriesForView, CategoryView{
-			ID:       cat.ID,
-			Name:     cat.Name,
-			Color:    color,
-			IconKey:  iconFileName,
-			IconHTML: iconHTML,
+			ID:            cat.ID,
+			Name:          cat.Name,
+			Color:         color,
+			IconKey:       iconFileName,
+			IconHTML:      iconHTML,
+			Subcategories: subcats,
 		})
 	}
 
@@ -67,8 +116,9 @@ func CategoryPageHandler(w http.ResponseWriter, r *http.Request, db *gorm.DB, pa
 	}
 
 	pageData := CategoryPageData{
-		Categories: categoriesForView,
-		Icons:      icons.CategoryIconCache,
+		Categories:       categoriesForView,
+		CategoryIcons:    icons.CategoryIconCache,
+		SubcategoryIcons: icons.SubCategoryIconCache,
 	}
 
 	err = tmpl.Execute(w, pageData)

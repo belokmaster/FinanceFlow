@@ -49,3 +49,18 @@ func GetCategories(db *gorm.DB) ([]Category, error) {
 	log.Printf("Successfully got %d categories from db", len(caregories))
 	return caregories, nil
 }
+
+func GetSubCategories(db *gorm.DB) ([]SubCategory, error) {
+	log.Println("Getting all sub_categories from database")
+
+	var sub_categories []SubCategory
+	result := db.Find(&sub_categories)
+
+	if result.Error != nil {
+		log.Printf("Error getting accounts: %v", result.Error)
+		return nil, fmt.Errorf("problem with get sub_categories in db: %v", result.Error)
+	}
+
+	log.Printf("Successfully got %d sub_categories from db", len(sub_categories))
+	return sub_categories, nil
+}

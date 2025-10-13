@@ -16,7 +16,7 @@ func CreateSubCategoryHandler(w http.ResponseWriter, r *http.Request, db *gorm.D
 
 	if r.Method != http.MethodPost {
 		log.Printf("CreateSubCategoryHandler: Invalid method %s, redirecting to /", r.Method)
-		http.Redirect(w, r, "/", http.StatusSeeOther)
+		http.Redirect(w, r, "/categories", http.StatusSeeOther)
 		return
 	}
 
@@ -29,43 +29,40 @@ func CreateSubCategoryHandler(w http.ResponseWriter, r *http.Request, db *gorm.D
 
 	log.Printf("CreateSubCategoryHandler: Form data received - %+v", r.Form)
 
-	subCategoryID, err := strconv.Atoi(r.FormValue("ID"))
-	if err != nil {
-		log.Printf("CreateSubCategoryHandler: Invalid subcategory ID '%s': %v", r.FormValue("ID"), err)
-		http.Error(w, "problem with id. use normal values", http.StatusBadRequest)
-		return
-	}
-
-	if subCategoryID < 0 {
-		log.Printf("CreateSubCategoryHandler: Negative subcategory ID %d", subCategoryID)
-		http.Error(w, "problem with id. use positive values", http.StatusBadRequest)
-		return
-	}
-
-	categoryID, err := strconv.Atoi(r.FormValue("CategoryID"))
-	if err != nil {
-		log.Printf("CreateSubCategoryHandler: Invalid category ID '%s': %v", r.FormValue("CategoryID"), err)
-		http.Error(w, "problem with id. use normal values", http.StatusBadRequest)
-		return
-	}
-
-	if categoryID < 0 {
-		log.Printf("CreateSubCategoryHandler: Negative category ID %d", categoryID)
-		http.Error(w, "problem with id. use positive values", http.StatusBadRequest)
-		return
-	}
-
 	name := r.FormValue("Name")
 	name = strings.TrimSpace(name)
 	log.Printf("CreateSubCategoryHandler: Subcategory name '%s'", name)
 
-	subCategory := database.SubCategory{
-		ID:         uint(subCategoryID),
-		Name:       name,
-		CategoryID: uint(categoryID),
+	color := r.FormValue("Color")
+	log.Printf("CreateSubCategoryHandler: Color '%s'", color)
+	color = strings.TrimPrefix(color, "#")
+
+	str_icon_id := r.FormValue("Icon")
+	icon_id := database.IconSubCategoryNamesToIDs[str_icon_id]
+
+	parentIDStr := r.FormValue("ParentID")
+	if parentIDStr == "" {
+		log.Printf("CreateSubCategoryHandler: Error - ParentID is missing from the form")
+		http.Error(w, "ParentID is required", http.StatusBadRequest)
+		return
 	}
 
-	log.Printf("CreateSubCategoryHandler: Creating subcategory with ID=%d, Name=%s, Parent Category ID=%d", subCategoryID, name, categoryID)
+	parentID_64, err := strconv.ParseUint(parentIDStr, 10, 32)
+	if err != nil {
+		log.Printf("CreateSubCategoryHandler: Error parsing ParentID '%s': %v", parentIDStr, err)
+		http.Error(w, "Invalid ParentID", http.StatusBadRequest)
+		return
+	}
+	parentID := uint(parentID_64)
+
+	subCategory := database.SubCategory{
+		Name:       name,
+		Color:      color,
+		IconCode:   database.TypeSubCategoryIcons(icon_id),
+		CategoryID: parentID,
+	}
+
+	log.Printf("CreateSubCategoryHandler: Creating sub_category  Name=%s, Color=%s, Icon=%d", name, color, icon_id)
 
 	err = database.AddSubCategory(db, subCategory)
 	if err != nil {
@@ -74,8 +71,8 @@ func CreateSubCategoryHandler(w http.ResponseWriter, r *http.Request, db *gorm.D
 		return
 	}
 
-	log.Printf("CreateSubCategoryHandler: Subcategory created successfully - ID=%d, Name=%s, Parent Category ID=%d", subCategoryID, name, categoryID)
-	http.Redirect(w, r, "/", http.StatusSeeOther)
+	log.Printf("CreateSubCategoryHandler: Subcategory created successfully.")
+	http.Redirect(w, r, "/categories", http.StatusSeeOther)
 }
 
 func DeleteSubCategoryHandler(w http.ResponseWriter, r *http.Request, db *gorm.DB) {
