@@ -27,28 +27,32 @@
 
     <div class="categories-container">
         {{range .Categories}}
-        <div class="category-card" style="background-color: {{.Color}};"
-            onclick="openCategoryModal({{.ID}}, '{{.Name}}', '{{.Color}}', '{{.IconKey}}')">
-            <div class="category-icon">{{.IconHTML}}</div>
-            <div class="category-info">
-                <h3>{{.Name}}</h3>
-            </div>
-        </div>
 
-        <div class="subcategories-container">
-            {{range .Subcategories}}
-            <div class="subcategory-card" style="background-color: {{.Color}};"
-                onclick="openSubcategoryModal({{.ID}}, '{{.Name}}', '{{.Color}}', '{{.IconKey}}', {{.ParentID}})">
-                <div class="subcategory-icon">{{.IconHTML}}</div>
-                <div class="subcategory-info">
-                    <h4>{{.Name}}</h4>
+        <div class="category-section">
+            <div class="category-card" style="background-color: {{.Color}};"
+                onclick="openCategoryModal({{.ID}}, '{{.Name}}', '{{.Color}}', '{{.IconKey}}')">
+                <div class="category-icon">{{.IconHTML}}</div>
+                <div class="category-info">
+                    <h3>{{.Name}}</h3>
                 </div>
             </div>
-            {{end}}
 
-            <div class="new_subcategory-card" onclick="openCreateSubcategoryModal({{.ID}})">
-                <i class="fa-solid fa-plus"></i>
-                <span>Добавить подкатегорию</span>
+            <div class="subcategories-container">
+                {{range .Subcategories}}
+                <div class="subcategory-card" style="background-color: {{.Color}};"
+                    onclick="openSubcategoryModal({{.ID}}, '{{.Name}}', '{{.Color}}', '{{.IconKey}}', {{.ParentID}})">
+                    <div class="subcategory-icon">{{.IconHTML}}</div>
+                    <div class="subcategory-info">
+                        <h4>{{.Name}}</h4>
+                    </div>
+                </div>
+
+                {{end}}
+
+                <div class="new_subcategory-card" onclick="openCreateSubcategoryModal({{.ID}})">
+                    <i class="fa-solid fa-plus"></i>
+                    <span>Добавить подкатегорию</span>
+                </div>
             </div>
         </div>
 

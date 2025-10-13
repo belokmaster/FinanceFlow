@@ -460,8 +460,8 @@ form button[type="submit"]:hover {
 /* categories block */
 .categories-container {
     display: flex;
-    flex-wrap: wrap;
-    gap: 20px;
+    flex-direction: column;
+    gap: 30px;
     padding: 20px 30px;
 }
 
@@ -542,7 +542,6 @@ form button[type="submit"]:hover {
     flex-wrap: wrap;
     gap: 15px;
     margin-left: 40px;
-    margin-bottom: 20px;
     padding-left: 20px;
     border-left: 2px dashed #e0e0e0;
 }
@@ -624,6 +623,8 @@ form button[type="submit"]:hover {
 }
 
 .category-section {
-    margin-bottom: 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
     width: 100%;
 }
