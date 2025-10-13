@@ -28,6 +28,16 @@ const createSubcategorySelectedIconDisplay = document.getElementById('createSubc
 const createSubcategoryIconOptionsContainer = document.getElementById('createSubcategoryIconOptionsContainer');
 const createSubcategoryHiddenIconInput = document.getElementById('createSubcategoryIcon');
 
+// for edit subcategory
+const editSubcategoryModal = document.getElementById('subcategoryModal');
+const editSubcategoryColorInput = document.getElementById('editSubcategoryColor');
+const editSubcategoryColorPreview = document.getElementById('subcategoryColorPreview');
+const editSubcategoryColorHexValue = document.getElementById('subcategoryColorHexValue');
+const editSubcategoryIconSelect = document.querySelector('#subcategoryModal .custom-icon-select');
+const editSubcategorySelectedIconDisplay = document.getElementById('subcategorySelectedIconDisplay');
+const editSubcategoryIconOptionsContainer = document.getElementById('subcategoryIconOptions');
+const editSubcategoryHiddenIconInput = document.getElementById('editSubcategoryIcon');
+
 function openModal(modalId) {
     const modal = document.getElementById(modalId);
     if (modal) {
@@ -84,6 +94,28 @@ function openCategoryModal(categoryId, categoryName, categoryColor, categoryIcon
     openModal('categoryModal');
 }
 
+function openSubcategoryModal(subcategoryId, subcategoryName, subcategoryColor, subcategoryIconKey, parentCategoryId) {
+    document.getElementById('editSubcategoryId').value = subcategoryId;
+    document.getElementById('editSubcategoryName').value = subcategoryName;
+    document.getElementById('editSubcategoryParentId').value = parentCategoryId;
+
+    editSubcategoryColorInput.value = subcategoryColor;
+    updateColorDisplay(subcategoryColor, editSubcategoryColorPreview, editSubcategoryColorHexValue);
+    editSubcategoryHiddenIconInput.value = subcategoryIconKey;
+
+    const targetOption = editSubcategoryIconOptionsContainer.querySelector(`.select-icon-option[data-key="${subcategoryIconKey}"]`);
+    if (targetOption) {
+        const iconSvgHTML = targetOption.querySelector('.option-icon-svg').innerHTML;
+        editSubcategorySelectedIconDisplay.querySelector('.selected-icon-svg').innerHTML = iconSvgHTML;
+        editSubcategorySelectedIconDisplay.querySelector('.selected-icon-key').textContent = subcategoryIconKey;
+    } else {
+        editSubcategorySelectedIconDisplay.querySelector('.selected-icon-svg').innerHTML = '';
+        editSubcategorySelectedIconDisplay.querySelector('.selected-icon-key').textContent = 'Выберите иконку';
+    }
+
+    openModal('subcategoryModal');
+}
+
 function deleteCategory() {
     const categoryId = document.getElementById('editCategoryId').value;
 
@@ -103,19 +135,6 @@ function deleteCategory() {
     }
 }
 
-function openCreateSubcategoryModal(parentCategoryId) {
-    document.getElementById('createSubcategoryName').value = '';
-    document.getElementById('createSubcategoryColor').value = '#4cd67a';
-    document.getElementById('createSubcategoryIcon').value = '';
-    document.getElementById('createSubcategoryParentId').value = parentCategoryId;
-
-    createSubcategorySelectedIconDisplay.querySelector('.selected-icon-svg').innerHTML = '';
-    createSubcategorySelectedIconDisplay.querySelector('.selected-icon-key').textContent = 'Выберите иконку';
-
-    updateColorDisplay('#4cd67a', createSubcategoryColorPreview, createSubcategoryColorHexValue);
-    openModal('createSubcategoryModal');
-}
-
 function deleteSubcategory() {
     const subcategoryId = document.getElementById('editSubcategoryId').value;
     if (confirm('Вы уверены, что хотите удалить эту подкатегорию? Это действие необратимо.')) {
@@ -130,6 +149,19 @@ function deleteSubcategory() {
         document.body.appendChild(form);
         form.submit();
     }
+}
+
+function openCreateSubcategoryModal(parentCategoryId) {
+    document.getElementById('createSubcategoryName').value = '';
+    document.getElementById('createSubcategoryColor').value = '#4cd67a';
+    document.getElementById('createSubcategoryIcon').value = '';
+    document.getElementById('createSubcategoryParentId').value = parentCategoryId;
+
+    createSubcategorySelectedIconDisplay.querySelector('.selected-icon-svg').innerHTML = '';
+    createSubcategorySelectedIconDisplay.querySelector('.selected-icon-key').textContent = 'Выберите иконку';
+
+    updateColorDisplay('#4cd67a', createSubcategoryColorPreview, createSubcategoryColorHexValue);
+    openModal('createSubcategoryModal');
 }
 
 createCategoryColorInput.addEventListener('input', () => {
@@ -210,6 +242,32 @@ createSubcategoryIconOptionsContainer.addEventListener('click', (e) => {
     }
 });
 
+editSubcategoryColorInput.addEventListener('input', () => {
+    updateColorDisplay(editSubcategoryColorInput.value, editSubcategoryColorPreview, editSubcategoryColorHexValue);
+});
+
+editSubcategorySelectedIconDisplay.addEventListener('click', (e) => {
+    e.stopPropagation();
+    editSubcategoryIconOptionsContainer.classList.toggle('show');
+    editSubcategoryIconSelect.classList.toggle('active');
+});
+
+editSubcategoryIconOptionsContainer.addEventListener('click', (e) => {
+    const option = e.target.closest('.select-icon-option');
+    if (option) {
+        const iconKey = option.dataset.key;
+        const iconSvgHTML = option.querySelector('.option-icon-svg').innerHTML;
+        const iconText = option.querySelector('.option-icon-key').textContent;
+
+        editSubcategoryHiddenIconInput.value = iconKey;
+        editSubcategorySelectedIconDisplay.querySelector('.selected-icon-svg').innerHTML = iconSvgHTML;
+        editSubcategorySelectedIconDisplay.querySelector('.selected-icon-key').textContent = iconText;
+
+        editSubcategoryIconOptionsContainer.classList.remove('show');
+        editSubcategoryIconSelect.classList.remove('active');
+    }
+});
+
 document.addEventListener('click', function (e) {
     if (e.target.classList.contains('modal')) {
         closeModal(e.target.id);
@@ -227,6 +285,11 @@ document.addEventListener('click', function (e) {
         createSubcategoryIconOptionsContainer.classList.remove('show');
         createSubcategoryIconSelect.classList.remove('active');
     }
+
+    if (editSubcategoryIconSelect && !editSubcategoryIconSelect.contains(e.target)) {
+        editSubcategoryIconOptionsContainer.classList.remove('show');
+        editSubcategoryIconSelect.classList.remove('active');
+    }
 });
 
 document.addEventListener('keydown', function (e) {
@@ -238,3 +301,20 @@ document.addEventListener('keydown', function (e) {
         closeModal('subcategoryModal');
     }
 });
+
+function toggleSubcategories(button) {
+    const categorySection = button.closest('.category-section');
+    const subcategoriesContainer = categorySection.querySelector('.subcategories-container');
+
+    button.classList.toggle('collapsed');
+    subcategoriesContainer.classList.toggle('collapsed');
+
+    const icon = button.querySelector('i');
+    if (button.classList.contains('collapsed')) {
+        icon.classList.remove('fa-chevron-down');
+        icon.classList.add('fa-chevron-right');
+    } else {
+        icon.classList.remove('fa-chevron-right');
+        icon.classList.add('fa-chevron-down');
+    }
+}

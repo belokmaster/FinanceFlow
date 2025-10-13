@@ -48,6 +48,7 @@ var categoryFileToName = map[string]string{
 
 var subCategoryFileToName = map[string]string{
 	"restaurant1": "Ресторан1",
+	"pizza1":      "Фаст-фуд1",
 }
 
 var AccountIconCache = make(map[string]template.HTML)

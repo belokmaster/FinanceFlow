@@ -29,12 +29,17 @@
         {{range .Categories}}
 
         <div class="category-section">
-            <div class="category-card" style="background-color: {{.Color}};"
-                onclick="openCategoryModal({{.ID}}, '{{.Name}}', '{{.Color}}', '{{.IconKey}}')">
-                <div class="category-icon">{{.IconHTML}}</div>
-                <div class="category-info">
-                    <h3>{{.Name}}</h3>
+            <div class="category-header">
+                <div class="category-card" style="background-color: {{.Color}};"
+                    onclick="openCategoryModal({{.ID}}, '{{.Name}}', '{{.Color}}', '{{.IconKey}}')">
+                    <div class="category-icon">{{.IconHTML}}</div>
+                    <div class="category-info">
+                        <h3>{{.Name}}</h3>
+                    </div>
                 </div>
+                <button class="toggle-subcategories-btn" onclick="toggleSubcategories(this)">
+                    <i class="fa-solid fa-chevron-down"></i>
+                </button>
             </div>
 
             <div class="subcategories-container">
@@ -217,6 +222,62 @@
                 </div>
 
                 <button type="button" class="delete-button" onclick="deleteCategory()">Удалить категорию</button>
+                <button type="submit">Сохранить</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- redact sub_category block -->
+    <!-- Modal for editing subcategory -->
+    <div id="subcategoryModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Редактировать подкатегорию</h2>
+                <span class="close" onclick="closeModal('subcategoryModal')">&times;</span>
+            </div>
+            <form action="/update_subcategory" method="post">
+                <input type="hidden" id="editSubcategoryId" name="ID">
+                <input type="hidden" id="editSubcategoryParentId" name="ParentID">
+
+                <div class="form-row">
+                    <div class="form-group name-group">
+                        <label for="editSubcategoryName">Название <span class="required">*</span></label>
+                        <input type="text" id="editSubcategoryName" name="Name" class="form-control" required>
+                    </div>
+                    <div class="form-group color-group">
+                        <label>Цвет</label>
+                        <div class="custom-color-picker">
+                            <div class="color-display">
+                                <span id="subcategoryColorPreview" class="color-dot"></span>
+                                <span id="subcategoryColorHexValue" class="color-hex">#000000</span>
+                            </div>
+                            <input type="color" id="editSubcategoryColor" name="Color">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group icon-group">
+                        <label>Иконка <span class="required">*</span></label>
+                        <div class="custom-icon-select">
+                            <input type="hidden" id="editSubcategoryIcon" name="Icon">
+                            <div id="subcategorySelectedIconDisplay" class="select-selected-icon">
+                                <span class="selected-icon-svg"></span>
+                                <span class="selected-icon-key">Выберите иконку</span>
+                            </div>
+                            <div id="subcategoryIconOptions" class="select-icon-options">
+                                {{range $key, $svg := .SubcategoryIcons}}
+                                <div class="select-icon-option" data-key="{{$key}}">
+                                    <span class="option-icon-svg">{{$svg}}</span>
+                                    <span class="option-icon-key">{{$key}}</span>
+                                </div>
+                                {{end}}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="button" class="delete-button" onclick="deleteSubcategory()">Удалить подкатегорию</button>
                 <button type="submit">Сохранить</button>
             </form>
         </div>

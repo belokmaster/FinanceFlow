@@ -174,13 +174,16 @@ var IconCategoryNamesToIDs = map[string]TypeCategoryIcons{
 type TypeSubCategoryIcons int
 
 const (
-	Restaurant TypeSubCategoryIcons = iota
+	Restaurant1 TypeSubCategoryIcons = iota
+	FastFood1
 )
 
 var IconSubCategoryFiles = map[TypeSubCategoryIcons]string{
-	Restaurant: "Ресторан1",
+	Restaurant1: "Ресторан1",
+	FastFood1:   "Фаст-фуд1",
 }
 
 var IconSubCategoryNamesToIDs = map[string]TypeSubCategoryIcons{
-	"Ресторан1": Restaurant,
+	"Ресторан1": Restaurant1,
+	"Фаст-фуд1": FastFood1,
 }
