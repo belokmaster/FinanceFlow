@@ -136,6 +136,13 @@ nav a:hover {
     position: relative;
 }
 
+#createAccountCurrency {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-size: 16px;
+    font-weight: 500;
+    color: #333
+}
+
 .new_account-card {
     background-color: #ffffff;
     border: 1px solid #e0e0e0;
@@ -216,7 +223,6 @@ nav a:hover {
     display: flex;
     align-items: flex-end;
     gap: 16px;
-    margin-bottom: 15px;
 }
 
 .form-group {
@@ -261,6 +267,7 @@ nav a:hover {
     box-sizing: border-box;
     font-size: 16px;
     transition: border-color 0.2s;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
 .form-control:focus {
@@ -309,7 +316,7 @@ nav a:hover {
     /* mb change this font to another lately? */
     font-family: monospace;
     font-size: 16px;
-    color: #555;
+    color: #333;
 }
 
 .custom-color-picker input[type="color"] {
@@ -797,7 +804,7 @@ form button[type="submit"]:hover {
 }
 
 .select-selected-account {
-    border: 2px solid #e1e5e9;
+    border: 1px solid #e1e5e9;
     border-radius: 8px;
     padding: 12px 16px;
     cursor: pointer;
@@ -806,12 +813,7 @@ form button[type="submit"]:hover {
 }
 
 .select-selected-account:hover {
-    border-color: #007bff;
-}
-
-.select-selected-account.active {
-    border-color: #007bff;
-    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.1);
+    border-color: #4cd67a;
 }
 
 .selected-account-display {
@@ -962,6 +964,149 @@ form button[type="submit"]:hover {
 
 .selected-account-icon>*,
 .option-account-icon>* {
+    color: white !important;
+    fill: white !important;
+}
+
+/* Category Select Styles */
+.custom-category-select {
+    position: relative;
+    width: 100%;
+}
+
+.select-selected-category {
+    border: 1px solid #e1e5e9;
+    border-radius: 8px;
+    padding: 12px 16px;
+    cursor: pointer;
+    background: white;
+    transition: all 0.2s ease;
+}
+
+.select-selected-category:hover {
+    border-color: #4cd67a;
+}
+
+.selected-category-display {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 12px;
+}
+
+.selected-category-icon {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    background: #f8f9fa;
+    font-size: 18px;
+    flex-shrink: 0;
+}
+
+.selected-category-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.selected-category-name {
+    font-weight: 600;
+    color: #2d3748;
+    font-size: 14px;
+}
+
+.select-category-options {
+    position: absolute;
+    display: none;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: white;
+    border: 1px solid #dcdcdc;
+    border-radius: 8px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+    z-index: 1001;
+    overflow-y: auto;
+    margin-top: 4px;
+    max-height: 300px;
+}
+
+.select-category-options.show {
+    display: block;
+}
+
+.select-category-option {
+    display: flex;
+    align-items: center;
+    padding: 12px 16px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border-bottom: 1px solid #f1f3f4;
+    gap: 12px;
+}
+
+.select-category-option:last-child {
+    border-bottom: none;
+}
+
+.select-category-option:hover {
+    background-color: #f8f9fa;
+}
+
+.select-category-option.selected {
+    background-color: #e3f2fd;
+}
+
+.option-category-icon {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    background: #f8f9fa;
+    font-size: 18px;
+    flex-shrink: 0;
+}
+
+.option-category-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.option-category-name {
+    font-weight: 600;
+    color: #2d3748;
+    font-size: 14px;
+}
+
+.selected-category-icon svg,
+.option-category-icon svg {
+    width: 20px;
+    height: 20px;
+    display: block;
+    fill: white !important;
+    color: white !important;
+}
+
+.selected-category-icon i,
+.option-category-icon i {
+    color: white !important;
+}
+
+.selected-category-icon,
+.option-category-icon {
+    position: relative;
+}
+
+.selected-category-icon>*,
+.option-category-icon>* {
     color: white !important;
     fill: white !important;
 }

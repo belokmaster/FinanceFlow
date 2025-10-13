@@ -145,6 +145,22 @@ function toggleAccountDropdown() {
     }
 }
 
+function toggleCategoryDropdown() {
+    const options = document.getElementById('categoryOptions');
+    const selected = document.querySelector('.select-selected-category');
+
+    if (options && selected) {
+        const isShowing = options.classList.contains('show');
+
+        closeAllDropdowns();
+
+        if (!isShowing) {
+            options.classList.add('show');
+            selected.classList.add('active');
+        }
+    }
+}
+
 function selectAccountOption(optionElement) {
     const accountId = optionElement.getAttribute('data-account-id');
     const accountName = optionElement.getAttribute('data-account-name');
@@ -184,17 +200,62 @@ function selectAccountOption(optionElement) {
     optionElement.classList.add('selected');
 }
 
-function closeAllDropdowns() {
-    const options = document.getElementById('accountOptions');
-    const selected = document.querySelector('.select-selected-account');
+function selectCategoryOption(optionElement) {
+    const categoryId = optionElement.getAttribute('data-category-id');
+    const categoryName = optionElement.getAttribute('data-category-name');
+    const categoryColor = optionElement.getAttribute('data-category-color');
+    const categoryIconElement = optionElement.querySelector('.option-category-icon');
+    const categoryIconHTML = categoryIconElement.innerHTML;
 
-    if (options) options.classList.remove('show');
-    if (selected) selected.classList.remove('active');
+    document.getElementById('transactionCategory').value = categoryId;
+
+    const selectedIcon = document.getElementById('selectedCategoryIcon');
+    const selectedName = document.getElementById('selectedCategoryName');
+
+    if (selectedIcon && selectedName) {
+        selectedIcon.innerHTML = categoryIconHTML;
+        selectedIcon.style.backgroundColor = categoryColor;
+
+        selectedIcon.style.display = 'flex';
+        selectedIcon.style.alignItems = 'center';
+        selectedIcon.style.justifyContent = 'center';
+        selectedIcon.style.borderRadius = '10px';
+        selectedIcon.style.width = '40px';
+        selectedIcon.style.height = '40px';
+        selectedIcon.style.fontSize = '18px';
+
+        selectedName.textContent = categoryName;
+    }
+
+    closeAllDropdowns();
+
+    const allOptions = document.querySelectorAll('.select-category-option');
+    allOptions.forEach(option => {
+        option.classList.remove('selected');
+    });
+    optionElement.classList.add('selected');
+
+    updateSubcategories();
+}
+
+function closeAllDropdowns() {
+    const accountOptions = document.getElementById('accountOptions');
+    const accountSelected = document.querySelector('.select-selected-account');
+    const categoryOptions = document.getElementById('categoryOptions');
+    const categorySelected = document.querySelector('.select-selected-category');
+
+    if (accountOptions) accountOptions.classList.remove('show');
+    if (accountSelected) accountSelected.classList.remove('active');
+    if (categoryOptions) categoryOptions.classList.remove('show');
+    if (categorySelected) categorySelected.classList.remove('active');
 }
 
 document.addEventListener('click', function (event) {
-    const selectContainer = document.querySelector('.custom-account-select');
-    if (!selectContainer.contains(event.target)) {
+    const accountSelectContainer = document.querySelector('.custom-account-select');
+    const categorySelectContainer = document.querySelector('.custom-category-select');
+
+    if ((!accountSelectContainer.contains(event.target)) &&
+        (!categorySelectContainer.contains(event.target))) {
         closeAllDropdowns();
     }
 });
@@ -219,18 +280,58 @@ document.addEventListener('DOMContentLoaded', function () {
     if (firstAccountOption) {
         selectAccountOption(firstAccountOption);
     }
+
+    const categoryOptions = document.querySelectorAll('.select-category-option');
+    categoryOptions.forEach(option => {
+        option.addEventListener('click', function (e) {
+            e.stopPropagation();
+            selectCategoryOption(this);
+        });
+    });
+
+    const firstCategoryOption = document.querySelector('.select-category-option');
+    if (firstCategoryOption) {
+        selectCategoryOption(firstCategoryOption);
+    }
 });
 
 function openCreateTransactionModal() {
-    const modal = document.getElementById('createTransactionModal');
-    if (modal) {
-        modal.style.display = 'flex';
+    document.getElementById('transactionAccount').value = '';
+    document.getElementById('transactionCategory').value = '';
+    createTransactionAmountInput.value = '';
+    document.getElementById('transactionDescription').value = '';
+    document.getElementById('transactionDate').value = '';
 
-        setTimeout(() => {
-            const firstAccountOption = document.querySelector('.select-account-option');
-            if (firstAccountOption) {
-                selectAccountOption(firstAccountOption);
+    const typeButtons = document.querySelectorAll('.type-btn');
+    typeButtons.forEach(btn => btn.classList.remove('active'));
+    document.querySelector('.income-btn').classList.add('active');
+    document.getElementById('transactionType').value = '0';
+
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('transactionDate').value = today;
+
+    setTimeout(() => {
+        const firstAccountOption = document.querySelector('.select-account-option');
+        if (firstAccountOption) {
+            selectAccountOption(firstAccountOption);
+        }
+
+        const firstCategoryOption = document.querySelector('.select-category-option');
+        if (firstCategoryOption) {
+            selectCategoryOption(firstCategoryOption);
+        }
+    }, 100);
+
+    // automatic point 0.00 to amount
+    const createAmmountForm = document.querySelector('form[action="/submit_transaction"]');
+    if (createAmmountForm) {
+        createAmmountForm.onsubmit = function () {
+            const amountInput = document.getElementById('transactionAmount');
+            if (!amountInput.value.trim()) {
+                amountInput.value = '0.00';
             }
-        }, 100);
+        };
     }
+
+    openModal('createTransactionModal');
 }
