@@ -45,7 +45,7 @@ function updateColorDisplay(newColor, previewEl, hexEl) {
 function openCreateModal() {
     // zero values
     document.getElementById('createAccountName').value = '';
-    createAccountBalanceInput.value = '0.00';
+    createAccountBalanceInput.value = '';
     document.getElementById('createAccountCurrency').value = '0';
     createColorInput.value = '#4cd67a';
     createHiddenIconInput.value = '';
@@ -54,6 +54,17 @@ function openCreateModal() {
     createSelectedIconDisplay.querySelector('.selected-icon-key').textContent = 'Выберите иконку';
 
     updateColorDisplay('#4cd67a', createColorPreview, createColorHexValue);
+
+    // automatic point 0.00 to balance
+    const createAccountForm = document.querySelector('form[action="/create_account"]');
+    if (createAccountForm) {
+        createAccountForm.onsubmit = function () {
+            const balanceInput = document.getElementById('createAccountBalance');
+            if (!balanceInput.value.trim()) {
+                balanceInput.value = '0.00';
+            }
+        };
+    }
 
     openModal('createAccountModal');
 }
@@ -101,6 +112,7 @@ function deleteAccount() {
     }
 }
 
+// normal format to balace. like xxx.xx
 function formatBalanceInput(e) {
     let value = e.target.value;
 
@@ -213,18 +225,3 @@ document.addEventListener('keydown', function (e) {
         }
     }
 });
-
-// delete it later when account will done
-function showForm(formId) {
-    const formsToHide = ['transferForm', 'transactionForm', 'createCategoryForm', 'deleteCategoryForm', 'createSubCategoryForm', 'deleteSubCategoryForm', 'deleteAccountForm'];
-    formsToHide.forEach(id => {
-        const formElement = document.getElementById(id);
-        if (formElement) {
-            formElement.style.display = 'none';
-        }
-    });
-    const formToShow = document.getElementById(formId);
-    if (formToShow) {
-        formToShow.style.display = 'block';
-    }
-}

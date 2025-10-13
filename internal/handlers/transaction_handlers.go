@@ -16,7 +16,7 @@ func TransactionHandler(w http.ResponseWriter, r *http.Request, db *gorm.DB) {
 
 	if r.Method != http.MethodPost {
 		log.Printf("TransactionHandler: Invalid method %s, redirecting to /", r.Method)
-		http.Redirect(w, r, "/", http.StatusSeeOther)
+		http.Redirect(w, r, "/transactions", http.StatusSeeOther)
 		return
 	}
 
@@ -98,5 +98,5 @@ func TransactionHandler(w http.ResponseWriter, r *http.Request, db *gorm.DB) {
 	}
 
 	log.Printf("TransactionHandler: Transaction added successfully - AccountID=%d, Type=%d, Amount=%.2f", accountID, transType, amount)
-	http.Redirect(w, r, "/", http.StatusSeeOther)
+	http.Redirect(w, r, "/transactions", http.StatusSeeOther)
 }

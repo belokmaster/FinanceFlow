@@ -14,6 +14,13 @@ import (
 func NewTransactionPageHandler(w http.ResponseWriter, r *http.Request, db *gorm.DB, path string) {
 	log.Printf("NewTransactionPageHandler: Preparing data for new transaction page")
 
+	if r.Method != http.MethodGet {
+		log.Printf("NewTransactionPageHandler: Invalid method %s, redirecting to /", r.Method)
+		http.Redirect(w, r, "/transactions", http.StatusSeeOther)
+		return
+	}
+
+	log.Printf("NewTransactionPageHandler: Getting accounts from database")
 	accounts, err := database.GetAccounts(db)
 	if err != nil {
 		log.Printf("NewTransactionPageHandler: Error getting accounts: %v", err)
@@ -21,12 +28,33 @@ func NewTransactionPageHandler(w http.ResponseWriter, r *http.Request, db *gorm.
 		return
 	}
 
+	log.Printf("NewTransactionPageHandler: Retrieved %d accounts from database", len(accounts))
+
 	var accountsForView []AccountView
 	for _, acc := range accounts {
-		symbol, _ := database.CurrencySymbols[acc.CurrencyCode]
+		symbol, ok := database.CurrencySymbols[acc.CurrencyCode]
+		if !ok {
+			log.Printf("NewTransactionPageHandler: Unknown currency code %d for account %s, using default symbol", acc.CurrencyCode, acc.Name)
+			symbol = "?"
+		}
+
 		color := "#" + acc.Color
-		iconFileName, _ := database.IconAccountFiles[acc.IconCode]
-		iconHTML, _ := icons.AccountIconCache[iconFileName]
+		if color == "" {
+			log.Printf("NewTransactionPageHandler: Empty color for account %s, using default", acc.Name)
+			color = "#4cd67a"
+		}
+
+		iconFileName, ok := database.IconAccountFiles[acc.IconCode]
+		if !ok {
+			log.Printf("NewTransactionPageHandler: Unknown icon code %d for account %s, using default icon", acc.IconCode, acc.Name)
+			iconFileName = "Wallet"
+		}
+
+		iconHTML, ok := icons.AccountIconCache[iconFileName]
+		if !ok {
+			log.Printf("NewTransactionPageHandler: Icon file %s not found in cache for account %s, using coin icon", iconFileName, acc.Name)
+			iconHTML = icons.AccountIconCache["coin"]
+		}
 
 		accountsForView = append(accountsForView, AccountView{
 			ID:             acc.ID,
@@ -38,7 +66,8 @@ func NewTransactionPageHandler(w http.ResponseWriter, r *http.Request, db *gorm.
 			IconHTML:       iconHTML,
 		})
 	}
-	log.Printf("NewTransactionPageHandler: Prepared %d accounts", len(accountsForView))
+
+	log.Printf("HomeHandler: Parsing template from path: %s", path)
 
 	categories, err := database.GetCategories(db)
 	if err != nil {
