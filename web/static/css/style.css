@@ -177,6 +177,8 @@ nav a:hover {
     text-align: left;
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
     border: 1px solid #f0f0f0;
+    justify-content: center;
+    align-items: center;
 }
 
 .modal-header {
@@ -666,4 +668,121 @@ form button[type="submit"]:hover {
     flex-direction: column;
     gap: 20px;
     width: 100%;
+}
+
+.new_transaction-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    padding: 20px 30px;
+}
+
+.new_transaction-card {
+    background-color: #ffffff;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    align-items: center;
+    padding: 12px 15px;
+    height: 30px;
+    width: 300px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    font-weight: bold;
+}
+
+.new_transaction-card:hover {
+    background-color: #f9f9f9;
+    border-color: #4cd67a;
+    color: #333;
+}
+
+/* START DEL AREA */
+.form-group select {
+    width: 100%;
+    height: 35px;
+    padding: 0 12px;
+    border: 1px solid #dcdcdc;
+    border-radius: 8px;
+    box-sizing: border-box;
+    font-size: 16px;
+    transition: border-color 0.2s;
+    background-color: white;
+}
+
+.form-group select:focus {
+    outline: none;
+    border-color: #4cd67a;
+}
+
+.form-group input[type="date"] {
+    width: 100%;
+    height: 35px;
+    padding: 0 12px;
+    border: 1px solid #dcdcdc;
+    border-radius: 8px;
+    box-sizing: border-box;
+    font-size: 16px;
+    transition: border-color 0.2s;
+}
+
+.form-group input[type="date"]:focus {
+    outline: none;
+    border-color: #4cd67a;
+}
+
+.btn-primary {
+    width: 100%;
+    height: 46px;
+    background-color: #4cd67a;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    margin-top: 20px;
+}
+
+.btn-primary:hover {
+    background-color: #45b96c;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-actions {
+    margin-top: 25px;
+}
+
+/* END OF DELETED SECTOR */
+
+/* button on transaction window block */
+.type-buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 5px;
+}
+
+.type-btn {
+    flex: 1;
+    padding: 10px;
+    background: white;
+    cursor: pointer;
+    font-size: 14px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+}
+
+.type-btn.active {
+    font-weight: bold;
+    color: white;
+}
+
+.income-btn.active {
+    background-color: #4cd67a;
+}
+
+.expense-btn.active {
+    background-color: #ac4c4c;
 }

@@ -19,8 +19,8 @@
         <nav>
             <a href="/" class="active">Счета</a>
             <a href="/categories">Категории</a>
-            <a href="#">Записи</a>
-            <a href="#">Аналитика</a>
+            <a href="/transactions">Записи</a>
+            <a href=" #">Аналитика</a>
             <a href="#">Нейронка</a>
         </nav>
     </header>
@@ -32,6 +32,7 @@
                 <h2>Редактировать счет</h2>
                 <span class="close" onclick="closeModal('accountModal')">&times;</span>
             </div>
+
             <form action="/update_account" method="post">
                 <!-- id only for server -->
                 <input type="hidden" id="editAccountId" name="ID">

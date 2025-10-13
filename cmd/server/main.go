@@ -59,6 +59,11 @@ func main() {
 		handlers.CategoryPageHandler(w, r, db, path)
 	})
 
+	http.HandleFunc("/transactions", func(w http.ResponseWriter, r *http.Request) {
+		path := "web/templates/transaction.html"
+		handlers.NewTransactionPageHandler(w, r, db, path)
+	})
+
 	http.HandleFunc("/create_account", func(w http.ResponseWriter, r *http.Request) {
 		handlers.CreateAccountHandler(w, r, db)
 	})

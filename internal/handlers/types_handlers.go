@@ -47,3 +47,8 @@ type SubCategoryPageData struct {
 	Categories []SubCategoryView
 	Icons      map[string]template.HTML
 }
+
+type TransactionPageData struct {
+	Accounts   []AccountView
+	Categories []CategoryView
+}

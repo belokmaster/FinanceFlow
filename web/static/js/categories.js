@@ -285,11 +285,6 @@ document.addEventListener('click', function (e) {
         createSubcategoryIconOptionsContainer.classList.remove('show');
         createSubcategoryIconSelect.classList.remove('active');
     }
-
-    if (editSubcategoryIconSelect && !editSubcategoryIconSelect.contains(e.target)) {
-        editSubcategoryIconOptionsContainer.classList.remove('show');
-        editSubcategoryIconSelect.classList.remove('active');
-    }
 });
 
 document.addEventListener('keydown', function (e) {
