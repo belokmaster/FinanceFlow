@@ -217,46 +217,6 @@
         </div>
     </div>
 
-    <h2>choise your option</h2>
-    <form>
-        <input type="button" value="Transfer" onclick="showForm('transferForm')"><br>
-        <input type="button" value="Transaction" onclick="showForm('transactionForm')"><br>
-    </form>
-    <div id="transactionForm" style="display: none;">
-        <h2>test add the transaction</h2>
-        <form action="/submit_transaction" method="post">
-            <label for="AccountID">AccountID:</label>
-            <input type="text" id="AccountID" name="AccountID" required><br>
-            <label for="CategoryID">CategoryID:</label>
-            <input type="text" id="CategoryID" name="CategoryID" required><br>
-            <label for="SubCategoryID">SubCategoryID:</label>
-            <input type="text" id="SubCategoryID" name="SubCategoryID"><br>
-            <label for="Type">Type (0/1):</label>
-            <input type="text" id="Type" name="Type" required><br>
-            <label for="Amount">Amount:</label>
-            <input type="text" id="Amount" name="Amount" required><br>
-            <label for="Comment">Comment:</label>
-            <input type="text" id="Comment" name="Comment"><br>
-            <button type="submit">add the transaction</button>
-        </form>
-    </div>
-    <div id="transferForm" style="display: none;">
-        <h2>test transfer from acc to acc</h2>
-        <form action="/transfer" method="post">
-            <label for="AccountID">AccountID:</label>
-            <input type="text" id="AccountID" name="AccountID" required><br>
-            <label for="TransferAccountID">TransferAccountID:</label>
-            <input type="text" id="TransferAccountID" name="TransferAccountID" required><br>
-            <label for="Type">Type (2):</label>
-            <input type="text" id="Type" name="Type" required><br>
-            <label for="Amount">Amount:</label>
-            <input type="text" id="Amount" name="Amount" required><br>
-            <label for="Comment">Comment:</label>
-            <input type="text" id="Comment" name="Comment"><br>
-            <button type="submit">approve transfer</button>
-        </form>
-    </div>
-
     <script src="/static/js/accounts.js"></script>
 </body>
 

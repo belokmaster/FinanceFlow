@@ -32,8 +32,9 @@ function openCreateTransactionModal() {
     document.querySelector('.income-btn').classList.add('active');
     document.getElementById('transactionType').value = '0';
 
-    const today = new Date().toISOString().split('T')[0];
-    document.getElementById('transactionDate').value = today;
+    const today = new Date();
+    const formattedDate = today.toISOString().split('T')[0];
+    document.getElementById('transactionDate').value = formattedDate;
 
     // automatic point 0.00 to amount
     const createAmmountForm = document.querySelector('form[action="/submit_transaction"]');
@@ -52,22 +53,29 @@ function openCreateTransactionModal() {
 
 function updateSubcategories() {
     const categorySelect = document.getElementById('transactionCategory');
-    const subCategorySelect = document.getElementById('transactionSubCategory');
     const selectedCategoryId = categorySelect.value;
+    const allSubOptions = document.querySelectorAll('.select-subcategory-option');
 
-    const allSubOptions = subCategorySelect.querySelectorAll('option[data-parent]');
     allSubOptions.forEach(option => {
         option.style.display = 'none';
     });
 
     if (selectedCategoryId) {
-        const relevantSubOptions = subCategorySelect.querySelectorAll(`option[data-parent="${selectedCategoryId}"]`);
+        const relevantSubOptions = document.querySelectorAll(`.select-subcategory-option[data-parent-id="${selectedCategoryId}"]`);
         relevantSubOptions.forEach(option => {
-            option.style.display = 'block';
+            option.style.display = 'flex';
         });
     }
 
-    subCategorySelect.value = "";
+    document.getElementById('transactionSubCategory').value = '';
+    document.getElementById('selectedSubcategoryIcon').innerHTML = '';
+    document.getElementById('selectedSubcategoryIcon').style.backgroundColor = '';
+    document.getElementById('selectedSubcategoryName').textContent = 'Выберите подкатегорию';
+
+    const allSubcategoryOptions = document.querySelectorAll('.select-subcategory-option');
+    allSubcategoryOptions.forEach(option => {
+        option.classList.remove('selected');
+    });
 }
 
 document.addEventListener('DOMContentLoaded', function () {
@@ -75,6 +83,14 @@ document.addEventListener('DOMContentLoaded', function () {
     if (categorySelect) {
         categorySelect.addEventListener('change', updateSubcategories);
     }
+
+    const subcategoryOptions = document.querySelectorAll('.select-subcategory-option');
+    subcategoryOptions.forEach(option => {
+        option.addEventListener('click', function (e) {
+            e.stopPropagation();
+            selectSubcategoryOption(this);
+        });
+    });
 });
 
 document.addEventListener('DOMContentLoaded', function () {
@@ -148,6 +164,22 @@ function toggleAccountDropdown() {
 function toggleCategoryDropdown() {
     const options = document.getElementById('categoryOptions');
     const selected = document.querySelector('.select-selected-category');
+
+    if (options && selected) {
+        const isShowing = options.classList.contains('show');
+
+        closeAllDropdowns();
+
+        if (!isShowing) {
+            options.classList.add('show');
+            selected.classList.add('active');
+        }
+    }
+}
+
+function toggleSubcategoryDropdown() {
+    const options = document.getElementById('subcategoryOptions');
+    const selected = document.querySelector('.select-selected-subcategory');
 
     if (options && selected) {
         const isShowing = options.classList.contains('show');
@@ -238,24 +270,66 @@ function selectCategoryOption(optionElement) {
     updateSubcategories();
 }
 
+function selectSubcategoryOption(optionElement) {
+    const subcategoryId = optionElement.getAttribute('data-subcategory-id');
+    const subcategoryName = optionElement.getAttribute('data-subcategory-name');
+    const subcategoryColor = optionElement.getAttribute('data-subcategory-color');
+    const subcategoryIconElement = optionElement.querySelector('.option-subcategory-icon');
+    const subcategoryIconHTML = subcategoryIconElement.innerHTML;
+
+    document.getElementById('transactionSubCategory').value = subcategoryId;
+
+    const selectedIcon = document.getElementById('selectedSubcategoryIcon');
+    const selectedName = document.getElementById('selectedSubcategoryName');
+
+    if (selectedIcon && selectedName) {
+        selectedIcon.innerHTML = subcategoryIconHTML;
+        selectedIcon.style.backgroundColor = subcategoryColor;
+
+        selectedIcon.style.display = 'flex';
+        selectedIcon.style.alignItems = 'center';
+        selectedIcon.style.justifyContent = 'center';
+        selectedIcon.style.borderRadius = '10px';
+        selectedIcon.style.width = '40px';
+        selectedIcon.style.height = '40px';
+        selectedIcon.style.fontSize = '18px';
+
+        selectedName.textContent = subcategoryName;
+    }
+
+    closeAllDropdowns();
+
+    const allOptions = document.querySelectorAll('.select-subcategory-option');
+    allOptions.forEach(option => {
+        option.classList.remove('selected');
+    });
+    optionElement.classList.add('selected');
+}
+
 function closeAllDropdowns() {
     const accountOptions = document.getElementById('accountOptions');
     const accountSelected = document.querySelector('.select-selected-account');
     const categoryOptions = document.getElementById('categoryOptions');
     const categorySelected = document.querySelector('.select-selected-category');
+    const subcategoryOptions = document.getElementById('subcategoryOptions');
+    const subcategorySelected = document.querySelector('.select-selected-subcategory');
 
     if (accountOptions) accountOptions.classList.remove('show');
     if (accountSelected) accountSelected.classList.remove('active');
     if (categoryOptions) categoryOptions.classList.remove('show');
     if (categorySelected) categorySelected.classList.remove('active');
+    if (subcategoryOptions) subcategoryOptions.classList.remove('show');
+    if (subcategorySelected) subcategorySelected.classList.remove('active');
 }
 
 document.addEventListener('click', function (event) {
     const accountSelectContainer = document.querySelector('.custom-account-select');
     const categorySelectContainer = document.querySelector('.custom-category-select');
+    const subcategorySelectContainer = document.querySelector('.custom-subcategory-select');
 
     if ((!accountSelectContainer.contains(event.target)) &&
-        (!categorySelectContainer.contains(event.target))) {
+        (!categorySelectContainer.contains(event.target)) &&
+        (!subcategorySelectContainer.contains(event.target))) {
         closeAllDropdowns();
     }
 });
@@ -320,6 +394,15 @@ function openCreateTransactionModal() {
         if (firstCategoryOption) {
             selectCategoryOption(firstCategoryOption);
         }
+
+        document.getElementById('selectedSubcategoryIcon').innerHTML = '';
+        document.getElementById('selectedSubcategoryIcon').style.backgroundColor = '';
+        document.getElementById('selectedSubcategoryName').textContent = 'Выберите подкатегорию';
+
+        const allSubcategoryOptions = document.querySelectorAll('.select-subcategory-option');
+        allSubcategoryOptions.forEach(option => {
+            option.classList.remove('selected');
+        });
     }, 100);
 
     // automatic point 0.00 to amount

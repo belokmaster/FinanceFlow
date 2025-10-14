@@ -42,11 +42,11 @@ type Transaction struct {
 	Account       Account
 	CategoryID    uint
 	Category      Category
-	SubCategoryID uint
-	SubCategory   SubCategory
+	SubCategoryID uint        `gorm:"null"`
+	SubCategory   SubCategory `gorm:"foreignKey:SubCategoryID"`
 	Type          TypeTransaction
 	Amount        float64
-	Comment       string
+	Comment       string `gorm:"size:500;null"`
 	Date          time.Time
 }
 

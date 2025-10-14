@@ -54,11 +54,25 @@ func TransactionHandler(w http.ResponseWriter, r *http.Request, db *gorm.DB) {
 		return
 	}
 
-	subCategoryID, err := strconv.Atoi(r.FormValue("SubCategoryID"))
-	if err != nil {
-		log.Printf("TransactionHandler: Invalid subcategory ID '%s': %v", r.FormValue("SubCategoryID"), err)
-		http.Error(w, "problem with subcategory_id. use normal values", http.StatusBadRequest)
-		return
+	var subCategoryID uint
+	subCategoryIDStr := r.FormValue("SubCategoryID")
+	if subCategoryIDStr != "" {
+		subID, err := strconv.Atoi(subCategoryIDStr)
+		if err != nil {
+			log.Printf("TransactionHandler: Invalid subcategory ID '%s': %v", subCategoryIDStr, err)
+			http.Error(w, "problem with subcategory_id. use normal values", http.StatusBadRequest)
+			return
+		}
+
+		if subID < 0 {
+			log.Printf("TransactionHandler: Negative subcategory ID %d", subID)
+			http.Error(w, "problem with subcategory_id. use positive values", http.StatusBadRequest)
+			return
+		}
+		subCategoryID = uint(subID)
+		log.Printf("TransactionHandler: SubCategoryID selected: %d", subCategoryID)
+	} else {
+		log.Printf("TransactionHandler: SubCategoryID not selected")
 	}
 
 	transType, err := strconv.Atoi(r.FormValue("Type"))
@@ -76,7 +90,12 @@ func TransactionHandler(w http.ResponseWriter, r *http.Request, db *gorm.DB) {
 	}
 
 	comment := r.FormValue("Comment")
-	log.Printf("TransactionHandler: Comment: '%s'", comment)
+
+	if comment == "" {
+		log.Printf("TransactionHandler: Comment is empty, will be stored as NULL")
+	} else {
+		log.Printf("TransactionHandler: Comment: '%s'", comment)
+	}
 
 	tx := database.Transaction{
 		AccountID:     uint(accountID),
