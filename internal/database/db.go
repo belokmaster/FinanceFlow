@@ -106,3 +106,20 @@ func GetSubCategories(db *gorm.DB) ([]SubCategory, error) {
 	log.Printf("Successfully got %d sub_categories from db", len(sub_categories))
 	return sub_categories, nil
 }
+
+func GetTransactions(db *gorm.DB) ([]Transaction, error) {
+	log.Println("Getting all transactions from database")
+
+	var transactions []Transaction
+	result := db.
+		Preload("Account").
+		Preload("Category").
+		Preload("SubCategory").
+		Find(&transactions)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	log.Printf("Successfully got %d sub_categories from db", len(transactions))
+	return transactions, nil
+}

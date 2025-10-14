@@ -3,6 +3,7 @@ package handlers
 import (
 	"finance_flow/internal/database"
 	"finance_flow/internal/icons"
+	"html/template"
 	"log"
 
 	"gorm.io/gorm"
@@ -127,4 +128,103 @@ func convertCategoriesToView(categories []database.Category, subcategoriesByPare
 	}
 
 	return categoriesForView
+}
+
+func getTransactionsForView(db *gorm.DB) ([]TransactionView, error) {
+	log.Printf("getTransactionsForView: Getting transactions from database")
+
+	transactions, err := database.GetTransactions(db)
+	if err != nil {
+		log.Printf("getTransactionsForView: Error getting transactions: %v", err)
+		return nil, err
+	}
+
+	log.Printf("getTransactionsForView: Retrieved %d transactions from database", len(transactions))
+
+	var transactionsForView []TransactionView
+	for _, tx := range transactions {
+		symbol, ok := database.CurrencySymbols[tx.Account.CurrencyCode]
+		if !ok {
+			log.Printf("getTransactionsForView: Unknown currency code %d for transaction %d, using default symbol", tx.Account.CurrencyCode, tx.ID)
+			symbol = "?"
+		}
+
+		formattedDate := tx.Date.Format("02.01.2006")
+		dateOnly := tx.Date.Format("2006-01-02")
+
+		var (
+			displayColor       string
+			displayIconHTML    template.HTML
+			displayName        string
+			parentCategoryName string
+		)
+
+		if tx.SubCategoryID != 0 && tx.SubCategory.ID != 0 {
+			log.Printf("Transaction %d has subcategory: %s", tx.ID, tx.SubCategory.Name)
+
+			displayColor = tx.SubCategory.Color
+			if displayColor == "" {
+				displayColor = "4cd67a"
+			}
+
+			subCategoryIconFileName, ok := database.IconSubCategoryFiles[tx.SubCategory.IconCode]
+			if !ok {
+				subCategoryIconFileName = "Restaraunt1"
+			}
+
+			displayIconHTML, ok = icons.SubCategoryIconCache[subCategoryIconFileName]
+			if !ok {
+				displayIconHTML = icons.SubCategoryIconCache["Restaraunt1"]
+			}
+
+			displayName = tx.SubCategory.Name
+			parentCategoryName = tx.Category.Name
+
+		} else {
+			displayColor = tx.Category.Color
+			if displayColor == "" {
+				displayColor = "4cd67a"
+			}
+
+			categoryIconFileName, ok := database.IconCategoryFiles[tx.Category.IconCode]
+			if !ok {
+				categoryIconFileName = "Food"
+			}
+
+			displayIconHTML, ok = icons.CategoryIconCache[categoryIconFileName]
+			if !ok {
+				displayIconHTML = icons.CategoryIconCache["Food"]
+			}
+
+			displayName = tx.Category.Name
+		}
+
+		transactionView := TransactionView{
+			ID:                 tx.ID,
+			Type:               tx.Type,
+			Amount:             tx.Amount,
+			AccountID:          tx.AccountID,
+			AccountName:        tx.Account.Name,
+			CurrencySymbol:     symbol,
+			CategoryID:         tx.CategoryID,
+			CategoryName:       tx.Category.Name,
+			CategoryColor:      displayColor,
+			CategoryIconHTML:   displayIconHTML,
+			DisplayName:        displayName,
+			ParentCategoryName: parentCategoryName,
+			Date:               dateOnly,
+			FormattedDate:      formattedDate,
+			Description:        tx.Comment,
+		}
+
+		if tx.SubCategoryID != 0 && tx.SubCategory.ID != 0 {
+			transactionView.SubCategoryID = &tx.SubCategoryID
+			subCatName := tx.SubCategory.Name
+			transactionView.SubCategoryName = &subCatName
+		}
+
+		transactionsForView = append(transactionsForView, transactionView)
+	}
+
+	return transactionsForView, nil
 }

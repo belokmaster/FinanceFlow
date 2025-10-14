@@ -25,12 +25,51 @@
         </nav>
     </header>
 
-    <div class="new_transaction-container">
-        <div class="new_transaction-card" onclick="openCreateTransactionModal()">
-            <i class="fa-solid fa-plus"></i>
-            <span>Добавить запись</span>
+    <div class="transactions-wrapper">
+        <div class="new_transaction-container">
+            <div class="new_transaction-card" onclick="openCreateTransactionModal()">
+                <i class="fa-solid fa-plus"></i>
+                <span>Добавить запись</span>
+            </div>
+        </div>
+
+        <div class="transactions-container">
+            {{range .Transactions}}
+            <div class="transaction-card">
+                <div class="transaction-icon-container" style="background-color: #{{.CategoryColor}};">
+                    <div class="transaction-icon">{{.CategoryIconHTML}}</div>
+                </div>
+                <div class="transaction-info">
+                    <div class="transaction-top-line">
+                        <div class="transaction-category-line">
+                            {{if .ParentCategoryName}}
+                            <span class="transaction-main-category">{{.ParentCategoryName}}:</span>
+                            <span class="transaction-subcategory">{{.DisplayName}}</span>
+                            {{else}}
+                            <span class="transaction-main-category">{{.DisplayName}}</span>
+                            {{end}}
+                        </div>
+                        <div class="transaction-center-account">
+                            <span class="transaction-account">{{.AccountName}}</span>
+                        </div>
+                        <span class="transaction-amount {{if eq .Type 0}}income{{else}}expense{{end}}">
+                            {{if eq .Type 1}}-{{end}}{{printf "%.2f" .Amount}} {{.CurrencySymbol}}
+                        </span>
+                    </div>
+                    <div class="transaction-bottom-line">
+                        <div class="transaction-date">{{.FormattedDate}}</div>
+                        {{if .Description}}
+                        <div class="transaction-description">{{.Description}}</div>
+                        {{end}}
+                    </div>
+                </div>
+            </div>
+            {{else}}
+            <p>Транзакций пока нет. Создайте первую транзакцию!</p>
+            {{end}}
         </div>
     </div>
+
 
     <div id="createTransactionModal" class="modal">
         <div class="modal-content">
@@ -65,7 +104,8 @@
                             <div class="selected-account-display">
                                 <span class="selected-account-icon" id="selectedAccountIcon"></span>
                                 <span class="selected-account-info">
-                                    <span class="selected-account-name" id="selectedAccountName">Выберите счет</span>
+                                    <span class="selected-account-name" id="selectedAccountName">Выберите
+                                        счет</span>
                                     <span class="selected-account-balance" id="selectedAccountBalance"></span>
                                 </span>
                                 <i class="fa-solid fa-chevron-down dropdown-arrow"></i>
