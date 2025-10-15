@@ -1257,11 +1257,12 @@ form button[type="submit"]:hover {
 }
 
 .transaction-card {
+    height: auto;
     background-color: #ffffff;
     border: 1px solid #e0e0e0;
     border-radius: 8px;
     padding: 12px 15px;
-    height: 50px;
+    min-height: 50px;
     width: 900px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     display: flex;
@@ -1407,16 +1408,22 @@ form button[type="submit"]:hover {
 
 .transaction-description {
     font-size: 12px;
+    flex: 1;
     color: #888;
     font-style: italic;
+    word-break: break-word;
+    white-space: normal;
+    line-height: 1.3;
+    width: 100%;
 }
 
 .transaction-top-line {
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-columns: 1fr 1fr 1.5fr 0.5fr;
     align-items: center;
     margin-bottom: 4px;
     gap: 10px;
+    width: 100%;
 }
 
 .transactions-wrapper {
@@ -1499,8 +1506,10 @@ form button[type="submit"]:hover {
 }
 
 .transaction-amount-section {
+    flex-shrink: 0;
     display: flex;
     flex-direction: column;
+    width: 100px;
     align-items: flex-end;
     gap: 1px;
     margin-bottom: 0px;

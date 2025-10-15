@@ -93,6 +93,7 @@ func TransactionHandler(w http.ResponseWriter, r *http.Request, db *gorm.DB) {
 
 	if comment == "" {
 		log.Printf("TransactionHandler: Comment is empty, will be stored as NULL")
+		comment = " "
 	} else {
 		log.Printf("TransactionHandler: Comment: '%s'", comment)
 	}
@@ -263,6 +264,7 @@ func UpdateTransactionHandler(w http.ResponseWriter, r *http.Request, db *gorm.D
 	comment := r.FormValue("Description")
 	if comment == "" {
 		log.Printf("UpdateTransactionHandler: Comment is empty, will be stored as NULL")
+		comment = " "
 	} else {
 		log.Printf("UpdateTransactionHandler: Comment: '%s'", comment)
 	}

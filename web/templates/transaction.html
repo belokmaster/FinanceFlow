@@ -56,6 +56,7 @@
                     </div>
                     <div class="transaction-info">
                         <div class="transaction-top-line">
+
                             <div class="transaction-category-line">
                                 {{if .ParentCategoryName}}
                                 <span class="transaction-main-category">{{.ParentCategoryName}}:</span>
@@ -64,10 +65,18 @@
                                 <span class="transaction-main-category">{{.DisplayName}}</span>
                                 {{end}}
                             </div>
+
                             <div class="transaction-center-account">
                                 <div class="account-color-dot" style="background-color: #{{.AccountColor}};"></div>
                                 <span class="transaction-account">{{.AccountName}}</span>
                             </div>
+
+                            {{if .Description}}
+                            <div class="transaction-comment-overlay">
+                                <div class="transaction-description">{{.Description}}</div>
+                            </div>
+                            {{end}}
+
                             <div class="transaction-amount-section">
                                 <span class="transaction-amount {{if eq .Type 0}}income{{else}}expense{{end}}">
                                     {{if eq .Type 1}}-{{end}}{{printf "%.2f" .Amount}} {{.CurrencySymbol}}
@@ -75,11 +84,10 @@
                                 <span class="transaction-time">{{.FormattedTime}}</span>
                             </div>
                         </div>
+
                         <div class="transaction-bottom-line">
                             <div class="transaction-date">{{.FormattedDate}}</div>
-                            {{if .Description}}
-                            <div class="transaction-description">{{.Description}}</div>
-                            {{end}}
+
                         </div>
                     </div>
                 </div>
@@ -219,7 +227,7 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="transactionDate">Дата</label>
+                    <label for="transactionDate">Дата <span class="required">*</span></label>
                     <input type="date" id="transactionDate" name="Date" required>
                 </div>
 
@@ -238,7 +246,7 @@
         </div>
     </div>
 
-    <!-- Edit Transaction Modal -->
+    <!-- edit transaction -->
     <div id="editTransactionModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
@@ -367,7 +375,7 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="editTransactionDate">Дата</label>
+                    <label for="editTransactionDate">Дата <span class="required">*</span></label>
                     <input type="date" id="editTransactionDate" name="Date" required>
                 </div>
 

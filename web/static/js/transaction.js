@@ -37,12 +37,27 @@ function openCreateTransactionModal() {
     document.getElementById('transactionDate').value = formattedDate;
 
     // automatic point 0.00 to amount
-    const createAmmountForm = document.querySelector('form[action="/submit_transaction"]');
-    if (createAmmountForm) {
-        createAmmountForm.onsubmit = function () {
-            const amountInput = document.getElementById('transactionAmount');
-            if (!amountInput.value.trim()) {
-                amountInput.value = '0.00';
+    const createForm = document.querySelector('form[action="/submit_transaction"]');
+    if (createForm) {
+        createForm.onsubmit = function (e) {
+            const account = document.getElementById('transactionAccount').value;
+            const category = document.getElementById('transactionCategory').value;
+            const amount = document.getElementById('transactionAmount').value.trim();
+
+            if (!account) {
+                alert('Выберите аккаунт!');
+                e.preventDefault();
+                return false;
+            }
+
+            if (!category) {
+                alert('Выберите категорию!');
+                e.preventDefault();
+                return false;
+            }
+
+            if (amount === '') {
+                document.getElementById('transactionAmount').value = '0.00';
             }
         };
     }
@@ -665,26 +680,16 @@ function openEditTransactionModal(id, type, amount, accountId, accountName, acco
     document.getElementById('editSelectedSubcategoryIcon').style.backgroundColor = '';
     document.getElementById('editSelectedSubcategoryName').textContent = 'Выберите подкатегорию';
 
-    setTimeout(() => {
-        const accountOption = document.querySelector(`#editAccountOptions .select-account-option[data-account-id="${accountId}"]`);
-        if (accountOption) {
-            selectEditAccountOption(accountOption);
-        }
+    const accountOption = document.querySelector(`#editAccountOptions .select-account-option[data-account-id="${accountId}"]`);
+    if (accountOption) selectEditAccountOption(accountOption);
 
-        const categoryOption = document.querySelector(`#editCategoryOptions .select-category-option[data-category-id="${categoryId}"]`);
-        if (categoryOption) {
-            selectEditCategoryOption(categoryOption);
-        }
+    const categoryOption = document.querySelector(`#editCategoryOptions .select-category-option[data-category-id="${categoryId}"]`);
+    if (categoryOption) selectEditCategoryOption(categoryOption);
 
-        setTimeout(() => {
-            if (subCategoryId && subCategoryId !== 'null' && subCategoryId !== '') {
-                const subCategoryOption = document.querySelector(`#editSubcategoryOptions .select-subcategory-option[data-subcategory-id="${subCategoryId}"]`);
-                if (subCategoryOption) {
-                    selectEditSubcategoryOption(subCategoryOption);
-                }
-            }
-        }, 200);
-    }, 100);
+    if (subCategoryId && subCategoryId !== 'null' && subCategoryId !== '') {
+        const subCategoryOption = document.querySelector(`#editSubcategoryOptions .select-subcategory-option[data-subcategory-id="${subCategoryId}"]`);
+        if (subCategoryOption) selectEditSubcategoryOption(subCategoryOption);
+    }
 
     openModal('editTransactionModal');
 }

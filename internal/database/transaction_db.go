@@ -31,7 +31,7 @@ func AddTransaction(db *gorm.DB, tx Transaction) error {
 
 		log.Printf("Found account: ID=%d, Name=%s, Old Balance=%.2f", account.ID, account.Name, account.Balance)
 
-		if tx.Amount <= 0 {
+		if tx.Amount < 0 {
 			return fmt.Errorf("transaction amount must be positive")
 		}
 
