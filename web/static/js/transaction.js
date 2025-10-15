@@ -418,3 +418,20 @@ function openCreateTransactionModal() {
 
     openModal('createTransactionModal');
 }
+
+function toggleTransactionGroup(header) {
+    const group = header.parentElement;
+    const button = header.querySelector('.toggle-transactions-btn');
+    const icon = header.querySelector('i');
+
+    group.classList.toggle('collapsed');
+    button.classList.toggle('collapsed');
+
+    if (group.classList.contains('collapsed')) {
+        icon.classList.remove('fa-chevron-down');
+        icon.classList.add('fa-chevron-right');
+    } else {
+        icon.classList.remove('fa-chevron-right');
+        icon.classList.add('fa-chevron-down');
+    }
+}

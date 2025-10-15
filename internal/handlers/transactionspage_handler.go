@@ -4,10 +4,42 @@ import (
 	"finance_flow/internal/database"
 	"log"
 	"net/http"
+	"sort"
 	"text/template"
+	"time"
 
 	"gorm.io/gorm"
 )
+
+func groupTransactionsByDate(transactions []TransactionView) []GroupedTransactions {
+	grouped := make(map[string][]TransactionView)
+
+	for _, t := range transactions {
+		parsedDate, err := time.Parse("2006-01-02", t.Date)
+		if err != nil {
+			log.Printf("Error parsing date '%s': %v", t.Date, err)
+			continue
+		}
+		date := parsedDate.Format("02.01.2006")
+		grouped[date] = append(grouped[date], t)
+	}
+
+	var result []GroupedTransactions
+	for date, trans := range grouped {
+		result = append(result, GroupedTransactions{
+			Date:         date,
+			Transactions: trans,
+		})
+	}
+
+	sort.Slice(result, func(i, j int) bool {
+		dateI, _ := time.Parse("02.01.2006", result[i].Date)
+		dateJ, _ := time.Parse("02.01.2006", result[j].Date)
+		return dateI.After(dateJ)
+	})
+
+	return result
+}
 
 func NewTransactionPageHandler(w http.ResponseWriter, r *http.Request, db *gorm.DB, path string) {
 	log.Printf("NewTransactionPageHandler: Preparing data for new transaction page")
@@ -56,13 +88,16 @@ func NewTransactionPageHandler(w http.ResponseWriter, r *http.Request, db *gorm.
 
 	log.Printf("NewTransactionPageHandler: Retrieved %d transactions from database", len(transactionsForView))
 
+	groupedTransactions := groupTransactionsByDate(transactionsForView)
+
 	subcategoriesByParent := convertSubcategoriesToView(subCategories)
 	categoriesForView := convertCategoriesToView(categories, subcategoriesByParent)
 
 	pageData := TransactionPageData{
-		Accounts:     accountsForView,
-		Categories:   categoriesForView,
-		Transactions: transactionsForView,
+		Accounts:            accountsForView,
+		Categories:          categoriesForView,
+		Transactions:        transactionsForView,
+		GroupedTransactions: groupedTransactions,
 	}
 
 	log.Printf("NewTransactionPageHandler: Parsing template from path: %s", path)

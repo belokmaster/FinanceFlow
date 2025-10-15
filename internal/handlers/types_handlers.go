@@ -49,10 +49,16 @@ type SubCategoryPageData struct {
 	Icons      map[string]template.HTML
 }
 
-type TransactionPageData struct {
-	Accounts     []AccountView
-	Categories   []CategoryView
+type GroupedTransactions struct {
+	Date         string
 	Transactions []TransactionView
+}
+
+type TransactionPageData struct {
+	Accounts            []AccountView
+	Categories          []CategoryView
+	Transactions        []TransactionView
+	GroupedTransactions []GroupedTransactions
 }
 
 type TransactionView struct {
@@ -71,6 +77,7 @@ type TransactionView struct {
 	SubCategoryID      *uint
 	SubCategoryName    *string
 	Date               string
+	FormattedTime      string
 	FormattedDate      string
 	Description        string
 }

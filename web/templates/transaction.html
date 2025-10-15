@@ -34,35 +34,48 @@
         </div>
 
         <div class="transactions-container">
-            {{range .Transactions}}
-            <div class="transaction-card">
-                <div class="transaction-icon-container" style="background-color: #{{.CategoryColor}};">
-                    <div class="transaction-icon">{{.CategoryIconHTML}}</div>
+            {{range .GroupedTransactions}}
+            <div class="transaction-date-group">
+                <div class="transaction-date-header" onclick="toggleTransactionGroup(this)">
+                    <div class="toggle-transactions-btn">
+                        <i class="fa-solid fa-chevron-down"></i>
+                    </div>
+                    <span>{{.Date}}</span>
                 </div>
-                <div class="transaction-info">
-                    <div class="transaction-top-line">
-                        <div class="transaction-category-line">
-                            {{if .ParentCategoryName}}
-                            <span class="transaction-main-category">{{.ParentCategoryName}}:</span>
-                            <span class="transaction-subcategory">{{.DisplayName}}</span>
-                            {{else}}
-                            <span class="transaction-main-category">{{.DisplayName}}</span>
+                {{range .Transactions}}
+                <div class="transaction-card">
+                    <div class="transaction-icon-container" style="background-color: #{{.CategoryColor}};">
+                        <div class="transaction-icon">{{.CategoryIconHTML}}</div>
+                    </div>
+                    <div class="transaction-info">
+                        <div class="transaction-top-line">
+                            <div class="transaction-category-line">
+                                {{if .ParentCategoryName}}
+                                <span class="transaction-main-category">{{.ParentCategoryName}}:</span>
+                                <span class="transaction-subcategory">{{.DisplayName}}</span>
+                                {{else}}
+                                <span class="transaction-main-category">{{.DisplayName}}</span>
+                                {{end}}
+                            </div>
+                            <div class="transaction-center-account">
+                                <span class="transaction-account">{{.AccountName}}</span>
+                            </div>
+                            <div class="transaction-amount-section">
+                                <span class="transaction-amount {{if eq .Type 0}}income{{else}}expense{{end}}">
+                                    {{if eq .Type 1}}-{{end}}{{printf "%.2f" .Amount}} {{.CurrencySymbol}}
+                                </span>
+                                <span class="transaction-time">{{.FormattedTime}}</span>
+                            </div>
+                        </div>
+                        <div class="transaction-bottom-line">
+                            <div class="transaction-date">{{.FormattedDate}}</div>
+                            {{if .Description}}
+                            <div class="transaction-description">{{.Description}}</div>
                             {{end}}
                         </div>
-                        <div class="transaction-center-account">
-                            <span class="transaction-account">{{.AccountName}}</span>
-                        </div>
-                        <span class="transaction-amount {{if eq .Type 0}}income{{else}}expense{{end}}">
-                            {{if eq .Type 1}}-{{end}}{{printf "%.2f" .Amount}} {{.CurrencySymbol}}
-                        </span>
-                    </div>
-                    <div class="transaction-bottom-line">
-                        <div class="transaction-date">{{.FormattedDate}}</div>
-                        {{if .Description}}
-                        <div class="transaction-description">{{.Description}}</div>
-                        {{end}}
                     </div>
                 </div>
+                {{end}}
             </div>
             {{else}}
             <p>Транзакций пока нет. Создайте первую транзакцию!</p>

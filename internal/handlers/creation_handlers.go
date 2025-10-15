@@ -151,6 +151,7 @@ func getTransactionsForView(db *gorm.DB) ([]TransactionView, error) {
 
 		formattedDate := tx.Date.Format("02.01.2006")
 		dateOnly := tx.Date.Format("2006-01-02")
+		formattedTime := tx.Date.Format("15:04")
 
 		var (
 			displayColor       string
@@ -214,6 +215,7 @@ func getTransactionsForView(db *gorm.DB) ([]TransactionView, error) {
 			ParentCategoryName: parentCategoryName,
 			Date:               dateOnly,
 			FormattedDate:      formattedDate,
+			FormattedTime:      formattedTime,
 			Description:        tx.Comment,
 		}
 

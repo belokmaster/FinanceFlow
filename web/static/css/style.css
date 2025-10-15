@@ -1261,8 +1261,8 @@ form button[type="submit"]:hover {
     border: 1px solid #e0e0e0;
     border-radius: 8px;
     padding: 12px 15px;
-    height: 30px;
-    width: 500px;
+    height: 50px;
+    width: 900px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     display: flex;
     align-items: center;
@@ -1381,8 +1381,7 @@ form button[type="submit"]:hover {
     font-size: 16px;
     font-weight: bold;
     white-space: nowrap;
-    margin-left: auto;
-    margin-bottom: -20px;
+    margin-bottom: 6px;
 }
 
 .transaction-amount.income {
@@ -1397,11 +1396,13 @@ form button[type="submit"]:hover {
     display: flex;
     align-items: center;
     gap: 10px;
+    margin-top: 2px;
 }
 
 .transaction-date {
     font-size: 12px;
     color: #999;
+    margin-bottom: 0;
 }
 
 .transaction-description {
@@ -1423,4 +1424,100 @@ form button[type="submit"]:hover {
     align-items: flex-start;
     gap: 10px;
     padding: 20px 30px;
+}
+
+.transaction-date-group {
+    margin-bottom: 30px;
+}
+
+.transaction-date-group .transaction-card {
+    /* add gap to transactions card */
+    margin-bottom: 10px;
+}
+
+.transaction-date-group .transaction-card:last-child {
+    /* delete gap last transaction card */
+    margin-bottom: 0;
+}
+
+.transaction-date-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 18px;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 15px;
+    padding-bottom: 5px;
+    cursor: pointer;
+    user-select: none;
+    position: relative;
+}
+
+.toggle-transactions-btn {
+    background: none;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background-color: #fff;
+}
+
+.toggle-transactions-btn:hover {
+    background-color: #f5f5f5;
+    border-color: #4cd67a;
+}
+
+.toggle-transactions-btn i {
+    font-size: 14px;
+    color: #666;
+    transition: transform 0.3s ease;
+}
+
+.toggle-transactions-btn.collapsed i {
+    transform: rotate(-90deg);
+}
+
+.transaction-date-group.collapsed .transaction-card {
+    display: none;
+}
+
+.transaction-date-header::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background-color: #4cd67a;
+    transition: all 0.3s ease;
+}
+
+.transaction-time {
+    font-size: 12px;
+    color: #777;
+    font-weight: 500;
+    line-height: 1;
+    margin-bottom: 0;
+}
+
+.transaction-amount-section {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 1px;
+    margin-bottom: 0px;
+}
+
+
+.transaction-time {
+    font-size: 12px;
+    color: #777;
+    font-weight: 500;
+    margin-bottom: -25px;
 }
