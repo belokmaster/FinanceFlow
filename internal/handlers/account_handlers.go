@@ -52,9 +52,18 @@ func CreateAccountHandler(w http.ResponseWriter, r *http.Request, db *gorm.DB) {
 		return
 	}
 
+	if currency_id >= len(database.CurrencySymbols) {
+		http.Error(w, "invalid currency id", http.StatusBadRequest)
+		return
+	}
+
 	color := r.FormValue("Color")
 	log.Printf("CreateAccountHandler: Color '%s'", color)
 	color = strings.TrimPrefix(color, "#")
+
+	if color == "" {
+		color = "4cd67a"
+	}
 
 	icon_id, err := strconv.Atoi(r.FormValue("Icon"))
 	if err != nil {

@@ -10,12 +10,13 @@ import (
 )
 
 func CreateNewAccount(db *gorm.DB, acc Account) error {
-	log.Printf("Creating new account: %s", acc.Name)
-
-	if acc.Name == "" {
-		log.Printf("Error: empty account name")
-		return fmt.Errorf("empty name of account")
+	if strings.TrimSpace(acc.Name) == "" {
+		err := fmt.Errorf("account name cannot be empty")
+		log.Println("Error creating account:", err)
+		return err
 	}
+
+	log.Printf("Creating new account: %s", acc.Name)
 
 	result := db.Create(&acc)
 	if result.Error != nil {
@@ -23,6 +24,7 @@ func CreateNewAccount(db *gorm.DB, acc Account) error {
 		return fmt.Errorf("problem to create a new acc: %v", result.Error)
 	}
 
+	log.Printf("Account %s created successfully with ID=%d", acc.Name, acc.ID)
 	return nil
 }
 
@@ -40,7 +42,7 @@ func DeleteAccount(db *gorm.DB, id int) error {
 		return fmt.Errorf("account with id %d not found", id)
 	}
 
-	log.Printf("Account deleted successfully ID: %d", id)
+	log.Printf("Account ID %d deleted successfully", id)
 	return nil
 }
 
@@ -54,17 +56,15 @@ func ChangeAccountColor(db *gorm.DB, id int, newColor string) error {
 
 	newColor = strings.TrimPrefix(newColor, "#")
 
-	var acc Account
-	err := db.First(&acc, id).Error
-	if err != nil {
-		log.Printf("Error finding account ID %d for color change: %v", id, err)
-		return fmt.Errorf("account with ID %d not found", id)
+	result := db.Model(&Account{}).Where("id = ?", id).Update("color", newColor)
+	if result.Error != nil {
+		log.Printf("Error updating color for account ID %d: %v", id, result.Error)
+		return fmt.Errorf("problem with change color in db: %v", result.Error)
 	}
 
-	err = db.Model(&Account{}).Where("id = ?", id).Update("Color", newColor).Error
-	if err != nil {
-		log.Printf("Error updating color for account ID %d: %v", id, err)
-		return fmt.Errorf("problem with change color in db: %v", err)
+	if result.RowsAffected == 0 {
+		log.Printf("No rows affected when updating color for account ID %d", id)
+		return fmt.Errorf("no rows were updated - account may not exist")
 	}
 
 	log.Printf("Color updated successfully for account ID %d", id)
@@ -116,6 +116,7 @@ func ChangeAccountName(db *gorm.DB, id int, newName string) error {
 	}
 
 	if result.RowsAffected == 0 {
+		log.Printf("No rows affected when updating name for account ID %d", id)
 		return fmt.Errorf("no rows were updated - account may not exist")
 	}
 
@@ -136,6 +137,7 @@ func ChangeAccountBalance(db *gorm.DB, id int, newBalance float64) error {
 	}
 
 	if result.RowsAffected == 0 {
+		log.Printf("No rows affected when updating balance for account ID %d", id)
 		return fmt.Errorf("no rows were updated - account may not exist")
 	}
 

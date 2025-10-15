@@ -75,10 +75,10 @@ func TransactionHandler(w http.ResponseWriter, r *http.Request, db *gorm.DB) {
 		log.Printf("TransactionHandler: SubCategoryID not selected")
 	}
 
-	transType, err := strconv.Atoi(r.FormValue("Type"))
+	transactionType, err := strconv.Atoi(r.FormValue("Type"))
 	if err != nil {
 		log.Printf("TransactionHandler: Invalid transaction type '%s': %v", r.FormValue("Type"), err)
-		http.Error(w, "problem with transtype. use normal values", http.StatusBadRequest)
+		http.Error(w, "problem with transactionType. use normal values", http.StatusBadRequest)
 		return
 	}
 
@@ -101,13 +101,13 @@ func TransactionHandler(w http.ResponseWriter, r *http.Request, db *gorm.DB) {
 		AccountID:     uint(accountID),
 		CategoryID:    uint(categoryID),
 		SubCategoryID: uint(subCategoryID),
-		Type:          database.TypeTransaction(transType),
+		Type:          database.TypeTransaction(transactionType),
 		Amount:        amount,
 		Comment:       comment,
 		Date:          time.Now(),
 	}
 
-	log.Printf("TransactionHandler: Creating transaction - AccountID=%d, CategoryID=%d, SubCategoryID=%d, Type=%d, Amount=%.2f", accountID, categoryID, subCategoryID, transType, amount)
+	log.Printf("TransactionHandler: Creating transaction - AccountID=%d, CategoryID=%d, SubCategoryID=%d, Type=%d, Amount=%.2f", accountID, categoryID, subCategoryID, transactionType, amount)
 
 	err = database.AddTransaction(db, tx)
 	if err != nil {
@@ -116,7 +116,7 @@ func TransactionHandler(w http.ResponseWriter, r *http.Request, db *gorm.DB) {
 		return
 	}
 
-	log.Printf("TransactionHandler: Transaction added successfully - AccountID=%d, Type=%d, Amount=%.2f", accountID, transType, amount)
+	log.Printf("TransactionHandler: Transaction added successfully - AccountID=%d, Type=%d, Amount=%.2f", accountID, transactionType, amount)
 	http.Redirect(w, r, "/transactions", http.StatusSeeOther)
 }
 
@@ -241,18 +241,23 @@ func UpdateTransactionHandler(w http.ResponseWriter, r *http.Request, db *gorm.D
 		log.Printf("UpdateTransactionHandler: SubCategoryID not selected")
 	}
 
-	transType, err := strconv.Atoi(r.FormValue("Type"))
+	transactionType, err := strconv.Atoi(r.FormValue("Type"))
 	if err != nil {
 		log.Printf("UpdateTransactionHandler: Invalid transaction type '%s': %v", r.FormValue("Type"), err)
-		http.Error(w, "problem with transtype. use normal values", http.StatusBadRequest)
+		http.Error(w, "problem with transactionType. use normal values", http.StatusBadRequest)
 		return
 	}
 
-	amount, err := strconv.ParseFloat(r.FormValue("Amount"), 64)
-	if err != nil {
-		log.Printf("UpdateTransactionHandler: Invalid amount '%s': %v", r.FormValue("Amount"), err)
-		http.Error(w, "problem with amount. use normal values", http.StatusBadRequest)
-		return
+	amount := r.FormValue("Amount")
+	var newAmount float64
+
+	if amount != "" {
+		newAmount, err = strconv.ParseFloat(amount, 64)
+		if err != nil {
+			log.Printf("UpdateTransactionHandler: Invalid amount '%s': %v", r.FormValue("Amount"), err)
+			http.Error(w, "problem with amount. use normal values", http.StatusBadRequest)
+			return
+		}
 	}
 
 	comment := r.FormValue("Description")
@@ -309,14 +314,14 @@ func UpdateTransactionHandler(w http.ResponseWriter, r *http.Request, db *gorm.D
 		AccountID:     uint(accountID),
 		CategoryID:    uint(categoryID),
 		SubCategoryID: subCategoryID,
-		Type:          database.TypeTransaction(transType),
-		Amount:        amount,
+		Type:          database.TypeTransaction(transactionType),
+		Amount:        newAmount,
 		Comment:       comment,
 		Date:          transactionDate,
 	}
 
 	log.Printf("UpdateTransactionHandler: Updating transaction ID %d - AccountID=%d, CategoryID=%d, SubCategoryID=%d, Type=%d, Amount=%.2f, Date=%v",
-		transactionID, accountID, categoryID, subCategoryID, transType, amount, transactionDate)
+		transactionID, accountID, categoryID, subCategoryID, transactionType, newAmount, transactionDate)
 
 	err = database.UpdateTransaction(db, tx)
 	if err != nil {

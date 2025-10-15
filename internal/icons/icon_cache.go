@@ -18,49 +18,12 @@ var categoryIconsFS embed.FS
 //go:embed subcategory_icons/*.svg
 var subCategoryIconsFS embed.FS
 
-var accountFileToName = map[string]string{
-	"wallet": "Общий счет",
-	"card":   "Карта",
-	"coin":   "Наличные",
-	"mark":   "Сберегательный счет",
-	"house":  "Ипотека",
-	"bag":    "Заем",
-	"bonus":  "Бонусы",
-}
-
-var categoryFileToName = map[string]string{
-	"food":        "Еда",
-	"housing1":    "Жилье1",
-	"housing2":    "Жилье2",
-	"car_repair1": "Транспортное средство1",
-	"car_repair2": "Транспортное средство2",
-	"coin_cat":    "Доход",
-	"computer1":   "Связь, ПК1",
-	"computer2":   "Связь, ПК2",
-	"bus1":        "Общественный транспорт1",
-	"bus2":        "Общественный транспорт2",
-	"community1":  "Жизнь и развлечения1",
-	"community2":  "Жизнь и развлечения2",
-	"community3":  "Жизнь и развлечения3",
-	"expense1":    "Финансовые расходы1",
-	"expense2":    "Финансовые расходы2",
-}
-
-var subCategoryFileToName = map[string]string{
-	"restaurant1": "Ресторан1",
-	"pizza1":      "Фаст-фуд1",
-}
-
-var AccountIconCache = make(map[string]template.HTML)
-var CategoryIconCache = make(map[string]template.HTML)
-var SubCategoryIconCache = make(map[string]template.HTML)
-
 func InitIcons() {
 	initAccountIcons()
 	initCategoryIcons()
 	initSubCategoryIcons()
-	log.Printf("Initialized %d account icons and %d category icons",
-		len(AccountIconCache), len(CategoryIconCache))
+	log.Printf("Initialized %d account icons, %d category icons, %d sub_category icons",
+		len(AccountIconCache), len(CategoryIconCache), len(SubCategoryIconCache))
 }
 
 func initAccountIcons() {
@@ -83,10 +46,14 @@ func initAccountIcons() {
 		}
 
 		contentStr := string(content)
-		contentStr = strings.ReplaceAll(contentStr, `fill="#FFF"`, "")
 
 		iconKey := strings.TrimSuffix(iconFile.Name(), filepath.Ext(iconFile.Name()))
-		curName := accountFileToName[iconKey]
+
+		curName, ok := accountFileToName[iconKey]
+		if !ok {
+			log.Printf("Warning: no display name for account icon %s", iconFile.Name())
+			continue
+		}
 		AccountIconCache[curName] = template.HTML(contentStr)
 	}
 }
@@ -112,7 +79,12 @@ func initCategoryIcons() {
 
 		contentStr := string(content)
 		iconKey := strings.TrimSuffix(iconFile.Name(), filepath.Ext(iconFile.Name()))
-		curName := categoryFileToName[iconKey]
+
+		curName, ok := categoryFileToName[iconKey]
+		if !ok {
+			log.Printf("Warning: no display name for category icon %s", iconFile.Name())
+			continue
+		}
 		CategoryIconCache[curName] = template.HTML(contentStr)
 	}
 }
@@ -120,7 +92,7 @@ func initCategoryIcons() {
 func initSubCategoryIcons() {
 	icons, err := fs.ReadDir(subCategoryIconsFS, "subcategory_icons")
 	if err != nil {
-		log.Printf("Error loading category icons: %v", err)
+		log.Printf("Error loading sub_category icons: %v", err)
 		return
 	}
 
@@ -138,22 +110,42 @@ func initSubCategoryIcons() {
 
 		contentStr := string(content)
 		iconKey := strings.TrimSuffix(iconFile.Name(), filepath.Ext(iconFile.Name()))
-		curName := subCategoryFileToName[iconKey]
+
+		curName, ok := subCategoryFileToName[iconKey]
+		if !ok {
+			log.Printf("Warning: no display name for sub_category icon %s", iconFile.Name())
+			continue
+		}
 		SubCategoryIconCache[curName] = template.HTML(contentStr)
 	}
 }
 
 // getters
 func GetAccountIcon(name string) template.HTML {
-	return AccountIconCache[name]
+	icon, ok := AccountIconCache[name]
+	if !ok {
+		log.Printf("account icon not found for %s", name)
+		return template.HTML("")
+	}
+	return icon
 }
 
 func GetCategoryIcon(name string) template.HTML {
-	return CategoryIconCache[name]
+	icon, ok := CategoryIconCache[name]
+	if !ok {
+		log.Printf("category icon not found for %s", name)
+		return template.HTML("")
+	}
+	return icon
 }
 
 func GetSubCategoryIcon(name string) template.HTML {
-	return SubCategoryIconCache[name]
+	icon, ok := SubCategoryIconCache[name]
+	if !ok {
+		log.Printf("sub_category icon not found for %s", name)
+		return template.HTML("")
+	}
+	return icon
 }
 
 func GetAccountIcons() map[string]template.HTML {

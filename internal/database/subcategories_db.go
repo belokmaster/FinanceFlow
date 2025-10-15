@@ -9,26 +9,16 @@ import (
 )
 
 func AddSubCategory(db *gorm.DB, subCat SubCategory) error {
-	log.Printf("Adding new subcategory: %s for category ID: %d", subCat.Name, subCat.CategoryID)
-
-	if subCat.Name == "" {
-		log.Printf("Error: empty subcategory name")
-		return fmt.Errorf("empty name of category")
+	if strings.TrimSpace(subCat.Name) == "" {
+		err := fmt.Errorf("subcategory name cannot be empty")
+		log.Println("Error creating subcategory:", err)
+		return err
 	}
-
-	var cat Category
-	err := db.First(&cat, subCat.CategoryID).Error
-	if err != nil {
-		log.Printf("Error: category with ID %d not found", subCat.CategoryID)
-		return fmt.Errorf("category with ID %d not found", subCat.CategoryID)
-	}
-
-	log.Printf("Found parent category: ID=%d, Name=%s", cat.ID, cat.Name)
 
 	result := db.Create(&subCat)
 	if result.Error != nil {
 		log.Printf("Error creating subcategory %s: %v", subCat.Name, result.Error)
-		return fmt.Errorf("problem to create a new sub_category: %v", result.Error)
+		return fmt.Errorf("problem to create a new subcategory: %v", result.Error)
 	}
 
 	log.Printf("Subcategory created successfully: ID=%d, Name=%s, Parent Category ID=%d",
@@ -64,17 +54,10 @@ func ChangeSubCategoryColor(db *gorm.DB, id int, newColor string) error {
 
 	newColor = strings.TrimPrefix(newColor, "#")
 
-	var subCat SubCategory
-	err := db.First(&subCat, id).Error
-	if err != nil {
-		log.Printf("Error finding sub_category ID %d for color change: %v", id, err)
-		return fmt.Errorf("sub_category with ID %d not found", id)
-	}
-
-	err = db.Model(&SubCategory{}).Where("id = ?", id).Update("Color", newColor).Error
-	if err != nil {
-		log.Printf("Error updating color for sub_category ID %d: %v", id, err)
-		return fmt.Errorf("problem with change color in db: %v", err)
+	result := db.Model(&SubCategory{}).Where("id = ?", id).Update("Color", newColor)
+	if result.Error != nil {
+		log.Printf("Error updating color for sub_category ID %d: %v", id, result.Error)
+		return fmt.Errorf("problem with change color in db: %v", result.Error)
 	}
 
 	log.Printf("Color updated successfully for sub_category ID %d", id)
@@ -88,15 +71,6 @@ func ChangeSubCategoryIcon(db *gorm.DB, id int, icon_id int) error {
 		log.Printf("Error: icon ID %d does not exist", icon_id)
 		return fmt.Errorf("icon with ID %d does not exist", icon_id)
 	}
-
-	var subCat SubCategory
-	err := db.First(&subCat, id).Error
-	if err != nil {
-		log.Printf("Error finding sub_category ID %d for icon change: %v", id, err)
-		return fmt.Errorf("sub_category with ID %d not found", id)
-	}
-
-	log.Printf("Found sub_category: ID=%d, Name=%s, Old icon=%d, New icon=%d", subCat.ID, subCat.Name, subCat.IconCode, icon_id)
 
 	result := db.Model(&SubCategory{}).Where("id = ?", id).Update("icon_code", TypeSubCategoryIcons(icon_id))
 	if result.Error != nil {
@@ -114,10 +88,9 @@ func ChangeSubCategoryIcon(db *gorm.DB, id int, icon_id int) error {
 }
 
 func ChangeSubCategoryName(db *gorm.DB, id int, newName string) error {
-	var subCat SubCategory
-	err := db.First(&subCat, id).Error
-	if err != nil {
-		return fmt.Errorf("sub_category with ID %d not found", id)
+	newName = strings.TrimSpace(newName)
+	if newName == "" {
+		return fmt.Errorf("new name cannot be empty")
 	}
 
 	result := db.Model(&SubCategory{}).Where("id = ?", id).Update("Name", newName)

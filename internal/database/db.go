@@ -14,7 +14,14 @@ func InitDatabase() *gorm.DB {
 
 	// check if db exists
 	_, err := os.Stat(dbPath)
-	dbExists := !os.IsNotExist(err)
+	dbExists := true
+	if err != nil {
+		if os.IsNotExist(err) {
+			dbExists = false
+		} else {
+			log.Fatalf("problem with db file: %v", err)
+		}
+	}
 
 	// open the db using gorm
 	db, err := gorm.Open(sqlite.Open(dbPath), &gorm.Config{})
@@ -22,16 +29,19 @@ func InitDatabase() *gorm.DB {
 		log.Fatalf("problem connecting to db: %v", err)
 	}
 
-	// initialize a new db if it doesnt exist
-	if !dbExists {
-		log.Println("initialize a new db")
-		err := migrateDB(db)
-		if err != nil {
-			log.Fatalf("failed to initialize the db: %v", err)
-		}
+	log.Println("Running migrations...")
+
+	err = migrateDB(db)
+	if err != nil {
+		log.Fatalf("failed to migrate the db: %v", err)
 	}
 
-	log.Println("The database opens successfully")
+	if !dbExists {
+		log.Println("Database created successfully")
+	} else {
+		log.Println("Database opened successfully")
+	}
+
 	return db
 }
 
@@ -58,7 +68,7 @@ func migrateDB(db *gorm.DB) error {
 		return fmt.Errorf("failed to create database: %v", err)
 	}
 
-	log.Println("The database created successfully")
+	log.Println("Database migration completed successfully")
 	return nil
 }
 
@@ -69,7 +79,6 @@ func GetAccounts(db *gorm.DB) ([]Account, error) {
 	result := db.Find(&accounts)
 
 	if result.Error != nil {
-		log.Printf("Error getting accounts: %v", result.Error)
 		return nil, fmt.Errorf("problem with get accounts in db: %v", result.Error)
 	}
 
@@ -80,31 +89,29 @@ func GetAccounts(db *gorm.DB) ([]Account, error) {
 func GetCategories(db *gorm.DB) ([]Category, error) {
 	log.Println("Getting all categories from database")
 
-	var caregories []Category
-	result := db.Find(&caregories)
+	var categories []Category
+	result := db.Find(&categories)
 
 	if result.Error != nil {
-		log.Printf("Error getting accounts: %v", result.Error)
 		return nil, fmt.Errorf("problem with get categories in db: %v", result.Error)
 	}
 
-	log.Printf("Successfully got %d categories from db", len(caregories))
-	return caregories, nil
+	log.Printf("Successfully got %d categories from db", len(categories))
+	return categories, nil
 }
 
 func GetSubCategories(db *gorm.DB) ([]SubCategory, error) {
 	log.Println("Getting all sub_categories from database")
 
-	var sub_categories []SubCategory
-	result := db.Find(&sub_categories)
+	var subCategories []SubCategory
+	result := db.Find(&subCategories)
 
 	if result.Error != nil {
-		log.Printf("Error getting accounts: %v", result.Error)
 		return nil, fmt.Errorf("problem with get sub_categories in db: %v", result.Error)
 	}
 
-	log.Printf("Successfully got %d sub_categories from db", len(sub_categories))
-	return sub_categories, nil
+	log.Printf("Successfully got %d sub_categories from db", len(subCategories))
+	return subCategories, nil
 }
 
 func GetTransactions(db *gorm.DB) ([]Transaction, error) {
@@ -116,10 +123,11 @@ func GetTransactions(db *gorm.DB) ([]Transaction, error) {
 		Preload("Category").
 		Preload("SubCategory").
 		Find(&transactions)
+
 	if result.Error != nil {
 		return nil, result.Error
 	}
 
-	log.Printf("Successfully got %d sub_categories from db", len(transactions))
+	log.Printf("Successfully got %d transactions from db", len(transactions))
 	return transactions, nil
 }

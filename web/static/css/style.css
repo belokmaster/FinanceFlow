@@ -1413,7 +1413,7 @@ form button[type="submit"]:hover {
 
 .transaction-top-line {
     display: grid;
-    grid-template-columns: 1fr auto 1fr;
+    grid-template-columns: 1fr 1fr 1fr;
     align-items: center;
     margin-bottom: 4px;
     gap: 10px;

@@ -20,6 +20,17 @@ const editIconOptionsContainer = document.getElementById('iconOptions');
 const editHiddenIconInput = document.getElementById('editAccountIcon');
 const editAccountBalanceInput = document.getElementById('editAccountBalance');
 
+// automatic point 0.00 to balance
+const createAccountForm = document.querySelector('form[action="/create_account"]');
+if (createAccountForm) {
+    createAccountForm.onsubmit = function () {
+        const balanceInput = document.getElementById('createAccountBalance');
+        if (!balanceInput.value.trim()) {
+            balanceInput.value = '0.00';
+        }
+    };
+}
+
 function openModal(modalId) {
     const modal = document.getElementById(modalId);
     if (modal) {
@@ -54,17 +65,6 @@ function openCreateModal() {
     createSelectedIconDisplay.querySelector('.selected-icon-key').textContent = 'Выберите иконку';
 
     updateColorDisplay('#4cd67a', createColorPreview, createColorHexValue);
-
-    // automatic point 0.00 to balance
-    const createAccountForm = document.querySelector('form[action="/create_account"]');
-    if (createAccountForm) {
-        createAccountForm.onsubmit = function () {
-            const balanceInput = document.getElementById('createAccountBalance');
-            if (!balanceInput.value.trim()) {
-                balanceInput.value = '0.00';
-            }
-        };
-    }
 
     openModal('createAccountModal');
 }

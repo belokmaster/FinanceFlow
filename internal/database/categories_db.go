@@ -8,13 +8,14 @@ import (
 	"gorm.io/gorm"
 )
 
-func AddCategory(db *gorm.DB, cat Category) error {
-	log.Printf("Adding new category: %s", cat.Name)
-
-	if cat.Name == "" {
-		log.Printf("Error: empty category name")
-		return fmt.Errorf("empty name of category")
+func CreateCategory(db *gorm.DB, cat Category) error {
+	if strings.TrimSpace(cat.Name) == "" {
+		err := fmt.Errorf("category name cannot be empty")
+		log.Println("Error creating category:", err)
+		return err
 	}
+
+	log.Printf("Adding new category: %s", cat.Name)
 
 	result := db.Create(&cat)
 	if result.Error != nil {
@@ -54,17 +55,15 @@ func ChangeCategoryColor(db *gorm.DB, id int, newColor string) error {
 
 	newColor = strings.TrimPrefix(newColor, "#")
 
-	var cat Category
-	err := db.First(&cat, id).Error
-	if err != nil {
-		log.Printf("Error finding category ID %d for color change: %v", id, err)
-		return fmt.Errorf("category with ID %d not found", id)
+	result := db.Model(&Category{}).Where("id = ?", id).Update("Color", newColor)
+	if result.Error != nil {
+		log.Printf("Error updating color for category ID %d: %v", id, result.Error)
+		return fmt.Errorf("problem with change color in db: %v", result.Error)
 	}
 
-	err = db.Model(&Category{}).Where("id = ?", id).Update("Color", newColor).Error
-	if err != nil {
-		log.Printf("Error updating color for category ID %d: %v", id, err)
-		return fmt.Errorf("problem with change color in db: %v", err)
+	if result.RowsAffected == 0 {
+		log.Printf("No rows affected when updating color for category ID %d", id)
+		return fmt.Errorf("no rows were updated - category may not exist")
 	}
 
 	log.Printf("Color updated successfully for category ID %d", id)
@@ -78,15 +77,6 @@ func ChangeCategoryIcon(db *gorm.DB, id int, icon_id int) error {
 		log.Printf("Error: icon ID %d does not exist", icon_id)
 		return fmt.Errorf("icon with ID %d does not exist", icon_id)
 	}
-
-	var cat Category
-	err := db.First(&cat, id).Error
-	if err != nil {
-		log.Printf("Error finding category ID %d for icon change: %v", id, err)
-		return fmt.Errorf("category with ID %d not found", id)
-	}
-
-	log.Printf("Found category: ID=%d, Name=%s, Old icon=%d, New icon=%d", cat.ID, cat.Name, cat.IconCode, icon_id)
 
 	result := db.Model(&Category{}).Where("id = ?", id).Update("icon_code", TypeCategoryIcons(icon_id))
 	if result.Error != nil {
@@ -104,10 +94,9 @@ func ChangeCategoryIcon(db *gorm.DB, id int, icon_id int) error {
 }
 
 func ChangeCategoryName(db *gorm.DB, id int, newName string) error {
-	var cat Category
-	err := db.First(&cat, id).Error
-	if err != nil {
-		return fmt.Errorf("category with ID %d not found", id)
+	newName = strings.TrimSpace(newName)
+	if newName == "" {
+		return fmt.Errorf("new name cannot be empty")
 	}
 
 	result := db.Model(&Category{}).Where("id = ?", id).Update("Name", newName)
@@ -119,5 +108,6 @@ func ChangeCategoryName(db *gorm.DB, id int, newName string) error {
 		return fmt.Errorf("no rows were updated - account may not exist")
 	}
 
+	log.Printf("Name updated successfully for category ID %d", id)
 	return nil
 }

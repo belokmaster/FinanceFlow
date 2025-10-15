@@ -47,7 +47,7 @@ func CreateCategoryHandler(w http.ResponseWriter, r *http.Request, db *gorm.DB) 
 
 	log.Printf("CreateCategoryHandler: Creating category  Name=%s, Color=%s, Icon=%d", name, color, icon_id)
 
-	err = database.AddCategory(db, category)
+	err = database.CreateCategory(db, category)
 	if err != nil {
 		log.Printf("CreateCategoryHandler: Failed to create category: %v", err)
 		http.Error(w, fmt.Sprintf("failed to create a new category: %v", err), http.StatusInternalServerError)

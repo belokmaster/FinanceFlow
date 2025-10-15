@@ -31,6 +31,10 @@ func AddTransaction(db *gorm.DB, tx Transaction) error {
 
 		log.Printf("Found account: ID=%d, Name=%s, Old Balance=%.2f", account.ID, account.Name, account.Balance)
 
+		if tx.Amount <= 0 {
+			return fmt.Errorf("transaction amount must be positive")
+		}
+
 		switch tx.Type {
 		case Income:
 			account.Balance += tx.Amount
@@ -59,39 +63,78 @@ func AddTransaction(db *gorm.DB, tx Transaction) error {
 func DeleteTransaction(db *gorm.DB, id int) error {
 	log.Printf("Deleting transaction with ID: %d", id)
 
-	result := db.Delete(&Transaction{}, id)
-	if result.Error != nil {
-		log.Printf("Error deleting transaction ID %d: %v", id, result.Error)
-		return fmt.Errorf("problem with delete transaction in db: %v", result.Error)
-	}
+	return db.Transaction(func(txDB *gorm.DB) error {
+		var tx Transaction
+		err := txDB.First(&tx, id).Error
+		if err != nil {
+			return fmt.Errorf("transaction with ID %d not found", id)
+		}
 
-	if result.RowsAffected == 0 {
-		log.Printf("Transaction with ID %d not found for deletion", id)
-		return fmt.Errorf("Transaction with id %d not found", id)
-	}
+		var acc Account
+		err = txDB.First(&acc, tx.AccountID).Error
+		if err != nil {
+			return fmt.Errorf("account with ID %d not found", tx.AccountID)
+		}
 
-	log.Printf("Transaction deleted successfully: ID=%d", id)
-	return nil
+		// return past balance
+		switch tx.Type {
+		case Income:
+			acc.Balance -= tx.Amount
+		case Expense:
+			acc.Balance += tx.Amount
+		}
+
+		if err := txDB.Save(&acc).Error; err != nil {
+			return fmt.Errorf("failed to update balance: %v", err)
+		}
+
+		if err := txDB.Delete(&Transaction{}, id).Error; err != nil {
+			return fmt.Errorf("failed to delete transaction: %v", err)
+		}
+
+		log.Printf("Transaction deleted and balance adjusted for account %d", acc.ID)
+		return nil
+	})
 }
 
-func UpdateTransaction(db *gorm.DB, transaction Transaction) error {
-	result := db.Model(&Transaction{}).Where("id = ?", transaction.ID).Updates(map[string]interface{}{
-		"account_id":      transaction.AccountID,
-		"category_id":     transaction.CategoryID,
-		"sub_category_id": transaction.SubCategoryID,
-		"type":            transaction.Type,
-		"amount":          transaction.Amount,
-		"comment":         transaction.Comment,
-		"date":            transaction.Date,
+func UpdateTransaction(db *gorm.DB, newTx Transaction) error {
+	return db.Transaction(func(txDB *gorm.DB) error {
+		var oldTx Transaction
+		err := txDB.First(&oldTx, newTx.ID).Error
+		if err != nil {
+			return fmt.Errorf("transaction not found: %v", err)
+		}
+
+		var acc Account
+		err = txDB.First(&acc, oldTx.AccountID).Error
+		if err != nil {
+			return fmt.Errorf("account not found: %v", err)
+		}
+
+		// back the old change
+		if oldTx.Type == Income {
+			acc.Balance -= oldTx.Amount
+		} else {
+			acc.Balance += oldTx.Amount
+		}
+
+		// approve new balance
+		if newTx.Type == Income {
+			acc.Balance += newTx.Amount
+		} else {
+			acc.Balance -= newTx.Amount
+		}
+
+		err = txDB.Save(&acc).Error
+		if err != nil {
+			return fmt.Errorf("failed to update account balance: %v", err)
+		}
+
+		err = txDB.Model(&Transaction{}).Where("id = ?", newTx.ID).Updates(newTx).Error
+		if err != nil {
+			return fmt.Errorf("failed to update transaction: %v", err)
+		}
+
+		return nil
 	})
-
-	if result.Error != nil {
-		return result.Error
-	}
-
-	if result.RowsAffected == 0 {
-		return fmt.Errorf("transaction not found")
-	}
-
-	return nil
 }
