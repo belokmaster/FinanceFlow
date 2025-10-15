@@ -61,6 +61,10 @@ func setupRoutes(db *gorm.DB) {
 		handlers.DeleteSubCategoryHandler(w, r, db)
 	})
 
+	http.HandleFunc("/delete_transaction", func(w http.ResponseWriter, r *http.Request) {
+		handlers.DeleteTransactionHandler(w, r, db)
+	})
+
 	http.HandleFunc("/update_account", func(w http.ResponseWriter, r *http.Request) {
 		handlers.UpdateAccountHandler(w, r, db)
 	})
@@ -71,5 +75,9 @@ func setupRoutes(db *gorm.DB) {
 
 	http.HandleFunc("/update_subcategory", func(w http.ResponseWriter, r *http.Request) {
 		handlers.UpdateSubCategoryHandler(w, r, db)
+	})
+
+	http.HandleFunc("/update_transaction", func(w http.ResponseWriter, r *http.Request) {
+		handlers.UpdateTransactionHandler(w, r, db)
 	})
 }

@@ -55,3 +55,43 @@ func AddTransaction(db *gorm.DB, tx Transaction) error {
 		return nil
 	})
 }
+
+func DeleteTransaction(db *gorm.DB, id int) error {
+	log.Printf("Deleting transaction with ID: %d", id)
+
+	result := db.Delete(&Transaction{}, id)
+	if result.Error != nil {
+		log.Printf("Error deleting transaction ID %d: %v", id, result.Error)
+		return fmt.Errorf("problem with delete transaction in db: %v", result.Error)
+	}
+
+	if result.RowsAffected == 0 {
+		log.Printf("Transaction with ID %d not found for deletion", id)
+		return fmt.Errorf("Transaction with id %d not found", id)
+	}
+
+	log.Printf("Transaction deleted successfully: ID=%d", id)
+	return nil
+}
+
+func UpdateTransaction(db *gorm.DB, transaction Transaction) error {
+	result := db.Model(&Transaction{}).Where("id = ?", transaction.ID).Updates(map[string]interface{}{
+		"account_id":      transaction.AccountID,
+		"category_id":     transaction.CategoryID,
+		"sub_category_id": transaction.SubCategoryID,
+		"type":            transaction.Type,
+		"amount":          transaction.Amount,
+		"comment":         transaction.Comment,
+		"date":            transaction.Date,
+	})
+
+	if result.Error != nil {
+		return result.Error
+	}
+
+	if result.RowsAffected == 0 {
+		return fmt.Errorf("transaction not found")
+	}
+
+	return nil
+}

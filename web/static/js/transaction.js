@@ -50,7 +50,6 @@ function openCreateTransactionModal() {
     openModal('createTransactionModal');
 }
 
-
 function updateSubcategories() {
     const categorySelect = document.getElementById('transactionCategory');
     const selectedCategoryId = categorySelect.value;
@@ -78,31 +77,148 @@ function updateSubcategories() {
     });
 }
 
-document.addEventListener('DOMContentLoaded', function () {
-    const categorySelect = document.getElementById('transactionCategory');
-    if (categorySelect) {
-        categorySelect.addEventListener('change', updateSubcategories);
+function updateEditSubcategories() {
+    const categorySelect = document.getElementById('editTransactionCategory');
+    const selectedCategoryId = categorySelect.value;
+    const allSubOptions = document.querySelectorAll('#editSubcategoryOptions .select-subcategory-option');
+
+    allSubOptions.forEach(option => {
+        option.style.display = 'none';
+    });
+
+    if (selectedCategoryId) {
+        const relevantSubOptions = document.querySelectorAll(`#editSubcategoryOptions .select-subcategory-option[data-parent-id="${selectedCategoryId}"]`);
+        relevantSubOptions.forEach(option => {
+            option.style.display = 'flex';
+        });
     }
 
-    const subcategoryOptions = document.querySelectorAll('.select-subcategory-option');
-    subcategoryOptions.forEach(option => {
+    document.getElementById('editTransactionSubCategory').value = '';
+    document.getElementById('editSelectedSubcategoryIcon').innerHTML = '';
+    document.getElementById('editSelectedSubcategoryIcon').style.backgroundColor = '';
+    document.getElementById('editSelectedSubcategoryName').textContent = 'Выберите подкатегорию';
+
+    const allSubcategoryOptions = document.querySelectorAll('#editSubcategoryOptions .select-subcategory-option');
+    allSubcategoryOptions.forEach(option => {
+        option.classList.remove('selected');
+    });
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+    const createCategorySelect = document.getElementById('transactionCategory');
+    if (createCategorySelect) {
+        createCategorySelect.addEventListener('change', updateSubcategories);
+    }
+
+    const createSubcategoryOptions = document.querySelectorAll('#subcategoryOptions .select-subcategory-option');
+    createSubcategoryOptions.forEach(option => {
         option.addEventListener('click', function (e) {
             e.stopPropagation();
             selectSubcategoryOption(this);
         });
     });
-});
 
-document.addEventListener('DOMContentLoaded', function () {
-    const typeButtons = document.querySelectorAll('.type-btn');
-    const typeInput = document.getElementById('transactionType');
+    const editCategorySelect = document.getElementById('editTransactionCategory');
+    if (editCategorySelect) {
+        editCategorySelect.addEventListener('change', updateEditSubcategories);
+    }
 
-    typeButtons.forEach(button => {
-        button.addEventListener('click', function () {
-            typeButtons.forEach(btn => btn.classList.remove('active'));
-            this.classList.add('active');
-            typeInput.value = this.getAttribute('data-type');
+    const editSubcategoryOptions = document.querySelectorAll('#editSubcategoryOptions .select-subcategory-option');
+    editSubcategoryOptions.forEach(option => {
+        option.addEventListener('click', function (e) {
+            e.stopPropagation();
+            selectEditSubcategoryOption(this);
         });
+    });
+
+    const createTypeButtons = document.querySelectorAll('#createTransactionModal .type-btn');
+    const createTypeInput = document.getElementById('transactionType');
+
+    createTypeButtons.forEach(button => {
+        button.addEventListener('click', function () {
+            createTypeButtons.forEach(btn => btn.classList.remove('active'));
+            this.classList.add('active');
+            createTypeInput.value = this.getAttribute('data-type');
+        });
+    });
+
+    const editTypeButtons = document.querySelectorAll('#editTransactionModal .type-btn');
+    const editTypeInput = document.getElementById('editTransactionType');
+
+    editTypeButtons.forEach(button => {
+        button.addEventListener('click', function () {
+            editTypeButtons.forEach(btn => btn.classList.remove('active'));
+            this.classList.add('active');
+            editTypeInput.value = this.getAttribute('data-type');
+        });
+    });
+
+    const amountInputs = document.querySelectorAll('input[type="text"][name="Amount"]');
+    amountInputs.forEach(input => {
+        input.addEventListener('input', formatAmountInput);
+    });
+
+    const accountOptions = document.querySelectorAll('.select-account-option');
+    accountOptions.forEach(option => {
+        option.addEventListener('click', function (e) {
+            e.stopPropagation();
+            if (this.closest('#editAccountOptions')) {
+                selectEditAccountOption(this);
+            } else {
+                selectAccountOption(this);
+            }
+        });
+    });
+
+    const categoryOptions = document.querySelectorAll('.select-category-option');
+    categoryOptions.forEach(option => {
+        option.addEventListener('click', function (e) {
+            e.stopPropagation();
+            if (this.closest('#editCategoryOptions')) {
+                selectEditCategoryOption(this);
+            } else {
+                selectCategoryOption(this);
+            }
+        });
+    });
+
+    const transactionCards = document.querySelectorAll('.transaction-card');
+    transactionCards.forEach(card => {
+        card.addEventListener('click', function (e) {
+            e.stopPropagation();
+
+            const transactionId = this.getAttribute('data-transaction-id');
+            const transactionType = parseInt(this.getAttribute('data-transaction-type'));
+            const amount = this.getAttribute('data-amount');
+            const accountId = this.getAttribute('data-account-id');
+            const accountName = this.getAttribute('data-account-name');
+            const accountColor = this.getAttribute('data-account-color');
+            const categoryId = this.getAttribute('data-category-id');
+            const categoryName = this.getAttribute('data-category-name');
+            const categoryColor = this.getAttribute('data-category-color');
+            const subCategoryId = this.getAttribute('data-subcategory-id') || '';
+            const description = this.getAttribute('data-description') || '';
+            const date = this.getAttribute('data-date');
+
+            console.log('Opening edit modal for transaction:', transactionId);
+
+            openEditTransactionModal(
+                transactionId,
+                transactionType,
+                amount,
+                accountId,
+                accountName,
+                accountColor,
+                categoryId,
+                categoryName,
+                categoryColor,
+                subCategoryId,
+                description,
+                date
+            );
+        });
+
+        card.style.cursor = 'pointer';
     });
 });
 
@@ -126,12 +242,9 @@ document.addEventListener('keydown', function (e) {
     }
 });
 
-createTransactionAmountInput.addEventListener('input', formatAmountInput);
-
 function formatAmountInput(e) {
     let value = e.target.value;
 
-    // regular for everything without figures and point
     value = value.replace(/[^\d.]/g, '');
     const parts = value.split('.');
     if (parts.length > 2) {
@@ -147,13 +260,11 @@ function formatAmountInput(e) {
 
 function toggleAccountDropdown() {
     const options = document.getElementById('accountOptions');
-    const selected = document.querySelector('.select-selected-account');
+    const selected = document.querySelector('#createTransactionModal .select-selected-account');
 
     if (options && selected) {
         const isShowing = options.classList.contains('show');
-
         closeAllDropdowns();
-
         if (!isShowing) {
             options.classList.add('show');
             selected.classList.add('active');
@@ -163,13 +274,11 @@ function toggleAccountDropdown() {
 
 function toggleCategoryDropdown() {
     const options = document.getElementById('categoryOptions');
-    const selected = document.querySelector('.select-selected-category');
+    const selected = document.querySelector('#createTransactionModal .select-selected-category');
 
     if (options && selected) {
         const isShowing = options.classList.contains('show');
-
         closeAllDropdowns();
-
         if (!isShowing) {
             options.classList.add('show');
             selected.classList.add('active');
@@ -179,13 +288,53 @@ function toggleCategoryDropdown() {
 
 function toggleSubcategoryDropdown() {
     const options = document.getElementById('subcategoryOptions');
-    const selected = document.querySelector('.select-selected-subcategory');
+    const selected = document.querySelector('#createTransactionModal .select-selected-subcategory');
 
     if (options && selected) {
         const isShowing = options.classList.contains('show');
-
         closeAllDropdowns();
+        if (!isShowing) {
+            options.classList.add('show');
+            selected.classList.add('active');
+        }
+    }
+}
 
+function toggleEditAccountDropdown() {
+    const options = document.getElementById('editAccountOptions');
+    const selected = document.querySelector('#editTransactionModal .select-selected-account');
+
+    if (options && selected) {
+        const isShowing = options.classList.contains('show');
+        closeAllDropdowns();
+        if (!isShowing) {
+            options.classList.add('show');
+            selected.classList.add('active');
+        }
+    }
+}
+
+function toggleEditCategoryDropdown() {
+    const options = document.getElementById('editCategoryOptions');
+    const selected = document.querySelector('#editTransactionModal .select-selected-category');
+
+    if (options && selected) {
+        const isShowing = options.classList.contains('show');
+        closeAllDropdowns();
+        if (!isShowing) {
+            options.classList.add('show');
+            selected.classList.add('active');
+        }
+    }
+}
+
+function toggleEditSubcategoryDropdown() {
+    const options = document.getElementById('editSubcategoryOptions');
+    const selected = document.querySelector('#editTransactionModal .select-selected-subcategory');
+
+    if (options && selected) {
+        const isShowing = options.classList.contains('show');
+        closeAllDropdowns();
         if (!isShowing) {
             options.classList.add('show');
             selected.classList.add('active');
@@ -225,7 +374,7 @@ function selectAccountOption(optionElement) {
 
     closeAllDropdowns();
 
-    const allOptions = document.querySelectorAll('.select-account-option');
+    const allOptions = document.querySelectorAll('#accountOptions .select-account-option');
     allOptions.forEach(option => {
         option.classList.remove('selected');
     });
@@ -261,7 +410,7 @@ function selectCategoryOption(optionElement) {
 
     closeAllDropdowns();
 
-    const allOptions = document.querySelectorAll('.select-category-option');
+    const allOptions = document.querySelectorAll('#categoryOptions .select-category-option');
     allOptions.forEach(option => {
         option.classList.remove('selected');
     });
@@ -299,7 +448,111 @@ function selectSubcategoryOption(optionElement) {
 
     closeAllDropdowns();
 
-    const allOptions = document.querySelectorAll('.select-subcategory-option');
+    const allOptions = document.querySelectorAll('#subcategoryOptions .select-subcategory-option');
+    allOptions.forEach(option => {
+        option.classList.remove('selected');
+    });
+    optionElement.classList.add('selected');
+}
+
+function selectEditAccountOption(optionElement) {
+    const accountId = optionElement.getAttribute('data-account-id');
+    const accountName = optionElement.getAttribute('data-account-name');
+    const accountBalance = optionElement.getAttribute('data-account-balance');
+    const accountColor = optionElement.getAttribute('data-account-color');
+    const accountIconHTML = optionElement.querySelector('.option-account-icon').innerHTML;
+
+    document.getElementById('editTransactionAccount').value = accountId;
+
+    const selectedIcon = document.getElementById('editSelectedAccountIcon');
+    const selectedName = document.getElementById('editSelectedAccountName');
+    const selectedBalance = document.getElementById('editSelectedAccountBalance');
+
+    selectedIcon.innerHTML = accountIconHTML;
+    selectedIcon.style.backgroundColor = accountColor;
+
+    selectedIcon.style.display = 'flex';
+    selectedIcon.style.alignItems = 'center';
+    selectedIcon.style.justifyContent = 'center';
+    selectedIcon.style.borderRadius = '10px';
+    selectedIcon.style.width = '40px';
+    selectedIcon.style.height = '40px';
+    selectedIcon.style.fontSize = '18px';
+
+    selectedName.textContent = accountName;
+    selectedBalance.textContent = accountBalance;
+
+    closeAllDropdowns();
+
+    const allOptions = document.querySelectorAll('#editAccountOptions .select-account-option');
+    allOptions.forEach(option => {
+        option.classList.remove('selected');
+    });
+    optionElement.classList.add('selected');
+}
+
+function selectEditCategoryOption(optionElement) {
+    const categoryId = optionElement.getAttribute('data-category-id');
+    const categoryName = optionElement.getAttribute('data-category-name');
+    const categoryColor = optionElement.getAttribute('data-category-color');
+    const categoryIconHTML = optionElement.querySelector('.option-category-icon').innerHTML;
+
+    document.getElementById('editTransactionCategory').value = categoryId;
+
+    const selectedIcon = document.getElementById('editSelectedCategoryIcon');
+    const selectedName = document.getElementById('editSelectedCategoryName');
+
+    selectedIcon.innerHTML = categoryIconHTML;
+    selectedIcon.style.backgroundColor = categoryColor;
+
+    selectedIcon.style.display = 'flex';
+    selectedIcon.style.alignItems = 'center';
+    selectedIcon.style.justifyContent = 'center';
+    selectedIcon.style.borderRadius = '10px';
+    selectedIcon.style.width = '40px';
+    selectedIcon.style.height = '40px';
+    selectedIcon.style.fontSize = '18px';
+
+    selectedName.textContent = categoryName;
+
+    closeAllDropdowns();
+
+    const allOptions = document.querySelectorAll('#editCategoryOptions .select-category-option');
+    allOptions.forEach(option => {
+        option.classList.remove('selected');
+    });
+    optionElement.classList.add('selected');
+
+    updateEditSubcategories();
+}
+
+function selectEditSubcategoryOption(optionElement) {
+    const subcategoryId = optionElement.getAttribute('data-subcategory-id');
+    const subcategoryName = optionElement.getAttribute('data-subcategory-name');
+    const subcategoryColor = optionElement.getAttribute('data-subcategory-color');
+    const subcategoryIconHTML = optionElement.querySelector('.option-subcategory-icon').innerHTML;
+
+    document.getElementById('editTransactionSubCategory').value = subcategoryId;
+
+    const selectedIcon = document.getElementById('editSelectedSubcategoryIcon');
+    const selectedName = document.getElementById('editSelectedSubcategoryName');
+
+    selectedIcon.innerHTML = subcategoryIconHTML;
+    selectedIcon.style.backgroundColor = subcategoryColor;
+
+    selectedIcon.style.display = 'flex';
+    selectedIcon.style.alignItems = 'center';
+    selectedIcon.style.justifyContent = 'center';
+    selectedIcon.style.borderRadius = '10px';
+    selectedIcon.style.width = '40px';
+    selectedIcon.style.height = '40px';
+    selectedIcon.style.fontSize = '18px';
+
+    selectedName.textContent = subcategoryName;
+
+    closeAllDropdowns();
+
+    const allOptions = document.querySelectorAll('#editSubcategoryOptions .select-subcategory-option');
     allOptions.forEach(option => {
         option.classList.remove('selected');
     });
@@ -308,11 +561,18 @@ function selectSubcategoryOption(optionElement) {
 
 function closeAllDropdowns() {
     const accountOptions = document.getElementById('accountOptions');
-    const accountSelected = document.querySelector('.select-selected-account');
+    const accountSelected = document.querySelector('#createTransactionModal .select-selected-account');
     const categoryOptions = document.getElementById('categoryOptions');
-    const categorySelected = document.querySelector('.select-selected-category');
+    const categorySelected = document.querySelector('#createTransactionModal .select-selected-category');
     const subcategoryOptions = document.getElementById('subcategoryOptions');
-    const subcategorySelected = document.querySelector('.select-selected-subcategory');
+    const subcategorySelected = document.querySelector('#createTransactionModal .select-selected-subcategory');
+
+    const editAccountOptions = document.getElementById('editAccountOptions');
+    const editAccountSelected = document.querySelector('#editTransactionModal .select-selected-account');
+    const editCategoryOptions = document.getElementById('editCategoryOptions');
+    const editCategorySelected = document.querySelector('#editTransactionModal .select-selected-category');
+    const editSubcategoryOptions = document.getElementById('editSubcategoryOptions');
+    const editSubcategorySelected = document.querySelector('#editTransactionModal .select-selected-subcategory');
 
     if (accountOptions) accountOptions.classList.remove('show');
     if (accountSelected) accountSelected.classList.remove('active');
@@ -320,103 +580,131 @@ function closeAllDropdowns() {
     if (categorySelected) categorySelected.classList.remove('active');
     if (subcategoryOptions) subcategoryOptions.classList.remove('show');
     if (subcategorySelected) subcategorySelected.classList.remove('active');
+
+    if (editAccountOptions) editAccountOptions.classList.remove('show');
+    if (editAccountSelected) editAccountSelected.classList.remove('active');
+    if (editCategoryOptions) editCategoryOptions.classList.remove('show');
+    if (editCategorySelected) editCategorySelected.classList.remove('active');
+    if (editSubcategoryOptions) editSubcategoryOptions.classList.remove('show');
+    if (editSubcategorySelected) editSubcategorySelected.classList.remove('active');
 }
 
 document.addEventListener('click', function (event) {
-    const accountSelectContainer = document.querySelector('.custom-account-select');
-    const categorySelectContainer = document.querySelector('.custom-category-select');
-    const subcategorySelectContainer = document.querySelector('.custom-subcategory-select');
+    const accountSelectContainers = document.querySelectorAll('.custom-account-select');
+    const categorySelectContainers = document.querySelectorAll('.custom-category-select');
+    const subcategorySelectContainers = document.querySelectorAll('.custom-subcategory-select');
 
-    if ((!accountSelectContainer.contains(event.target)) &&
-        (!categorySelectContainer.contains(event.target)) &&
-        (!subcategorySelectContainer.contains(event.target))) {
+    let isClickInside = false;
+
+    accountSelectContainers.forEach(container => {
+        if (container.contains(event.target)) {
+            isClickInside = true;
+        }
+    });
+
+    categorySelectContainers.forEach(container => {
+        if (container.contains(event.target)) {
+            isClickInside = true;
+        }
+    });
+
+    subcategorySelectContainers.forEach(container => {
+        if (container.contains(event.target)) {
+            isClickInside = true;
+        }
+    });
+
+    if (!isClickInside) {
         closeAllDropdowns();
     }
 });
 
-document.addEventListener('DOMContentLoaded', function () {
-    const accountOptions = document.querySelectorAll('.select-account-option');
-    accountOptions.forEach(option => {
-        option.addEventListener('click', function (e) {
-            e.stopPropagation();
-            selectAccountOption(this);
-        });
-    });
+function openEditTransactionModal(id, type, amount, accountId, accountName, accountColor, categoryId, categoryName, categoryColor, subCategoryId, description, date) {
+    document.getElementById('editTransactionId').value = id;
+    document.getElementById('editTransactionAmount').value = parseFloat(amount).toFixed(2);
+    document.getElementById('editTransactionDescription').value = description || '';
 
-    document.addEventListener('click', function (event) {
-        const selectContainer = document.getElementById('accountSelect');
-        if (selectContainer && !selectContainer.contains(event.target)) {
-            closeAllDropdowns();
+    let transactionDate;
+    if (date) {
+        const originalDate = new Date(date);
+        if (!isNaN(originalDate.getTime())) {
+            transactionDate = originalDate;
+        } else {
+            transactionDate = new Date();
         }
-    });
-
-    const firstAccountOption = document.querySelector('.select-account-option');
-    if (firstAccountOption) {
-        selectAccountOption(firstAccountOption);
+    } else {
+        transactionDate = new Date();
     }
 
-    const categoryOptions = document.querySelectorAll('.select-category-option');
-    categoryOptions.forEach(option => {
-        option.addEventListener('click', function (e) {
-            e.stopPropagation();
-            selectCategoryOption(this);
-        });
-    });
+    const year = transactionDate.getFullYear();
+    const month = String(transactionDate.getMonth() + 1).padStart(2, '0');
+    const day = String(transactionDate.getDate()).padStart(2, '0');
+    document.getElementById('editTransactionDate').value = `${year}-${month}-${day}`;
 
-    const firstCategoryOption = document.querySelector('.select-category-option');
-    if (firstCategoryOption) {
-        selectCategoryOption(firstCategoryOption);
-    }
-});
-
-function openCreateTransactionModal() {
-    document.getElementById('transactionAccount').value = '';
-    document.getElementById('transactionCategory').value = '';
-    createTransactionAmountInput.value = '';
-    document.getElementById('transactionDescription').value = '';
-    document.getElementById('transactionDate').value = '';
-
-    const typeButtons = document.querySelectorAll('.type-btn');
+    const typeButtons = document.querySelectorAll('#editTransactionModal .type-btn');
     typeButtons.forEach(btn => btn.classList.remove('active'));
-    document.querySelector('.income-btn').classList.add('active');
-    document.getElementById('transactionType').value = '0';
 
-    const today = new Date().toISOString().split('T')[0];
-    document.getElementById('transactionDate').value = today;
+    if (type === 0 || type === '0') {
+        document.querySelector('#editTransactionModal .income-btn').classList.add('active');
+        document.getElementById('editTransactionType').value = '0';
+    } else {
+        document.querySelector('#editTransactionModal .expense-btn').classList.add('active');
+        document.getElementById('editTransactionType').value = '1';
+    }
+
+    document.getElementById('editSelectedAccountIcon').innerHTML = '';
+    document.getElementById('editSelectedAccountIcon').style.backgroundColor = '';
+    document.getElementById('editSelectedAccountName').textContent = 'Выберите счет';
+    document.getElementById('editSelectedAccountBalance').textContent = '';
+
+    document.getElementById('editSelectedCategoryIcon').innerHTML = '';
+    document.getElementById('editSelectedCategoryIcon').style.backgroundColor = '';
+    document.getElementById('editSelectedCategoryName').textContent = 'Выберите категорию';
+
+    document.getElementById('editSelectedSubcategoryIcon').innerHTML = '';
+    document.getElementById('editSelectedSubcategoryIcon').style.backgroundColor = '';
+    document.getElementById('editSelectedSubcategoryName').textContent = 'Выберите подкатегорию';
 
     setTimeout(() => {
-        const firstAccountOption = document.querySelector('.select-account-option');
-        if (firstAccountOption) {
-            selectAccountOption(firstAccountOption);
+        const accountOption = document.querySelector(`#editAccountOptions .select-account-option[data-account-id="${accountId}"]`);
+        if (accountOption) {
+            selectEditAccountOption(accountOption);
         }
 
-        const firstCategoryOption = document.querySelector('.select-category-option');
-        if (firstCategoryOption) {
-            selectCategoryOption(firstCategoryOption);
+        const categoryOption = document.querySelector(`#editCategoryOptions .select-category-option[data-category-id="${categoryId}"]`);
+        if (categoryOption) {
+            selectEditCategoryOption(categoryOption);
         }
 
-        document.getElementById('selectedSubcategoryIcon').innerHTML = '';
-        document.getElementById('selectedSubcategoryIcon').style.backgroundColor = '';
-        document.getElementById('selectedSubcategoryName').textContent = 'Выберите подкатегорию';
-
-        const allSubcategoryOptions = document.querySelectorAll('.select-subcategory-option');
-        allSubcategoryOptions.forEach(option => {
-            option.classList.remove('selected');
-        });
+        setTimeout(() => {
+            if (subCategoryId && subCategoryId !== 'null' && subCategoryId !== '') {
+                const subCategoryOption = document.querySelector(`#editSubcategoryOptions .select-subcategory-option[data-subcategory-id="${subCategoryId}"]`);
+                if (subCategoryOption) {
+                    selectEditSubcategoryOption(subCategoryOption);
+                }
+            }
+        }, 200);
     }, 100);
 
-    // automatic point 0.00 to amount
-    const createAmmountForm = document.querySelector('form[action="/submit_transaction"]');
-    if (createAmmountForm) {
-        createAmmountForm.onsubmit = function () {
-            const amountInput = document.getElementById('transactionAmount');
-            if (!amountInput.value.trim()) {
-                amountInput.value = '0.00';
-            }
-        };
-    }
+    openModal('editTransactionModal');
+}
 
-    openModal('createTransactionModal');
+function deleteTransaction() {
+    const transactionId = document.getElementById('editTransactionId').value;
+    if (confirm('Вы уверены, что хотите удалить эту транзакцию? Это действие необратимо.')) {
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = '/delete_transaction';
+
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = 'ID';
+        input.value = transactionId;
+
+        form.appendChild(input);
+        document.body.appendChild(form);
+        form.submit();
+    }
 }
 
 function toggleTransactionGroup(header) {
