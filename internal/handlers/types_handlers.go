@@ -50,8 +50,10 @@ type SubCategoryPageData struct {
 }
 
 type GroupedTransactions struct {
-	Date         string
-	Transactions []TransactionView
+	Date           string
+	TotalAmount    float64
+	CurrencySymbol string
+	Transactions   []TransactionView
 }
 
 type TransactionPageData struct {
@@ -67,6 +69,7 @@ type TransactionView struct {
 	Amount             float64
 	AccountID          uint
 	AccountName        string
+	AccountColor       string
 	CurrencySymbol     string
 	CategoryID         uint
 	CategoryName       string

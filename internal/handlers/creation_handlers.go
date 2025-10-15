@@ -206,6 +206,7 @@ func getTransactionsForView(db *gorm.DB) ([]TransactionView, error) {
 			Amount:             tx.Amount,
 			AccountID:          tx.AccountID,
 			AccountName:        tx.Account.Name,
+			AccountColor:       tx.Account.Color,
 			CurrencySymbol:     symbol,
 			CategoryID:         tx.CategoryID,
 			CategoryName:       tx.Category.Name,

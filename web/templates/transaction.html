@@ -41,6 +41,9 @@
                         <i class="fa-solid fa-chevron-down"></i>
                     </div>
                     <span>{{.Date}}</span>
+                    <span class="date-total-amount">
+                        {{printf "%.2f" .TotalAmount}} {{.CurrencySymbol}}
+                    </span>
                 </div>
                 {{range .Transactions}}
                 <div class="transaction-card">
@@ -58,6 +61,7 @@
                                 {{end}}
                             </div>
                             <div class="transaction-center-account">
+                                <div class="account-color-dot" style="background-color: #{{.AccountColor}};"></div>
                                 <span class="transaction-account">{{.AccountName}}</span>
                             </div>
                             <div class="transaction-amount-section">

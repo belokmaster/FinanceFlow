@@ -25,10 +25,23 @@ func groupTransactionsByDate(transactions []TransactionView) []GroupedTransactio
 	}
 
 	var result []GroupedTransactions
+	curSymbol := ""
 	for date, trans := range grouped {
+		total := 0.0
+		for _, t := range trans {
+			if t.Type == 0 {
+				total += t.Amount
+			} else {
+				total -= t.Amount
+			}
+			curSymbol = t.CurrencySymbol
+		}
+
 		result = append(result, GroupedTransactions{
-			Date:         date,
-			Transactions: trans,
+			Date:           date,
+			TotalAmount:    total,
+			Transactions:   trans,
+			CurrencySymbol: curSymbol,
 		})
 	}
 
