@@ -653,6 +653,11 @@ function closeAllDropdowns() {
     const editSubcategoryOptions = document.getElementById('editSubcategoryOptions');
     const editSubcategorySelected = document.querySelector('#editTransactionModal .select-selected-subcategory');
 
+    const editFromAccountOptions = document.getElementById('editFromAccountOptions');
+    const editFromAccountSelected = document.querySelector('#editTransferModal #editFromAccount + .select-selected-account');
+    const editToAccountOptions = document.getElementById('editToAccountOptions');
+    const editToAccountSelected = document.querySelector('#editTransferModal #editToAccount + .select-selected-account');
+
     if (accountOptions) accountOptions.classList.remove('show');
     if (accountSelected) accountSelected.classList.remove('active');
     if (categoryOptions) categoryOptions.classList.remove('show');
@@ -666,6 +671,11 @@ function closeAllDropdowns() {
     if (editCategorySelected) editCategorySelected.classList.remove('active');
     if (editSubcategoryOptions) editSubcategoryOptions.classList.remove('show');
     if (editSubcategorySelected) editSubcategorySelected.classList.remove('active');
+
+    if (editFromAccountOptions) editFromAccountOptions.classList.remove('show');
+    if (editFromAccountSelected) editFromAccountSelected.classList.remove('active');
+    if (editToAccountOptions) editToAccountOptions.classList.remove('show');
+    if (editToAccountSelected) editToAccountSelected.classList.remove('active');
 }
 
 document.addEventListener('click', function (event) {
@@ -1005,4 +1015,201 @@ document.addEventListener('DOMContentLoaded', function () {
             return true;
         };
     }
+});
+
+function openEditTransferModal(id, amount, accountId, accountName, accountColor,
+    transferAccountId, transferAccountName, transferAccountColor,
+    description, date) {
+
+    document.getElementById('editTransferId').value = id;
+    document.getElementById('editTransferAmount').value = parseFloat(amount).toFixed(2);
+    document.getElementById('editTransferDescription').value = description || '';
+
+    let transferDate;
+    if (date) {
+        const originalDate = new Date(date);
+        if (!isNaN(originalDate.getTime())) {
+            transferDate = originalDate;
+        } else {
+            transferDate = new Date();
+        }
+    } else {
+        transferDate = new Date();
+    }
+
+    const year = transferDate.getFullYear();
+    const month = String(transferDate.getMonth() + 1).padStart(2, '0');
+    const day = String(transferDate.getDate()).padStart(2, '0');
+    document.getElementById('editTransferDate').value = `${year}-${month}-${day}`;
+
+    document.getElementById('editFromSelectedAccountIcon').innerHTML = '';
+    document.getElementById('editFromSelectedAccountIcon').style.backgroundColor = '';
+    document.getElementById('editFromSelectedAccountName').textContent = 'Выберите счет';
+    document.getElementById('editFromSelectedAccountBalance').textContent = '';
+
+    document.getElementById('editToSelectedAccountIcon').innerHTML = '';
+    document.getElementById('editToSelectedAccountIcon').style.backgroundColor = '';
+    document.getElementById('editToSelectedAccountName').textContent = 'Выберите счет для перевода';
+    document.getElementById('editToSelectedAccountBalance').textContent = '';
+
+    const fromAccountOption = document.querySelector(`#editFromAccountOptions .select-account-option[data-account-id="${accountId}"]`);
+    if (fromAccountOption) selectEditFromAccountOption(fromAccountOption);
+
+    const toAccountOption = document.querySelector(`#editToAccountOptions .select-account-option[data-account-id="${transferAccountId}"]`);
+    if (toAccountOption) selectEditToAccountOption(toAccountOption);
+
+    openModal('editTransferModal');
+}
+
+function toggleEditFromAccountDropdown() {
+    const options = document.getElementById('editFromAccountOptions');
+    const selected = document.querySelector('#editTransferModal #editFromAccount + .select-selected-account');
+
+    if (options && selected) {
+        const isShowing = options.classList.contains('show');
+        closeAllDropdowns();
+        if (!isShowing) {
+            options.classList.add('show');
+            selected.classList.add('active');
+        }
+    }
+}
+
+function toggleEditToAccountDropdown() {
+    const options = document.getElementById('editToAccountOptions');
+    const selected = document.querySelector('#editTransferModal #editToAccount + .select-selected-account');
+
+    if (options && selected) {
+        const isShowing = options.classList.contains('show');
+        closeAllDropdowns();
+        if (!isShowing) {
+            options.classList.add('show');
+            selected.classList.add('active');
+        }
+    }
+}
+
+function selectEditFromAccountOption(optionElement) {
+    const accountId = optionElement.getAttribute('data-account-id');
+    const accountName = optionElement.getAttribute('data-account-name');
+    const accountBalance = optionElement.getAttribute('data-account-balance');
+    const accountColor = optionElement.getAttribute('data-account-color');
+    const accountIconHTML = optionElement.querySelector('.option-account-icon').innerHTML;
+
+    document.getElementById('editFromAccount').value = accountId;
+
+    const selectedIcon = document.getElementById('editFromSelectedAccountIcon');
+    const selectedName = document.getElementById('editFromSelectedAccountName');
+    const selectedBalance = document.getElementById('editFromSelectedAccountBalance');
+
+    selectedIcon.innerHTML = accountIconHTML;
+    selectedIcon.style.backgroundColor = accountColor;
+
+    selectedIcon.style.display = 'flex';
+    selectedIcon.style.alignItems = 'center';
+    selectedIcon.style.justifyContent = 'center';
+    selectedIcon.style.borderRadius = '10px';
+    selectedIcon.style.width = '40px';
+    selectedIcon.style.height = '40px';
+    selectedIcon.style.fontSize = '18px';
+
+    selectedName.textContent = accountName;
+    selectedBalance.textContent = accountBalance;
+
+    closeAllDropdowns();
+
+    const allOptions = document.querySelectorAll('#editFromAccountOptions .select-account-option');
+    allOptions.forEach(option => {
+        option.classList.remove('selected');
+    });
+    optionElement.classList.add('selected');
+}
+
+function selectEditToAccountOption(optionElement) {
+    const accountId = optionElement.getAttribute('data-account-id');
+    const accountName = optionElement.getAttribute('data-account-name');
+    const accountBalance = optionElement.getAttribute('data-account-balance');
+    const accountColor = optionElement.getAttribute('data-account-color');
+    const accountIconHTML = optionElement.querySelector('.option-account-icon').innerHTML;
+
+    document.getElementById('editToAccount').value = accountId;
+
+    const selectedIcon = document.getElementById('editToSelectedAccountIcon');
+    const selectedName = document.getElementById('editToSelectedAccountName');
+    const selectedBalance = document.getElementById('editToSelectedAccountBalance');
+
+    selectedIcon.innerHTML = accountIconHTML;
+    selectedIcon.style.backgroundColor = accountColor;
+
+    selectedIcon.style.display = 'flex';
+    selectedIcon.style.alignItems = 'center';
+    selectedIcon.style.justifyContent = 'center';
+    selectedIcon.style.borderRadius = '10px';
+    selectedIcon.style.width = '40px';
+    selectedIcon.style.height = '40px';
+    selectedIcon.style.fontSize = '18px';
+
+    selectedName.textContent = accountName;
+    selectedBalance.textContent = accountBalance;
+
+    closeAllDropdowns();
+
+    const allOptions = document.querySelectorAll('#editToAccountOptions .select-account-option');
+    allOptions.forEach(option => {
+        option.classList.remove('selected');
+    });
+    optionElement.classList.add('selected');
+}
+
+function deleteTransfer() {
+    const transferId = document.getElementById('editTransferId').value;
+    if (confirm('Вы уверены, что хотите удалить этот перевод? Это действие необратимо.')) {
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = '/delete_transfer';
+
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = 'ID';
+        input.value = transferId;
+
+        form.appendChild(input);
+        document.body.appendChild(form);
+        form.submit();
+    }
+}
+
+const transferCards = document.querySelectorAll('.transfer-card');
+transferCards.forEach(card => {
+    card.addEventListener('click', function (e) {
+        e.stopPropagation();
+
+        const transferId = this.getAttribute('data-transfer-id');
+        const amount = this.getAttribute('data-amount');
+        const accountId = this.getAttribute('data-account-id');
+        const accountName = this.getAttribute('data-account-name');
+        const accountColor = this.getAttribute('data-account-color');
+        const transferAccountId = this.getAttribute('data-transfer-account-id');
+        const transferAccountName = this.getAttribute('data-transfer-account-name');
+        const transferAccountColor = this.getAttribute('data-transfer-account-color');
+        const description = this.getAttribute('data-description') || '';
+        const date = this.getAttribute('data-date');
+
+        console.log('Opening edit modal for transfer:', transferId);
+
+        openEditTransferModal(
+            transferId,
+            amount,
+            accountId,
+            accountName,
+            accountColor,
+            transferAccountId,
+            transferAccountName,
+            transferAccountColor,
+            description,
+            date
+        );
+    });
+
+    card.style.cursor = 'pointer';
 });

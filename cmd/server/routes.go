@@ -41,6 +41,10 @@ func setupRoutes(db *gorm.DB) {
 		handlers.TransferHandler(w, r, db)
 	})
 
+	http.HandleFunc("/delete_transfer", func(w http.ResponseWriter, r *http.Request) {
+		handlers.DeleteTransferHandler(w, r, db)
+	})
+
 	http.HandleFunc("/submit_transaction", func(w http.ResponseWriter, r *http.Request) {
 		handlers.TransactionHandler(w, r, db)
 	})
@@ -79,5 +83,9 @@ func setupRoutes(db *gorm.DB) {
 
 	http.HandleFunc("/update_transaction", func(w http.ResponseWriter, r *http.Request) {
 		handlers.UpdateTransactionHandler(w, r, db)
+	})
+
+	http.HandleFunc("/update_transfer", func(w http.ResponseWriter, r *http.Request) {
+		handlers.UpdateTransferHandler(w, r, db)
 	})
 }

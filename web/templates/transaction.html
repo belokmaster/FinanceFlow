@@ -45,6 +45,7 @@
                         {{printf "%.2f" .TotalAmount}} {{.CurrencySymbol}}
                     </span>
                 </div>
+
                 {{range .Transactions}}
                 <div class="transaction-card" data-transaction-id="{{.ID}}" data-transaction-type="{{.Type}}"
                     data-amount="{{.Amount}}" data-account-id="{{.AccountID}}" data-account-name="{{.AccountName}}"
@@ -88,6 +89,62 @@
                         <div class="transaction-bottom-line">
                             <div class="transaction-date">{{.FormattedDate}}</div>
 
+                        </div>
+                    </div>
+                </div>
+                {{end}}
+
+
+                {{range .Transfers}}
+                <div class="transaction-card transfer-card" data-transfer-id="{{.ID}}" data-transfer-type="{{.Type}}"
+                    data-amount="{{.Amount}}" data-account-id="{{.AccountID}}" data-account-name="{{.AccountName}}"
+                    data-account-color="{{.AccountColor}}" data-transfer-account-id="{{.TransferAccountID}}"
+                    data-transfer-account-name="{{.TransferAccountName}}"
+                    data-transfer-account-color="{{.TransferAccountColor}}" data-description="{{.Description}}"
+                    data-date="{{.Date}}">
+
+                    <div class="transaction-icon-container" style="background-color: #17a2b8;">
+                        <div class="transaction-icon">
+                            <i class="fa-solid fa-arrow-right-arrow-left" style="color: white;"></i>
+                        </div>
+                    </div>
+
+                    <div class="transaction-info">
+                        <div class="transaction-top-line">
+                            <div class="transaction-category-line">
+                                <span class="transaction-main-category">Перевод</span>
+                                <span class="transaction-subcategory">на {{.TransferAccountName}}</span>
+                            </div>
+
+                            <div class="transaction-center-account">
+                                <div class="account-color-dot" style="background-color: #{{.AccountColor}};"></div>
+                                <span class="transaction-account">{{.AccountName}}</span>
+                                <i class="fa-solid fa-arrow-right"
+                                    style="margin: 0 8px; color: #666; font-size: 12px;"></i>
+                                <div class="account-color-dot" style="background-color: #{{.TransferAccountColor}};">
+                                </div>
+                                <span class="transaction-account">{{.TransferAccountName}}</span>
+                            </div>
+
+                            {{if .Description}}
+                            <div class="transaction-comment-overlay">
+                                <div class="transaction-description">{{.Description}}</div>
+                            </div>
+                            {{end}}
+
+                            <div class="transaction-amount-section">
+                                <span class="transaction-amount transfer">
+                                    -{{printf "%.2f" .Amount}} {{.CurrencySymbol}}
+                                </span>
+                                <span class="transaction-time">{{.FormattedTime}}</span>
+                            </div>
+                        </div>
+
+                        <div class="transaction-bottom-line">
+                            <div class="transaction-date">{{.FormattedDate}}</div>
+                            {{if .Description}}
+                            <div class="transaction-description">{{.Description}}</div>
+                            {{end}}
                         </div>
                     </div>
                 </div>
@@ -326,55 +383,46 @@
     </div>
 
     <!-- edit transaction -->
-    <div id="editTransactionModal" class="modal">
+    <div id="editTransferModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2>Редактировать транзакцию</h2>
-                <span class="close" onclick="closeModal('editTransactionModal')">&times;</span>
+                <h2>Редактировать перевод</h2>
+                <span class="close" onclick="closeModal('editTransferModal')">&times;</span>
             </div>
 
-            <form action="/update_transaction" method="POST">
-                <input type="hidden" id="editTransactionId" name="ID">
-
-                <div class="form-group">
-                    <label>Тип операции <span class="required">*</span></label>
-                    <div class="type-buttons">
-                        <button type="button" class="type-btn income-btn" data-type="0">Доход</button>
-                        <button type="button" class="type-btn expense-btn" data-type="1">Расход</button>
-                    </div>
-                    <input type="hidden" id="editTransactionType" name="Type" value="0" required>
-                </div>
+            <form action="/update_transfer" method="POST">
+                <input type="hidden" id="editTransferId" name="ID">
 
                 <div class="form-row">
                     <div class="form-group name-group">
-                        <label for="editTransactionAmount">Сумма <span class="required">*</span></label>
-                        <input type="text" id="editTransactionAmount" name="Amount" class="form-control"
+                        <label for="editTransferAmount">Сумма <span class="required">*</span></label>
+                        <input type="text" id="editTransferAmount" name="Amount" class="form-control"
                             placeholder="0.00">
                     </div>
                 </div>
 
                 <div class="form-group">
-                    <label for="editTransactionAccount">Счет <span class="required">*</span></label>
+                    <label for="editFromAccount">Счет списания<span class="required">*</span></label>
                     <div class="custom-account-select">
-                        <input type="hidden" id="editTransactionAccount" name="AccountID" required>
+                        <input type="hidden" id="editFromAccount" name="AccountID" required>
 
-                        <div class="select-selected-account" onclick="toggleEditAccountDropdown('icome')">
+                        <div class="select-selected-account" onclick="toggleEditFromAccountDropdown()">
                             <div class="selected-account-display">
-                                <span class="selected-account-icon" id="editSelectedAccountIcon"></span>
+                                <span class="selected-account-icon" id="editFromSelectedAccountIcon"></span>
                                 <span class="selected-account-info">
-                                    <span class="selected-account-name" id="editSelectedAccountName">Выберите
+                                    <span class="selected-account-name" id="editFromSelectedAccountName">Выберите
                                         счет</span>
-                                    <span class="selected-account-balance" id="editSelectedAccountBalance"></span>
+                                    <span class="selected-account-balance" id="editFromSelectedAccountBalance"></span>
                                 </span>
                                 <i class="fa-solid fa-chevron-down dropdown-arrow"></i>
                             </div>
                         </div>
 
-                        <div class="select-account-options" id="editAccountOptions">
+                        <div class="select-account-options" id="editFromAccountOptions">
                             {{range .Accounts}}
                             <div class="select-account-option" data-account-id="{{.ID}}" data-account-name="{{.Name}}"
                                 data-account-balance="{{.Balance}} {{.CurrencySymbol}}" data-account-color="{{.Color}}"
-                                onclick="selectEditAccountOption(this)">
+                                onclick="selectEditFromAccountOption(this)">
                                 <span class="option-account-icon"
                                     style="background-color: {{.Color}};">{{.IconHTML}}</span>
                                 <span class="option-account-info">
@@ -388,30 +436,32 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="editTransactionCategory">Категория <span class="required">*</span></label>
-                    <div class="custom-category-select">
-                        <input type="hidden" id="editTransactionCategory" name="CategoryID" required>
+                    <label for="editToAccount">Счет зачисления<span class="required">*</span></label>
+                    <div class="custom-account-select">
+                        <input type="hidden" id="editToAccount" name="TransferAccountID" required>
 
-                        <div class="select-selected-category" onclick="toggleEditCategoryDropdown()">
-                            <div class="selected-category-display">
-                                <span class="selected-category-icon" id="editSelectedCategoryIcon"></span>
-                                <span class="selected-category-info">
-                                    <span class="selected-category-name" id="editSelectedCategoryName">Выберите
-                                        категорию</span>
+                        <div class="select-selected-account" onclick="toggleEditToAccountDropdown()">
+                            <div class="selected-account-display">
+                                <span class="selected-account-icon" id="editToSelectedAccountIcon"></span>
+                                <span class="selected-account-info">
+                                    <span class="selected-account-name" id="editToSelectedAccountName">Выберите счет для
+                                        перевода</span>
+                                    <span class="selected-account-balance" id="editToSelectedAccountBalance"></span>
                                 </span>
                                 <i class="fa-solid fa-chevron-down dropdown-arrow"></i>
                             </div>
                         </div>
 
-                        <div class="select-category-options" id="editCategoryOptions">
-                            {{range .Categories}}
-                            <div class="select-category-option" data-category-id="{{.ID}}"
-                                data-category-name="{{.Name}}" data-category-color="{{.Color}}"
-                                onclick="selectEditCategoryOption(this)">
-                                <span class="option-category-icon"
+                        <div class="select-account-options" id="editToAccountOptions">
+                            {{range .Accounts}}
+                            <div class="select-account-option" data-account-id="{{.ID}}" data-account-name="{{.Name}}"
+                                data-account-balance="{{.Balance}} {{.CurrencySymbol}}" data-account-color="{{.Color}}"
+                                onclick="selectEditToAccountOption(this)">
+                                <span class="option-account-icon"
                                     style="background-color: {{.Color}};">{{.IconHTML}}</span>
-                                <span class="option-category-info">
-                                    <span class="option-category-name">{{.Name}}</span>
+                                <span class="option-account-info">
+                                    <span class="option-account-name">{{.Name}}</span>
+                                    <span class="option-account-balance">{{.Balance}} {{.CurrencySymbol}}</span>
                                 </span>
                             </div>
                             {{end}}
@@ -420,54 +470,19 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="editTransactionSubCategory">Подкатегория</label>
-                    <div class="custom-subcategory-select">
-                        <input type="hidden" id="editTransactionSubCategory" name="SubCategoryID">
-
-                        <div class="select-selected-subcategory" onclick="toggleEditSubcategoryDropdown()">
-                            <div class="selected-subcategory-display">
-                                <span class="selected-subcategory-icon" id="editSelectedSubcategoryIcon"></span>
-                                <span class="selected-subcategory-info">
-                                    <span class="selected-subcategory-name" id="editSelectedSubcategoryName">Выберите
-                                        подкатегорию</span>
-                                </span>
-                                <i class="fa-solid fa-chevron-down dropdown-arrow"></i>
-                            </div>
-                        </div>
-
-                        <div class="select-subcategory-options" id="editSubcategoryOptions">
-                            {{range .Categories}}
-                            {{range .Subcategories}}
-                            <div class="select-subcategory-option" data-subcategory-id="{{.ID}}"
-                                data-subcategory-name="{{.Name}}" data-subcategory-color="{{.Color}}"
-                                data-parent-id="{{.ParentID}}" onclick="selectEditSubcategoryOption(this)">
-                                <span class="option-subcategory-icon"
-                                    style="background-color: {{.Color}};">{{.IconHTML}}</span>
-                                <span class="option-subcategory-info">
-                                    <span class="option-subcategory-name">{{.Name}}</span>
-                                </span>
-                            </div>
-                            {{end}}
-                            {{end}}
-                        </div>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label for="editTransactionDate">Дата <span class="required">*</span></label>
-                    <input type="date" id="editTransactionDate" name="Date" required>
+                    <label for="editTransferDate">Дата <span class="required">*</span></label>
+                    <input type="date" id="editTransferDate" name="Date" required>
                 </div>
 
                 <div class="form-row">
                     <div class="form-group name-group">
-                        <label for="editTransactionDescription">Описание</label>
-                        <input type="text" id="editTransactionDescription" name="Description" class="form-control">
+                        <label for="editTransferDescription">Описание</label>
+                        <input type="text" id="editTransferDescription" name="Description" class="form-control">
                     </div>
                 </div>
 
                 <div class="form-actions">
-                    <button type="button" class="delete-button" onclick="deleteTransaction()">Удалить
-                        транзакцию</button>
+                    <button type="button" class="delete-button" onclick="deleteTransfer()">Удалить перевод</button>
                     <button type="submit" class="btn btn-primary">Сохранить изменения</button>
                 </div>
             </form>

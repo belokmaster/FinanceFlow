@@ -1575,3 +1575,50 @@ form button[type="submit"]:hover {
     background-color: #17a2b8;
     border-color: #17a2b8;
 }
+
+.transaction-amount.transfer {
+    color: #17a2b8;
+}
+
+.transfer-card {
+    border-left: 3px solid #17a2b8;
+}
+
+.transfer-card:hover {
+    border-left-color: #138496;
+}
+
+.transaction-icon-container .fa-arrow-right-arrow-left {
+    font-size: 18px;
+}
+
+.transaction-center-account {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 8px;
+    margin: 0;
+    height: 20px;
+    line-height: 20px;
+}
+
+.transaction-center-account .fa-arrow-right-arrow-left,
+.transaction-center-account .fa-right-left {
+    vertical-align: baseline;
+    line-height: inherit;
+    display: inline-flex;
+    align-items: center;
+}
+
+.transaction-center-account {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.transaction-center-account i {
+    font-size: 1em;
+    line-height: 1;
+    display: inline-flex;
+    vertical-align: middle;
+}

@@ -11,8 +11,8 @@ import (
 	"gorm.io/gorm"
 )
 
-func groupTransactionsByDate(transactions []TransactionView) []GroupedTransactions {
-	grouped := make(map[string][]TransactionView)
+func groupTransactionsByDate(transactions []TransactionView, transfers []TransferView) []GroupedTransactions {
+	grouped := make(map[string]*GroupedTransactions)
 
 	for _, t := range transactions {
 		parsedDate, err := time.Parse("2006-01-02", t.Date)
@@ -21,28 +21,51 @@ func groupTransactionsByDate(transactions []TransactionView) []GroupedTransactio
 			continue
 		}
 		date := parsedDate.Format("02.01.2006")
-		grouped[date] = append(grouped[date], t)
+
+		if _, exists := grouped[date]; !exists {
+			grouped[date] = &GroupedTransactions{
+				Date:           date,
+				TotalAmount:    0,
+				CurrencySymbol: t.CurrencySymbol,
+				Transactions:   []TransactionView{},
+				Transfers:      []TransferView{},
+			}
+		}
+
+		grouped[date].Transactions = append(grouped[date].Transactions, t)
+
+		switch t.Type {
+		case 0:
+			grouped[date].TotalAmount += t.Amount
+		case 1:
+			grouped[date].TotalAmount -= t.Amount
+		}
+	}
+
+	for _, t := range transfers {
+		parsedDate, err := time.Parse("2006-01-02", t.Date)
+		if err != nil {
+			log.Printf("Error parsing date '%s': %v", t.Date, err)
+			continue
+		}
+		date := parsedDate.Format("02.01.2006")
+
+		if _, exists := grouped[date]; !exists {
+			grouped[date] = &GroupedTransactions{
+				Date:           date,
+				TotalAmount:    0,
+				CurrencySymbol: t.CurrencySymbol,
+				Transactions:   []TransactionView{},
+				Transfers:      []TransferView{},
+			}
+		}
+
+		grouped[date].Transfers = append(grouped[date].Transfers, t)
 	}
 
 	var result []GroupedTransactions
-	curSymbol := ""
-	for date, trans := range grouped {
-		total := 0.0
-		for _, t := range trans {
-			if t.Type == 0 {
-				total += t.Amount
-			} else {
-				total -= t.Amount
-			}
-			curSymbol = t.CurrencySymbol
-		}
-
-		result = append(result, GroupedTransactions{
-			Date:           date,
-			TotalAmount:    total,
-			Transactions:   trans,
-			CurrencySymbol: curSymbol,
-		})
+	for _, group := range grouped {
+		result = append(result, *group)
 	}
 
 	sort.Slice(result, func(i, j int) bool {
@@ -101,7 +124,17 @@ func NewTransactionPageHandler(w http.ResponseWriter, r *http.Request, db *gorm.
 
 	log.Printf("NewTransactionPageHandler: Retrieved %d transactions from database", len(transactionsForView))
 
-	groupedTransactions := groupTransactionsByDate(transactionsForView)
+	log.Printf("NewTransactionPageHandler: Getting transfers from database")
+	transfersForView, err := getTransfersForView(db)
+	if err != nil {
+		log.Printf("NewTransactionPageHandler: Error getting transfers: %v", err)
+		http.Error(w, "could not get transfers", http.StatusInternalServerError)
+		return
+	}
+
+	log.Printf("NewTransactionPageHandler: Retrieved %d transactions from database", len(transactionsForView))
+
+	groupedTransactions := groupTransactionsByDate(transactionsForView, transfersForView)
 
 	subcategoriesByParent := convertSubcategoriesToView(subCategories)
 	categoriesForView := convertCategoriesToView(categories, subcategoriesByParent)

@@ -231,3 +231,51 @@ func getTransactionsForView(db *gorm.DB) ([]TransactionView, error) {
 
 	return transactionsForView, nil
 }
+
+func getTransfersForView(db *gorm.DB) ([]TransferView, error) {
+	log.Printf("getTransfersForView: Getting transfers from database")
+
+	var transfers []database.TransferTransaction
+	err := db.Preload("Account").Preload("TransferAccount").Find(&transfers).Error
+	if err != nil {
+		log.Printf("getTransfersForView: Error getting transfers: %v", err)
+		return nil, err
+	}
+
+	log.Printf("getTransfersForView: Found %d transfers", len(transfers))
+
+	var transfersForView []TransferView
+
+	for _, transfer := range transfers {
+		symbol, ok := database.CurrencySymbols[transfer.Account.CurrencyCode]
+		if !ok {
+			symbol = "?"
+		}
+
+		formattedDate := transfer.Date.Format("02.01.2006")
+		dateOnly := transfer.Date.Format("2006-01-02")
+		formattedTime := transfer.Date.Format("15:04")
+
+		transferView := TransferView{
+			ID:                   transfer.ID,
+			Type:                 database.Transfer,
+			Amount:               transfer.Amount,
+			AccountID:            transfer.AccountID,
+			AccountName:          transfer.Account.Name,
+			AccountColor:         transfer.Account.Color,
+			TransferAccountID:    transfer.TransferAccountID,
+			TransferAccountName:  transfer.TransferAccount.Name,
+			TransferAccountColor: transfer.TransferAccount.Color,
+			CurrencySymbol:       symbol,
+			Date:                 dateOnly,
+			FormattedDate:        formattedDate,
+			FormattedTime:        formattedTime,
+			Description:          transfer.Comment,
+		}
+
+		transfersForView = append(transfersForView, transferView)
+	}
+
+	log.Printf("getTransfersForView: Successfully converted %d transfers to view", len(transfersForView))
+	return transfersForView, nil
+}

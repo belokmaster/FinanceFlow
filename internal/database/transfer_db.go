@@ -86,3 +86,136 @@ func TransferToAnotherAcc(db *gorm.DB, tx TransferTransaction) error {
 		return nil
 	})
 }
+
+func DeleteTransfer(db *gorm.DB, id int) error {
+	log.Printf("Deleting transfer with ID: %d", id)
+
+	return db.Transaction(func(txDB *gorm.DB) error {
+		var tx TransferTransaction
+		err := txDB.First(&tx, id).Error
+		if err != nil {
+			return fmt.Errorf("transfer with ID %d not found", id)
+		}
+
+		var fromAccount Account
+		err = txDB.First(&fromAccount, tx.AccountID).Error
+		if err != nil {
+			return fmt.Errorf("from account with ID %d not found", tx.AccountID)
+		}
+
+		var toAccount Account
+		err = txDB.First(&toAccount, tx.TransferAccountID).Error
+		if err != nil {
+			return fmt.Errorf("to account with ID %d not found", tx.TransferAccountID)
+		}
+
+		log.Printf("Found transfer: From=%s, To=%s, Amount=%.2f", fromAccount.Name, toAccount.Name, tx.Amount)
+		log.Printf("Old balances: From=%.2f, To=%.2f", fromAccount.Balance, toAccount.Balance)
+
+		fromAccount.Balance += tx.Amount
+		toAccount.Balance -= tx.Amount
+
+		log.Printf("New balances: From=%.2f, To=%.2f", fromAccount.Balance, toAccount.Balance)
+
+		if err := txDB.Save(&fromAccount).Error; err != nil {
+			return fmt.Errorf("failed to update from account balance: %v", err)
+		}
+
+		if err := txDB.Save(&toAccount).Error; err != nil {
+			return fmt.Errorf("failed to update to account balance: %v", err)
+		}
+
+		if err := txDB.Delete(&TransferTransaction{}, id).Error; err != nil {
+			return fmt.Errorf("failed to delete transfer: %v", err)
+		}
+
+		log.Printf("Transfer deleted and balances adjusted: From=%s, To=%s", fromAccount.Name, toAccount.Name)
+		return nil
+	})
+}
+
+func UpdateTransfer(db *gorm.DB, newTx TransferTransaction) error {
+	log.Printf("Updating transfer with ID: %d", newTx.ID)
+
+	return db.Transaction(func(txDB *gorm.DB) error {
+		var oldTx TransferTransaction
+		err := txDB.First(&oldTx, newTx.ID).Error
+		if err != nil {
+			return fmt.Errorf("transfer not found: %v", err)
+		}
+
+		if newTx.AccountID == newTx.TransferAccountID {
+			return fmt.Errorf("cannot transfer to the same account")
+		}
+
+		var oldFromAccount Account
+		err = txDB.First(&oldFromAccount, oldTx.AccountID).Error
+		if err != nil {
+			return fmt.Errorf("old from account not found: %v", err)
+		}
+
+		var oldToAccount Account
+		err = txDB.First(&oldToAccount, oldTx.TransferAccountID).Error
+		if err != nil {
+			return fmt.Errorf("old to account not found: %v", err)
+		}
+
+		var newFromAccount Account
+		err = txDB.First(&newFromAccount, newTx.AccountID).Error
+		if err != nil {
+			return fmt.Errorf("new from account not found: %v", err)
+		}
+
+		var newToAccount Account
+		err = txDB.First(&newToAccount, newTx.TransferAccountID).Error
+		if err != nil {
+			return fmt.Errorf("new to account not found: %v", err)
+		}
+
+		log.Printf("Old transfer: From=%s, To=%s, Amount=%.2f", oldFromAccount.Name, oldToAccount.Name, oldTx.Amount)
+		log.Printf("New transfer: From=%s, To=%s, Amount=%.2f", newFromAccount.Name, newToAccount.Name, newTx.Amount)
+
+		oldFromAccount.Balance += oldTx.Amount
+		oldToAccount.Balance -= oldTx.Amount
+
+		if newFromAccount.Balance < newTx.Amount {
+			return fmt.Errorf("insufficient funds in new from account: available %.2f, required %.2f", newFromAccount.Balance, newTx.Amount)
+		}
+
+		newFromAccount.Balance -= newTx.Amount
+		newToAccount.Balance += newTx.Amount
+
+		accountsToSave := []*Account{&oldFromAccount, &oldToAccount, &newFromAccount, &newToAccount}
+		for _, acc := range accountsToSave {
+			if err := txDB.Save(acc).Error; err != nil {
+				return fmt.Errorf("failed to update account %s balance: %v", acc.Name, err)
+			}
+		}
+
+		err = txDB.Model(&TransferTransaction{}).Where("id = ?", newTx.ID).Updates(newTx).Error
+		if err != nil {
+			return fmt.Errorf("failed to update transfer: %v", err)
+		}
+
+		log.Printf("Transfer updated successfully: ID=%d", newTx.ID)
+		return nil
+	})
+}
+
+func GetTransfer(db *gorm.DB, id int) (TransferTransaction, error) {
+	var transfer TransferTransaction
+	err := db.Preload("Account").Preload("TransferAccount").First(&transfer, id).Error
+	if err != nil {
+		return TransferTransaction{}, err
+	}
+	return transfer, nil
+}
+
+func GetTransfers(db *gorm.DB) ([]TransferTransaction, error) {
+	var transfers []TransferTransaction
+	err := db.Preload("Account").Preload("TransferAccount").Order("date DESC").Find(&transfers).Error
+	if err != nil {
+		return nil, err
+	}
+	return transfers, nil
+}

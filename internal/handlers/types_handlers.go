@@ -54,6 +54,7 @@ type GroupedTransactions struct {
 	TotalAmount    float64
 	CurrencySymbol string
 	Transactions   []TransactionView
+	Transfers      []TransferView
 }
 
 type TransactionPageData struct {
@@ -83,4 +84,21 @@ type TransactionView struct {
 	FormattedTime      string
 	FormattedDate      string
 	Description        string
+}
+
+type TransferView struct {
+	ID                   uint
+	Type                 database.TypeTransaction
+	Amount               float64
+	AccountID            uint
+	AccountName          string
+	AccountColor         string
+	TransferAccountID    uint
+	TransferAccountName  string
+	TransferAccountColor string
+	CurrencySymbol       string
+	Date                 string
+	FormattedTime        string
+	FormattedDate        string
+	Description          string
 }
