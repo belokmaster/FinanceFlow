@@ -107,12 +107,15 @@
                 <span class="close" onclick="closeModal('createTransactionModal')">&times;</span>
             </div>
 
-            <form action="/submit_transaction" method="POST">
+            <form id="transactionForm" method="POST">
+                <input type="hidden" id="formAction" name="formAction">
+
                 <div class="form-group">
                     <label>Тип операции <span class="required">*</span></label>
                     <div class="type-buttons">
                         <button type="button" class="type-btn income-btn active" data-type="0">Доход</button>
                         <button type="button" class="type-btn expense-btn" data-type="1">Расход</button>
+                        <button type="button" class="type-btn transfer-btn" data-type="2">Перевод</button>
                     </div>
                     <input type="hidden" id="transactionType" name="Type" value="0" required>
                 </div>
@@ -124,104 +127,180 @@
                     </div>
                 </div>
 
-                <div class="form-group">
-                    <label for="transactionAccount">Счет <span class="required">*</span></label>
-                    <div class="custom-account-select">
-                        <input type="hidden" id="transactionAccount" name="AccountID" required>
+                <div id="incomeExpenseFields">
+                    <div class="form-group">
+                        <label for="transactionAccount">Счет <span class="required">*</span></label>
+                        <div class="custom-account-select">
+                            <input type="hidden" id="transactionAccount" name="AccountID" required>
 
-                        <div class="select-selected-account" onclick="toggleAccountDropdown()">
-                            <div class="selected-account-display">
-                                <span class="selected-account-icon" id="selectedAccountIcon"></span>
-                                <span class="selected-account-info">
-                                    <span class="selected-account-name" id="selectedAccountName">Выберите
-                                        счет</span>
-                                    <span class="selected-account-balance" id="selectedAccountBalance"></span>
-                                </span>
-                                <i class="fa-solid fa-chevron-down dropdown-arrow"></i>
+                            <div class="select-selected-account" onclick="toggleAccountDropdown('income')">
+                                <div class="selected-account-display">
+                                    <span class="selected-account-icon" id="selectedAccountIcon"></span>
+                                    <span class="selected-account-info">
+                                        <span class="selected-account-name" id="selectedAccountName">Выберите
+                                            счет</span>
+                                        <span class="selected-account-balance" id="selectedAccountBalance"></span>
+                                    </span>
+                                    <i class="fa-solid fa-chevron-down dropdown-arrow"></i>
+                                </div>
+                            </div>
+
+                            <div class="select-account-options" id="accountOptions">
+                                {{range .Accounts}}
+                                <div class="select-account-option" data-account-id="{{.ID}}"
+                                    data-account-name="{{.Name}}"
+                                    data-account-balance="{{.Balance}} {{.CurrencySymbol}}"
+                                    data-account-color="{{.Color}}" onclick="selectAccountOption(this, 'income')">
+                                    <span class="option-account-icon"
+                                        style="background-color: {{.Color}};">{{.IconHTML}}</span>
+                                    <span class="option-account-info">
+                                        <span class="option-account-name">{{.Name}}</span>
+                                        <span class="option-account-balance">{{.Balance}} {{.CurrencySymbol}}</span>
+                                    </span>
+                                </div>
+                                {{end}}
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="transactionCategory">Категория <span class="required">*</span></label>
+                        <div class="custom-category-select">
+                            <input type="hidden" id="transactionCategory" name="CategoryID" required>
+
+                            <div class="select-selected-category" onclick="toggleCategoryDropdown()">
+                                <div class="selected-category-display">
+                                    <span class="selected-category-icon" id="selectedCategoryIcon"></span>
+                                    <span class="selected-category-info">
+                                        <span class="selected-category-name" id="selectedCategoryName">Выберите
+                                            категорию</span>
+                                    </span>
+                                    <i class="fa-solid fa-chevron-down dropdown-arrow"></i>
+                                </div>
+                            </div>
+
+                            <div class="select-category-options" id="categoryOptions">
+                                {{range .Categories}}
+                                <div class="select-category-option" data-category-id="{{.ID}}"
+                                    data-category-name="{{.Name}}" data-category-color="{{.Color}}"
+                                    onclick="selectCategoryOption(this)">
+                                    <span class="option-category-icon"
+                                        style="background-color: {{.Color}};">{{.IconHTML}}</span>
+                                    <span class="option-category-info">
+                                        <span class="option-category-name">{{.Name}}</span>
+                                    </span>
+                                </div>
+                                {{end}}
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="transactionSubCategory">Подкатегория</label>
+                        <div class="custom-subcategory-select">
+                            <input type="hidden" id="transactionSubCategory" name="SubCategoryID">
+
+                            <div class="select-selected-subcategory" onclick="toggleSubcategoryDropdown()">
+                                <div class="selected-subcategory-display">
+                                    <span class="selected-subcategory-icon" id="selectedSubcategoryIcon"></span>
+                                    <span class="selected-subcategory-info">
+                                        <span class="selected-subcategory-name" id="selectedSubcategoryName">Выберите
+                                            подкатегорию</span>
+                                    </span>
+                                    <i class="fa-solid fa-chevron-down dropdown-arrow"></i>
+                                </div>
+                            </div>
+
+                            <div class="select-subcategory-options" id="subcategoryOptions">
+                                {{range .Categories}}
+                                {{range .Subcategories}}
+                                <div class="select-subcategory-option" data-subcategory-id="{{.ID}}"
+                                    data-subcategory-name="{{.Name}}" data-subcategory-color="{{.Color}}"
+                                    data-parent-id="{{.ParentID}}" onclick="selectSubcategoryOption(this)">
+                                    <span class="option-subcategory-icon"
+                                        style="background-color: {{.Color}};">{{.IconHTML}}</span>
+                                    <span class="option-subcategory-info">
+                                        <span class="option-subcategory-name">{{.Name}}</span>
+                                    </span>
+                                </div>
+                                {{end}}
+                                {{end}}
                             </div>
                         </div>
-
-                        <div class="select-account-options" id="accountOptions">
-                            {{range .Accounts}}
-                            <div class="select-account-option" data-account-id="{{.ID}}" data-account-name="{{.Name}}"
-                                data-account-balance="{{.Balance}} {{.CurrencySymbol}}" data-account-color="{{.Color}}"
-                                onclick="selectAccountOption(this)">
-                                <span class="option-account-icon"
-                                    style="background-color: {{.Color}};">{{.IconHTML}}</span>
-                                <span class="option-account-info">
-                                    <span class="option-account-name">{{.Name}}</span>
-                                    <span class="option-account-balance">{{.Balance}} {{.CurrencySymbol}}</span>
-                                </span>
-                            </div>
-                            {{end}}
-                        </div>
-
                     </div>
                 </div>
 
-                <div class="form-group">
-                    <label for="transactionCategory">Категория <span class="required">*</span></label>
-                    <div class="custom-category-select">
-                        <input type="hidden" id="transactionCategory" name="CategoryID" required>
+                <!-- for transaction -->
+                <div id="transferFields" style="display: none;">
+                    <div class="form-group">
+                        <label for="fromAccount">Счет списания<span class="required">*</span></label>
+                        <div class="custom-account-select">
+                            <input type="hidden" id="fromAccount" name="AccountID" required>
 
-                        <div class="select-selected-category" onclick="toggleCategoryDropdown()">
-                            <div class="selected-category-display">
-                                <span class="selected-category-icon" id="selectedCategoryIcon"></span>
-                                <span class="selected-category-info">
-                                    <span class="selected-category-name" id="selectedCategoryName">Выберите
-                                        категорию</span>
-                                </span>
-                                <i class="fa-solid fa-chevron-down dropdown-arrow"></i>
+                            <div class="select-selected-account" onclick="toggleAccountDropdown('from')">
+                                <div class="selected-account-display">
+                                    <span class="selected-account-icon" id="fromSelectedAccountIcon"></span>
+                                    <span class="selected-account-info">
+                                        <span class="selected-account-name" id="fromSelectedAccountName">Выберите
+                                            счет</span>
+                                        <span class="selected-account-balance" id="fromSelectedAccountBalance"></span>
+                                    </span>
+                                    <i class="fa-solid fa-chevron-down dropdown-arrow"></i>
+                                </div>
+                            </div>
+
+                            <div class="select-account-options" id="fromAccountOptions">
+                                {{range .Accounts}}
+                                <div class="select-account-option" data-account-id="{{.ID}}"
+                                    data-account-name="{{.Name}}"
+                                    data-account-balance="{{.Balance}} {{.CurrencySymbol}}"
+                                    data-account-color="{{.Color}}" onclick="selectAccountOption(this, 'from')">
+                                    <span class="option-account-icon"
+                                        style="background-color: {{.Color}};">{{.IconHTML}}</span>
+                                    <span class="option-account-info">
+                                        <span class="option-account-name">{{.Name}}</span>
+                                        <span class="option-account-balance">{{.Balance}} {{.CurrencySymbol}}</span>
+                                    </span>
+                                </div>
+                                {{end}}
                             </div>
                         </div>
-
-                        <div class="select-category-options" id="categoryOptions">
-                            {{range .Categories}}
-                            <div class="select-category-option" data-category-id="{{.ID}}"
-                                data-category-name="{{.Name}}" data-category-color="{{.Color}}"
-                                onclick="selectCategoryOption(this)">
-                                <span class="option-category-icon"
-                                    style="background-color: {{.Color}};">{{.IconHTML}}</span>
-                                <span class="option-category-info">
-                                    <span class="option-category-name">{{.Name}}</span>
-                                </span>
-                            </div>
-                            {{end}}
-                        </div>
-
                     </div>
-                </div>
 
-                <div class="form-group">
-                    <label for="transactionSubCategory">Подкатегория</label>
-                    <div class="custom-subcategory-select">
-                        <input type="hidden" id="transactionSubCategory" name="SubCategoryID">
+                    <div class="form-group">
+                        <label for="toAccount">Счет зачисления<span class="required">*</span></label>
+                        <div class="custom-account-select">
+                            <input type="hidden" id="toAccount" name="TransferAccountID" required>
 
-                        <div class="select-selected-subcategory" onclick="toggleSubcategoryDropdown()">
-                            <div class="selected-subcategory-display">
-                                <span class="selected-subcategory-icon" id="selectedSubcategoryIcon"></span>
-                                <span class="selected-subcategory-info">
-                                    <span class="selected-subcategory-name" id="selectedSubcategoryName">Выберите
-                                        подкатегорию</span>
-                                </span>
-                                <i class="fa-solid fa-chevron-down dropdown-arrow"></i>
+                            <div class="select-selected-account" onclick="toggleAccountDropdown('to')">
+                                <div class="selected-account-display">
+                                    <span class="selected-account-icon" id="toSelectedAccountIcon"></span>
+                                    <span class="selected-account-info">
+                                        <span class="selected-account-name" id="toSelectedAccountName">Выберите
+                                            счет для перевода</span>
+                                        <span class="selected-account-balance" id="toSelectedAccountBalance"></span>
+                                    </span>
+                                    <i class="fa-solid fa-chevron-down dropdown-arrow"></i>
+                                </div>
                             </div>
-                        </div>
 
-                        <div class="select-subcategory-options" id="subcategoryOptions">
-                            {{range .Categories}}
-                            {{range .Subcategories}}
-                            <div class="select-subcategory-option" data-subcategory-id="{{.ID}}"
-                                data-subcategory-name="{{.Name}}" data-subcategory-color="{{.Color}}"
-                                data-parent-id="{{.ParentID}}" onclick="selectSubcategoryOption(this)">
-                                <span class="option-subcategory-icon"
-                                    style="background-color: {{.Color}};">{{.IconHTML}}</span>
-                                <span class="option-subcategory-info">
-                                    <span class="option-subcategory-name">{{.Name}}</span>
-                                </span>
+                            <div class="select-account-options" id="toAccountOptions">
+                                {{range .Accounts}}
+                                <div class="select-account-option" data-account-id="{{.ID}}"
+                                    data-account-name="{{.Name}}"
+                                    data-account-balance="{{.Balance}} {{.CurrencySymbol}}"
+                                    data-account-color="{{.Color}}" onclick="selectAccountOption(this, 'to')">
+                                    <span class="option-account-icon"
+                                        style="background-color: {{.Color}};">{{.IconHTML}}</span>
+                                    <span class="option-account-info">
+                                        <span class="option-account-name">{{.Name}}</span>
+                                        <span class="option-account-balance">{{.Balance}} {{.CurrencySymbol}}</span>
+                                    </span>
+                                </div>
+                                {{end}}
                             </div>
-                            {{end}}
-                            {{end}}
                         </div>
                     </div>
                 </div>
@@ -279,7 +358,7 @@
                     <div class="custom-account-select">
                         <input type="hidden" id="editTransactionAccount" name="AccountID" required>
 
-                        <div class="select-selected-account" onclick="toggleEditAccountDropdown()">
+                        <div class="select-selected-account" onclick="toggleEditAccountDropdown('icome')">
                             <div class="selected-account-display">
                                 <span class="selected-account-icon" id="editSelectedAccountIcon"></span>
                                 <span class="selected-account-info">

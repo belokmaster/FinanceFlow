@@ -40,20 +40,46 @@ function openCreateTransactionModal() {
     const createForm = document.querySelector('form[action="/submit_transaction"]');
     if (createForm) {
         createForm.onsubmit = function (e) {
-            const account = document.getElementById('transactionAccount').value;
-            const category = document.getElementById('transactionCategory').value;
+            const type = document.getElementById('transactionType').value;
             const amount = document.getElementById('transactionAmount').value.trim();
 
-            if (!account) {
-                alert('Выберите аккаунт!');
-                e.preventDefault();
-                return false;
-            }
+            if (type === '0' || type === '1') { // Доход или Расход
+                const account = document.getElementById('transactionAccount').value;
+                const category = document.getElementById('transactionCategory').value;
 
-            if (!category) {
-                alert('Выберите категорию!');
-                e.preventDefault();
-                return false;
+                if (!account) {
+                    alert('Выберите счет!');
+                    e.preventDefault();
+                    return false;
+                }
+
+                if (!category) {
+                    alert('Выберите категорию!');
+                    e.preventDefault();
+                    return false;
+                }
+
+            } else if (type === '2') { // Перевод
+                const fromAccount = document.getElementById('fromAccount').value;
+                const toAccount = document.getElementById('toAccount').value;
+
+                if (!fromAccount) {
+                    alert('Выберите счет списания!');
+                    e.preventDefault();
+                    return false;
+                }
+
+                if (!toAccount) {
+                    alert('Выберите счет зачисления!');
+                    e.preventDefault();
+                    return false;
+                }
+
+                if (fromAccount === toAccount) {
+                    alert('Счета списания и зачисления не могут быть одинаковыми!');
+                    e.preventDefault();
+                    return false;
+                }
             }
 
             if (amount === '') {
@@ -177,11 +203,16 @@ document.addEventListener('DOMContentLoaded', function () {
     accountOptions.forEach(option => {
         option.addEventListener('click', function (e) {
             e.stopPropagation();
-            if (this.closest('#editAccountOptions')) {
-                selectEditAccountOption(this);
-            } else {
-                selectAccountOption(this);
+            const container = this.closest('.select-account-options');
+            let prefix = 'income';
+
+            if (container && container.id === 'fromAccountOptions') {
+                prefix = 'from';
+            } else if (container && container.id === 'toAccountOptions') {
+                prefix = 'to';
             }
+
+            selectAccountOption(this, prefix);
         });
     });
 
@@ -273,9 +304,19 @@ function formatAmountInput(e) {
     e.target.value = value;
 }
 
-function toggleAccountDropdown() {
-    const options = document.getElementById('accountOptions');
-    const selected = document.querySelector('#createTransactionModal .select-selected-account');
+function toggleAccountDropdown(prefix = 'income') {
+    let options, selected;
+
+    if (prefix === 'from') {
+        options = document.querySelector('#fromAccount + .select-selected-account').nextElementSibling;
+        selected = document.querySelector('#fromAccount + .select-selected-account');
+    } else if (prefix === 'to') {
+        options = document.querySelector('#toAccount + .select-selected-account').nextElementSibling;
+        selected = document.querySelector('#toAccount + .select-selected-account');
+    } else {
+        options = document.getElementById('accountOptions');
+        selected = document.querySelector('#createTransactionModal .select-selected-account');
+    }
 
     if (options && selected) {
         const isShowing = options.classList.contains('show');
@@ -357,7 +398,7 @@ function toggleEditSubcategoryDropdown() {
     }
 }
 
-function selectAccountOption(optionElement) {
+function selectAccountOption(optionElement, prefix = 'income') {
     const accountId = optionElement.getAttribute('data-account-id');
     const accountName = optionElement.getAttribute('data-account-name');
     const accountBalance = optionElement.getAttribute('data-account-balance');
@@ -365,11 +406,32 @@ function selectAccountOption(optionElement) {
     const accountIconElement = optionElement.querySelector('.option-account-icon');
     const accountIconHTML = accountIconElement.innerHTML;
 
-    document.getElementById('transactionAccount').value = accountId;
+    let accountInput, selectedIcon, selectedName, selectedBalance;
 
-    const selectedIcon = document.getElementById('selectedAccountIcon');
-    const selectedName = document.getElementById('selectedAccountName');
-    const selectedBalance = document.getElementById('selectedAccountBalance');
+    if (prefix === 'from') {
+        accountInput = document.getElementById('fromAccount');
+        selectedIcon = document.getElementById('fromSelectedAccountIcon');
+        selectedName = document.getElementById('fromSelectedAccountName');
+        selectedBalance = document.getElementById('fromSelectedAccountBalance');
+        optionsContainer = document.getElementById('fromAccountOptions');
+    } else if (prefix === 'to') {
+        accountInput = document.getElementById('toAccount');
+        selectedIcon = document.getElementById('toSelectedAccountIcon');
+        selectedName = document.getElementById('toSelectedAccountName');
+        selectedBalance = document.getElementById('toSelectedAccountBalance');
+        optionsContainer = document.getElementById('toAccountOptions');
+    } else {
+        accountInput = document.getElementById('transactionAccount');
+        selectedIcon = document.getElementById('selectedAccountIcon');
+        selectedName = document.getElementById('selectedAccountName');
+        selectedBalance = document.getElementById('selectedAccountBalance');
+        optionsContainer = document.getElementById('accountOptions');
+    }
+
+    if (accountInput) {
+        accountInput.value = accountId.trim();
+        console.log(`Set ${prefix} account input to:`, accountId.trim());
+    }
 
     if (selectedIcon && selectedName && selectedBalance) {
         selectedIcon.innerHTML = accountIconHTML;
@@ -389,11 +451,13 @@ function selectAccountOption(optionElement) {
 
     closeAllDropdowns();
 
-    const allOptions = document.querySelectorAll('#accountOptions .select-account-option');
-    allOptions.forEach(option => {
-        option.classList.remove('selected');
-    });
-    optionElement.classList.add('selected');
+    if (optionsContainer) {
+        const allOptions = optionsContainer.querySelectorAll('.select-account-option');
+        allOptions.forEach(option => {
+            option.classList.remove('selected');
+        });
+        optionElement.classList.add('selected');
+    }
 }
 
 function selectCategoryOption(optionElement) {
@@ -728,3 +792,217 @@ function toggleTransactionGroup(header) {
         icon.classList.add('fa-chevron-down');
     }
 }
+
+function handleTypeChange(type) {
+    const transactionTypeInput = document.getElementById('transactionType');
+    const typeButtons = document.querySelectorAll('#createTransactionModal .type-buttons .type-btn');
+    const incomeExpenseFields = document.getElementById('incomeExpenseFields');
+    const transferFields = document.getElementById('transferFields');
+    const form = document.getElementById('transactionForm');
+    const formActionInput = document.getElementById('formAction');
+
+    const incomeExpenseInputs = incomeExpenseFields.querySelectorAll('input, button, select');
+    const transferInputs = transferFields.querySelectorAll('input, button, select');
+
+    transactionTypeInput.value = type;
+
+    typeButtons.forEach(button => {
+        button.classList.remove('active');
+        if (button.getAttribute('data-type') === type) {
+            button.classList.add('active');
+        }
+    });
+
+    if (type === '0' || type === '1') {
+        incomeExpenseFields.style.display = 'block';
+        transferFields.style.display = 'none';
+
+        incomeExpenseInputs.forEach(input => input.disabled = false);
+        transferInputs.forEach(input => input.disabled = true);
+
+        if (form) form.action = '/submit_transaction';
+        if (formActionInput) formActionInput.value = '/submit_transaction';
+    } else if (type === '2') {
+        incomeExpenseFields.style.display = 'none';
+        transferFields.style.display = 'block';
+
+        incomeExpenseInputs.forEach(input => input.disabled = true);
+        transferInputs.forEach(input => input.disabled = false);
+
+        if (form) form.action = '/transfer';
+        if (formActionInput) formActionInput.value = '/transfer';
+    }
+}
+
+function handleEditTypeChange(type) {
+    const transactionTypeInput = document.getElementById('editTransactionType');
+    const typeButtons = document.querySelectorAll('#editTransactionModal .type-buttons .type-btn');
+
+    transactionTypeInput.value = type;
+
+    typeButtons.forEach(button => {
+        button.classList.remove('active');
+        if (button.getAttribute('data-type') === type) {
+            button.classList.add('active');
+        }
+    });
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    handleTypeChange(document.getElementById('transactionType').value || '0');
+});
+
+window.onclick = function (event) {
+    if (!event.target.closest('.custom-account-select')) {
+        const dropdowns = document.querySelectorAll('.select-account-options');
+        dropdowns.forEach(function (dropdown) {
+            if (dropdown.classList.contains('show')) {
+                dropdown.classList.remove('show');
+            }
+        });
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+    const createTypeButtons = document.querySelectorAll('#createTransactionModal .type-btn');
+    createTypeButtons.forEach(button => {
+        button.addEventListener('click', function () {
+            const type = this.getAttribute('data-type');
+            handleTypeChange(type);
+        });
+    });
+
+    const editTypeButtons = document.querySelectorAll('#editTransactionModal .type-btn');
+    editTypeButtons.forEach(button => {
+        button.addEventListener('click', function () {
+            const type = this.getAttribute('data-type');
+            handleEditTypeChange(type);
+        });
+    });
+});
+
+function setupFormFields() {
+    const form = document.getElementById('transactionForm');
+    const type = document.getElementById('transactionType').value;
+
+    const existingDynamicFields = form.querySelectorAll('[data-dynamic-field]');
+    existingDynamicFields.forEach(field => field.remove());
+
+    if (type === '0' || type === '1') {
+        const accountId = document.getElementById('transactionAccount').value;
+        const categoryId = document.getElementById('transactionCategory').value;
+        const subCategoryId = document.getElementById('transactionSubCategory').value;
+
+        if (accountId) {
+            const accountField = document.createElement('input');
+            accountField.type = 'hidden';
+            accountField.name = 'AccountID';
+            accountField.value = accountId;
+            accountField.setAttribute('data-dynamic-field', 'true');
+            form.appendChild(accountField);
+        }
+
+        if (categoryId) {
+            const categoryField = document.createElement('input');
+            categoryField.type = 'hidden';
+            categoryField.name = 'CategoryID';
+            categoryField.value = categoryId;
+            categoryField.setAttribute('data-dynamic-field', 'true');
+            form.appendChild(categoryField);
+        }
+
+        if (subCategoryId) {
+            const subCategoryField = document.createElement('input');
+            subCategoryField.type = 'hidden';
+            subCategoryField.name = 'SubCategoryID';
+            subCategoryField.value = subCategoryId;
+            subCategoryField.setAttribute('data-dynamic-field', 'true');
+            form.appendChild(subCategoryField);
+        }
+
+    } else if (type === '2') {
+        const fromAccountId = document.getElementById('fromAccount').value;
+        const toAccountId = document.getElementById('toAccount').value;
+
+        if (fromAccountId) {
+            const fromAccountField = document.createElement('input');
+            fromAccountField.type = 'hidden';
+            fromAccountField.name = 'AccountID';
+            fromAccountField.value = fromAccountId;
+            fromAccountField.setAttribute('data-dynamic-field', 'true');
+            form.appendChild(fromAccountField);
+        }
+
+        if (toAccountId) {
+            const toAccountField = document.createElement('input');
+            toAccountField.type = 'hidden';
+            toAccountField.name = 'TransferAccountID';
+            toAccountField.value = toAccountId;
+            toAccountField.setAttribute('data-dynamic-field', 'true');
+            form.appendChild(toAccountField);
+        }
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+    const form = document.getElementById('transactionForm');
+    if (form) {
+        form.onsubmit = function (e) {
+            setupFormFields();
+
+            const type = document.getElementById('transactionType').value;
+            const amount = document.getElementById('transactionAmount').value.trim();
+
+            if (!amount || isNaN(parseFloat(amount))) {
+                alert('Введите корректную сумму!');
+                e.preventDefault();
+                return false;
+            }
+
+            if (type === '0' || type === '1') {
+                const account = document.getElementById('transactionAccount').value;
+                const category = document.getElementById('transactionCategory').value;
+
+                if (!account || account.trim() === '') {
+                    alert('Выберите счет!');
+                    e.preventDefault();
+                    return false;
+                }
+
+                if (!category || category.trim() === '') {
+                    alert('Выберите категорию!');
+                    e.preventDefault();
+                    return false;
+                }
+
+            } else if (type === '2') {
+                const fromAccount = document.getElementById('fromAccount').value;
+                const toAccount = document.getElementById('toAccount').value;
+
+                if (!fromAccount || fromAccount.trim() === '') {
+                    alert('Выберите счет списания!');
+                    e.preventDefault();
+                    return false;
+                }
+
+                if (!toAccount || toAccount.trim() === '') {
+                    alert('Выберите счет зачисления!');
+                    e.preventDefault();
+                    return false;
+                }
+
+                if (fromAccount.trim() === toAccount.trim()) {
+                    alert('Счета списания и зачисления не могут быть одинаковыми!');
+                    e.preventDefault();
+                    return false;
+                }
+            }
+
+            if (amount === '') {
+                document.getElementById('transactionAmount').value = '0.00';
+            }
+
+            return true;
+        };
+    }
+});

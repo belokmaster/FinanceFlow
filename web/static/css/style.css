@@ -1546,3 +1546,32 @@ form button[type="submit"]:hover {
     margin-bottom: -21px;
     margin-right: 5px;
 }
+
+.type-buttons .type-btn {
+    padding: 10px 15px;
+    border: 1px solid #ccc;
+    background-color: #f0f0f0;
+    cursor: pointer;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.type-buttons .type-btn.active {
+    background-color: #007bff;
+    color: white;
+    border-color: #007bff;
+}
+
+.type-buttons .income-btn.active {
+    background-color: #28a745;
+    border-color: #28a745;
+}
+
+.type-buttons .expense-btn.active {
+    background-color: #dc3545;
+    border-color: #dc3545;
+}
+
+.type-buttons .transfer-btn.active {
+    background-color: #17a2b8;
+    border-color: #17a2b8;
+}
