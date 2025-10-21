@@ -653,6 +653,11 @@ function closeAllDropdowns() {
     const editSubcategoryOptions = document.getElementById('editSubcategoryOptions');
     const editSubcategorySelected = document.querySelector('#editTransactionModal .select-selected-subcategory');
 
+    const fromAccountOptions = document.getElementById('fromAccountOptions');
+    const fromAccountSelected = document.querySelector('#createTransactionModal #fromAccount + .select-selected-account');
+    const toAccountOptions = document.getElementById('toAccountOptions');
+    const toAccountSelected = document.querySelector('#createTransactionModal #toAccount + .select-selected-account');
+
     const editFromAccountOptions = document.getElementById('editFromAccountOptions');
     const editFromAccountSelected = document.querySelector('#editTransferModal #editFromAccount + .select-selected-account');
     const editToAccountOptions = document.getElementById('editToAccountOptions');
@@ -671,6 +676,11 @@ function closeAllDropdowns() {
     if (editCategorySelected) editCategorySelected.classList.remove('active');
     if (editSubcategoryOptions) editSubcategoryOptions.classList.remove('show');
     if (editSubcategorySelected) editSubcategorySelected.classList.remove('active');
+
+    if (fromAccountOptions) fromAccountOptions.classList.remove('show');
+    if (fromAccountSelected) fromAccountSelected.classList.remove('active');
+    if (toAccountOptions) toAccountOptions.classList.remove('show');
+    if (toAccountSelected) toAccountSelected.classList.remove('active');
 
     if (editFromAccountOptions) editFromAccountOptions.classList.remove('show');
     if (editFromAccountSelected) editFromAccountSelected.classList.remove('active');
@@ -1213,3 +1223,37 @@ transferCards.forEach(card => {
 
     card.style.cursor = 'pointer';
 });
+
+function deleteCategory(categoryId) {
+    if (confirm('Внимание! При удалении категории будут также удалены все связанные подкатегории и транзакции. Вы уверены, что хотите продолжить?')) {
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = '/delete_category';
+
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = 'ID';
+        input.value = categoryId;
+
+        form.appendChild(input);
+        document.body.appendChild(form);
+        form.submit();
+    }
+}
+
+function deleteCategory(categoryId) {
+    if (confirm('Внимание! При удалении счета будут также удалены все связанные с ним транзакции. Вы уверены, что хотите продолжить?')) {
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = '/delete_account';
+
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = 'ID';
+        input.value = categoryId;
+
+        form.appendChild(input);
+        document.body.appendChild(form);
+        form.submit();
+    }
+}

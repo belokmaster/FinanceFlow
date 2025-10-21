@@ -1283,7 +1283,7 @@ form button[type="submit"]:hover {
 }
 
 .transaction-card.income::before {
-    border-left: 3px solid #27ae60;
+    border-left: 3px solid #4cd67a;
 }
 
 .transaction-card.expense::before {

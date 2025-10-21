@@ -31,18 +31,47 @@ func CreateNewAccount(db *gorm.DB, acc Account) error {
 func DeleteAccount(db *gorm.DB, id int) error {
 	log.Printf("Deleting account with ID: %d", id)
 
-	result := db.Delete(&Account{}, id)
+	tx := db.Begin()
+	if tx.Error != nil {
+		log.Printf("Error starting transaction: %v", tx.Error)
+		return fmt.Errorf("problem starting transaction: %v", tx.Error)
+	}
+
+	result := tx.Where("account_id = ?", id).Delete(&Transaction{})
 	if result.Error != nil {
+		tx.Rollback()
+		log.Printf("Error deleting transactions for account ID %d: %v", id, result.Error)
+		return fmt.Errorf("problem deleting transactions: %v", result.Error)
+	}
+	log.Printf("Deleted %d transactions for account ID %d", result.RowsAffected, id)
+
+	result = tx.Where("account_id = ? OR transfer_account_id = ?", id, id).Delete(&TransferTransaction{})
+	if result.Error != nil {
+		tx.Rollback()
+		log.Printf("Error deleting transfers for account ID %d: %v", id, result.Error)
+		return fmt.Errorf("problem deleting transfers: %v", result.Error)
+	}
+	log.Printf("Deleted %d transfers for account ID %d", result.RowsAffected, id)
+
+	result = tx.Delete(&Account{}, id)
+	if result.Error != nil {
+		tx.Rollback()
 		log.Printf("Error deleting account ID %d: %v", id, result.Error)
 		return fmt.Errorf("problem with delete account in db: %v", result.Error)
 	}
 
 	if result.RowsAffected == 0 {
+		tx.Rollback()
 		log.Printf("Account with ID %d not found for deletion", id)
 		return fmt.Errorf("account with id %d not found", id)
 	}
 
-	log.Printf("Account ID %d deleted successfully", id)
+	if err := tx.Commit().Error; err != nil {
+		log.Printf("Error committing transaction for account ID %d: %v", id, err)
+		return fmt.Errorf("problem committing transaction: %v", err)
+	}
+
+	log.Printf("Account ID %d and all related transactions/transfers deleted successfully", id)
 	return nil
 }
 

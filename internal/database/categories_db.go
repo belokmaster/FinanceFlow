@@ -30,8 +30,31 @@ func CreateCategory(db *gorm.DB, cat Category) error {
 func DeleteCategory(db *gorm.DB, id int) error {
 	log.Printf("Deleting category with ID: %d", id)
 
-	result := db.Delete(&Category{}, id)
+	tx := db.Begin()
+	if tx.Error != nil {
+		log.Printf("Error starting transaction: %v", tx.Error)
+		return fmt.Errorf("problem starting transaction: %v", tx.Error)
+	}
+
+	result := tx.Where("category_id = ?", id).Delete(&SubCategory{})
 	if result.Error != nil {
+		tx.Rollback()
+		log.Printf("Error deleting subcategories for category ID %d: %v", id, result.Error)
+		return fmt.Errorf("problem deleting subcategories: %v", result.Error)
+	}
+	log.Printf("Deleted %d subcategories for category ID %d", result.RowsAffected, id)
+
+	result = tx.Where("category_id = ?", id).Delete(&Transaction{})
+	if result.Error != nil {
+		tx.Rollback()
+		log.Printf("Error deleting transactions for category ID %d: %v", id, result.Error)
+		return fmt.Errorf("problem deleting transactions: %v", result.Error)
+	}
+	log.Printf("Deleted %d transactions for category ID %d", result.RowsAffected, id)
+
+	result = tx.Delete(&Category{}, id)
+	if result.Error != nil {
+		tx.Rollback()
 		log.Printf("Error deleting category ID %d: %v", id, result.Error)
 		return fmt.Errorf("problem with delete category in db: %v", result.Error)
 	}
@@ -41,7 +64,12 @@ func DeleteCategory(db *gorm.DB, id int) error {
 		return fmt.Errorf("category with id %d not found", id)
 	}
 
-	log.Printf("Category deleted successfully: ID=%d", id)
+	if err := tx.Commit().Error; err != nil {
+		log.Printf("Error committing transaction for category ID %d: %v", id, err)
+		return fmt.Errorf("problem committing transaction: %v", err)
+	}
+
+	log.Printf("Category ID %d and all related subcategories/transactions deleted successfully", id)
 	return nil
 }
 
