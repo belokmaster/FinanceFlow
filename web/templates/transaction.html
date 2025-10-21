@@ -47,8 +47,9 @@
                 </div>
 
                 {{range .Transactions}}
-                <div class="transaction-card" data-transaction-id="{{.ID}}" data-transaction-type="{{.Type}}"
-                    data-amount="{{.Amount}}" data-account-id="{{.AccountID}}" data-account-name="{{.AccountName}}"
+                <div class="transaction-card {{if eq .Type 0}}income{{else if eq .Type 1}}expense{{else}}transfer{{end}}"
+                    data-transaction-id="{{.ID}}" data-transaction-type="{{.Type}}" data-amount="{{.Amount}}"
+                    data-account-id="{{.AccountID}}" data-account-name="{{.AccountName}}"
                     data-account-color="{{.AccountColor}}" data-category-id="{{.CategoryID}}"
                     data-category-name="{{.CategoryName}}" data-category-color="{{.CategoryColor}}"
                     data-subcategory-id="{{.SubCategoryID}}" data-description="{{.Description}}" data-date="{{.Date}}">
@@ -113,14 +114,14 @@
                         <div class="transaction-top-line">
                             <div class="transaction-category-line">
                                 <span class="transaction-main-category">Перевод</span>
-                                <span class="transaction-subcategory">на {{.TransferAccountName}}</span>
                             </div>
 
                             <div class="transaction-center-account">
                                 <div class="account-color-dot" style="background-color: #{{.AccountColor}};"></div>
                                 <span class="transaction-account">{{.AccountName}}</span>
+                                <!-- hs kak v css perenesti -->
                                 <i class="fa-solid fa-arrow-right"
-                                    style="margin: 0 8px; color: #666; font-size: 12px;"></i>
+                                    style="margin: 0 8px; margin-bottom: -21px;color: #666; font-size: 12px;"></i>
                                 <div class="account-color-dot" style="background-color: #{{.TransferAccountColor}};">
                                 </div>
                                 <span class="transaction-account">{{.TransferAccountName}}</span>

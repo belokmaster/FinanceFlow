@@ -1269,23 +1269,30 @@ form button[type="submit"]:hover {
     align-items: center;
     gap: 10px;
     position: relative;
+    transition: transform 0.1s ease;
+}
+
+.transaction-card::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 3px;
+    height: 100%;
+    border-radius: 10px 0 0 10px;
+}
+
+.transaction-card.income::before {
+    border-left: 3px solid #27ae60;
+}
+
+.transaction-card.expense::before {
+    border-left: 3px solid #e74c3c;
 }
 
 .transaction-card:hover {
     background-color: #f9f9f9;
     border-color: #4cd67a;
-}
-
-.transaction-card:hover::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: rgba(0, 0, 0, 0.1);
-    border-radius: 8px;
-    pointer-events: none;
 }
 
 .transaction-icon {
@@ -1364,8 +1371,17 @@ form button[type="submit"]:hover {
     flex: 1;
 }
 
-.transaction-main-category,
+.transaction-main-category {
+    font-size: 16px;
+    font-weight: bold;
+    color: #333;
+}
+
 .transaction-subcategory {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
     font-size: 16px;
     font-weight: bold;
     color: #333;
@@ -1588,10 +1604,6 @@ form button[type="submit"]:hover {
     border-left-color: #138496;
 }
 
-.transaction-icon-container .fa-arrow-right-arrow-left {
-    font-size: 18px;
-}
-
 .transaction-center-account {
     display: flex;
     align-items: center;
@@ -1608,6 +1620,7 @@ form button[type="submit"]:hover {
     line-height: inherit;
     display: inline-flex;
     align-items: center;
+    margin-bottom: 20px;
 }
 
 .transaction-center-account {
