@@ -35,15 +35,23 @@ func DeleteSubCategory(db *gorm.DB, id int) error {
 		return fmt.Errorf("problem starting transaction: %v", tx.Error)
 	}
 
-	result := tx.Where("sub_category_id = ?", id).Delete(&Transaction{})
-	if result.Error != nil {
+	var transactions []Transaction
+	if err := tx.Where("sub_category_id = ?", id).Find(&transactions).Error; err != nil {
 		tx.Rollback()
-		log.Printf("Error deleting transactions for subcategory ID %d: %v", id, result.Error)
-		return fmt.Errorf("problem deleting transactions: %v", result.Error)
+		log.Printf("Error finding transactions for subcategory ID %d: %v", id, err)
+		return fmt.Errorf("problem finding transactions: %v", err)
 	}
-	log.Printf("Deleted %d transactions for subcategory ID %d", result.RowsAffected, id)
 
-	result = tx.Delete(&SubCategory{}, id)
+	for _, transaction := range transactions {
+		if err := DeleteTransaction(tx, int(transaction.ID)); err != nil {
+			tx.Rollback()
+			log.Printf("Error deleting transaction ID %d for subcategory ID %d: %v", transaction.ID, id, err)
+			return fmt.Errorf("problem deleting transaction %d: %v", transaction.ID, err)
+		}
+	}
+	log.Printf("Deleted %d transactions for subcategory ID %d", len(transactions), id)
+
+	result := tx.Delete(&SubCategory{}, id)
 	if result.Error != nil {
 		tx.Rollback()
 		log.Printf("Error deleting subcategory ID %d: %v", id, result.Error)
@@ -51,8 +59,9 @@ func DeleteSubCategory(db *gorm.DB, id int) error {
 	}
 
 	if result.RowsAffected == 0 {
-		log.Printf("Category with ID %d not found for deletion", id)
-		return fmt.Errorf("category with id %d not found", id)
+		tx.Rollback()
+		log.Printf("Subcategory with ID %d not found for deletion", id)
+		return fmt.Errorf("subcategory with id %d not found", id)
 	}
 
 	if err := tx.Commit().Error; err != nil {

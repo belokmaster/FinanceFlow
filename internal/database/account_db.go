@@ -37,23 +37,38 @@ func DeleteAccount(db *gorm.DB, id int) error {
 		return fmt.Errorf("problem starting transaction: %v", tx.Error)
 	}
 
-	result := tx.Where("account_id = ?", id).Delete(&Transaction{})
-	if result.Error != nil {
+	var transactions []Transaction
+	if err := tx.Where("account_id = ?", id).Find(&transactions).Error; err != nil {
 		tx.Rollback()
-		log.Printf("Error deleting transactions for account ID %d: %v", id, result.Error)
-		return fmt.Errorf("problem deleting transactions: %v", result.Error)
+		log.Printf("Error finding transactions for account ID %d: %v", id, err)
+		return fmt.Errorf("problem finding transactions: %v", err)
 	}
-	log.Printf("Deleted %d transactions for account ID %d", result.RowsAffected, id)
 
-	result = tx.Where("account_id = ? OR transfer_account_id = ?", id, id).Delete(&TransferTransaction{})
-	if result.Error != nil {
+	for _, transaction := range transactions {
+		if err := DeleteTransaction(tx, int(transaction.ID)); err != nil {
+			tx.Rollback()
+			log.Printf("Error deleting transaction ID %d for account ID %d: %v", transaction.ID, id, err)
+			return fmt.Errorf("problem deleting transaction %d: %v", transaction.ID, err)
+		}
+	}
+	log.Printf("Deleted %d transactions for account ID %d", len(transactions), id)
+
+	var transfers []TransferTransaction
+	if err := tx.Where("account_id = ? OR transfer_account_id = ?", id, id).Find(&transfers).Error; err != nil {
 		tx.Rollback()
-		log.Printf("Error deleting transfers for account ID %d: %v", id, result.Error)
-		return fmt.Errorf("problem deleting transfers: %v", result.Error)
+		log.Printf("Error finding transfers for account ID %d: %v", id, err)
+		return fmt.Errorf("problem finding transfers: %v", err)
 	}
-	log.Printf("Deleted %d transfers for account ID %d", result.RowsAffected, id)
+	for _, tr := range transfers {
+		if err := DeleteTransfer(tx, int(tr.ID)); err != nil {
+			tx.Rollback()
+			log.Printf("Error deleting transfer ID %d for account ID %d: %v", tr.ID, id, err)
+			return fmt.Errorf("problem deleting transfer %d: %v", tr.ID, err)
+		}
+	}
+	log.Printf("Deleted %d transfers for account ID %d", len(transfers), id)
 
-	result = tx.Delete(&Account{}, id)
+	result := tx.Delete(&Account{}, id)
 	if result.Error != nil {
 		tx.Rollback()
 		log.Printf("Error deleting account ID %d: %v", id, result.Error)

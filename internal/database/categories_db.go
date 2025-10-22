@@ -36,23 +36,39 @@ func DeleteCategory(db *gorm.DB, id int) error {
 		return fmt.Errorf("problem starting transaction: %v", tx.Error)
 	}
 
-	result := tx.Where("category_id = ?", id).Delete(&SubCategory{})
-	if result.Error != nil {
+	var subCategories []SubCategory
+	if err := tx.Where("category_id = ?", id).Find(&subCategories).Error; err != nil {
 		tx.Rollback()
-		log.Printf("Error deleting subcategories for category ID %d: %v", id, result.Error)
-		return fmt.Errorf("problem deleting subcategories: %v", result.Error)
+		log.Printf("Error finding subcategories for category ID %d: %v", id, err)
+		return fmt.Errorf("problem finding subcategories: %v", err)
 	}
-	log.Printf("Deleted %d subcategories for category ID %d", result.RowsAffected, id)
 
-	result = tx.Where("category_id = ?", id).Delete(&Transaction{})
-	if result.Error != nil {
+	for _, subCategory := range subCategories {
+		if err := DeleteSubCategory(tx, int(subCategory.ID)); err != nil {
+			tx.Rollback()
+			log.Printf("Error deleting subcategory ID %d for category ID %d: %v", subCategory.ID, id, err)
+			return fmt.Errorf("problem deleting subcategory %d: %v", subCategory.ID, err)
+		}
+	}
+	log.Printf("Deleted %d subcategories for category ID %d", len(subCategories), id)
+
+	var transactions []Transaction
+	if err := tx.Where("category_id = ?", id).Find(&transactions).Error; err != nil {
 		tx.Rollback()
-		log.Printf("Error deleting transactions for category ID %d: %v", id, result.Error)
-		return fmt.Errorf("problem deleting transactions: %v", result.Error)
+		log.Printf("Error finding direct transactions for category ID %d: %v", id, err)
+		return fmt.Errorf("problem finding direct transactions: %v", err)
 	}
-	log.Printf("Deleted %d transactions for category ID %d", result.RowsAffected, id)
 
-	result = tx.Delete(&Category{}, id)
+	for _, transaction := range transactions {
+		if err := DeleteTransaction(tx, int(transaction.ID)); err != nil {
+			tx.Rollback()
+			log.Printf("Error deleting direct transaction ID %d for category ID %d: %v", transaction.ID, id, err)
+			return fmt.Errorf("problem deleting direct transaction %d: %v", transaction.ID, err)
+		}
+	}
+	log.Printf("Deleted %d direct transactions for category ID %d", len(transactions), id)
+
+	result := tx.Delete(&Category{}, id)
 	if result.Error != nil {
 		tx.Rollback()
 		log.Printf("Error deleting category ID %d: %v", id, result.Error)
@@ -60,6 +76,7 @@ func DeleteCategory(db *gorm.DB, id int) error {
 	}
 
 	if result.RowsAffected == 0 {
+		tx.Rollback()
 		log.Printf("Category with ID %d not found for deletion", id)
 		return fmt.Errorf("category with id %d not found", id)
 	}
