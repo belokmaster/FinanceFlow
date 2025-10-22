@@ -94,6 +94,32 @@ function openCategoryModal(categoryId, categoryName, categoryColor, categoryIcon
     openModal('categoryModal');
 }
 
+function openCreateSubcategoryModal(parentCategoryId) {
+    document.getElementById('createSubcategoryName').value = '';
+    document.getElementById('createSubcategoryIcon').value = '';
+    document.getElementById('createSubcategoryParentId').value = parentCategoryId;
+
+    const categoryCard = document.querySelector(`.category-card[onclick*="openCategoryModal(${parentCategoryId},"]`);
+    let categoryColor = '#4cd67a';
+
+    if (categoryCard) {
+        categoryColor = categoryCard.style.backgroundColor;
+        if (categoryColor.startsWith('rgb')) {
+            const rgb = categoryColor.match(/\d+/g);
+            if (rgb && rgb.length === 3) {
+                categoryColor = "#" + ((1 << 24) + (+rgb[0] << 16) + (+rgb[1] << 8) + +rgb[2]).toString(16).slice(1);
+            }
+        }
+    }
+
+    document.getElementById('createSubcategoryColor').value = categoryColor;
+    createSubcategorySelectedIconDisplay.querySelector('.selected-icon-svg').innerHTML = '';
+    createSubcategorySelectedIconDisplay.querySelector('.selected-icon-key').textContent = 'Выберите иконку';
+
+    updateColorDisplay(categoryColor, createSubcategoryColorPreview, createSubcategoryColorHexValue);
+    openModal('createSubcategoryModal');
+}
+
 function openSubcategoryModal(subcategoryId, subcategoryName, subcategoryColor, subcategoryIconKey, parentCategoryId) {
     document.getElementById('editSubcategoryId').value = subcategoryId;
     document.getElementById('editSubcategoryName').value = subcategoryName;
@@ -149,19 +175,6 @@ function deleteSubcategory() {
         document.body.appendChild(form);
         form.submit();
     }
-}
-
-function openCreateSubcategoryModal(parentCategoryId) {
-    document.getElementById('createSubcategoryName').value = '';
-    document.getElementById('createSubcategoryColor').value = '#4cd67a';
-    document.getElementById('createSubcategoryIcon').value = '';
-    document.getElementById('createSubcategoryParentId').value = parentCategoryId;
-
-    createSubcategorySelectedIconDisplay.querySelector('.selected-icon-svg').innerHTML = '';
-    createSubcategorySelectedIconDisplay.querySelector('.selected-icon-key').textContent = 'Выберите иконку';
-
-    updateColorDisplay('#4cd67a', createSubcategoryColorPreview, createSubcategoryColorHexValue);
-    openModal('createSubcategoryModal');
 }
 
 createCategoryColorInput.addEventListener('input', () => {

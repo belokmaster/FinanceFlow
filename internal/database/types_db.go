@@ -176,14 +176,29 @@ type TypeSubCategoryIcons int
 const (
 	Restaurant1 TypeSubCategoryIcons = iota
 	FastFood1
+	Cooking1
+	Cooking2
+	Pharmacy1
+	Baby1
+	Pets1
 )
 
 var IconSubCategoryFiles = map[TypeSubCategoryIcons]string{
 	Restaurant1: "Ресторан1",
 	FastFood1:   "Фаст-фуд1",
+	Cooking1:    "Готовка1",
+	Cooking2:    "Десерт1",
+	Pharmacy1:   "Аптека1",
+	Baby1:       "Детские товары1",
+	Pets1:       "Домашние животные, питомцы1",
 }
 
 var IconSubCategoryNamesToIDs = map[string]TypeSubCategoryIcons{
-	"Ресторан1": Restaurant1,
-	"Фаст-фуд1": FastFood1,
+	"Ресторан1":       Restaurant1,
+	"Фаст-фуд1":       FastFood1,
+	"Готовка1":        Cooking1,
+	"Десерт1":         Cooking2,
+	"Аптека1":         Pharmacy1,
+	"Детские товары1": Baby1,
+	"Домашние животные, питомцы1": Pets1,
 }
