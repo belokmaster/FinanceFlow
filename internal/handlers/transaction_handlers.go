@@ -98,6 +98,27 @@ func TransactionHandler(w http.ResponseWriter, r *http.Request, db *gorm.DB) {
 		log.Printf("TransactionHandler: Comment: '%s'", comment)
 	}
 
+	dateStr := r.FormValue("Date")
+	var transactionDate time.Time
+	if dateStr != "" {
+		location, locErr := time.LoadLocation("Local")
+		if locErr != nil {
+			location = time.UTC
+		}
+
+		// parsing form HTML datetime-local (YYYY-MM-DDTHH:MM)
+		transactionDate, err = time.ParseInLocation("2006-01-02T15:04", dateStr, location)
+		if err != nil {
+			log.Printf("TransactionHandler: Invalid date format '%s': %v", dateStr, err)
+			http.Error(w, "invalid date format", http.StatusBadRequest)
+			return
+		}
+		log.Printf("TransactionHandler: User selected date: %v", transactionDate)
+	} else {
+		transactionDate = time.Now()
+		log.Printf("TransactionHandler: Using current date: %v (Local: %v)", transactionDate, transactionDate.Local())
+	}
+
 	tx := database.Transaction{
 		AccountID:     uint(accountID),
 		CategoryID:    uint(categoryID),
@@ -105,10 +126,10 @@ func TransactionHandler(w http.ResponseWriter, r *http.Request, db *gorm.DB) {
 		Type:          database.TypeTransaction(transactionType),
 		Amount:        amount,
 		Comment:       comment,
-		Date:          time.Now(),
+		Date:          transactionDate,
 	}
 
-	log.Printf("TransactionHandler: Creating transaction - AccountID=%d, CategoryID=%d, SubCategoryID=%d, Type=%d, Amount=%.2f", accountID, categoryID, subCategoryID, transactionType, amount)
+	log.Printf("TransactionHandler: Creating transaction - AccountID=%d, CategoryID=%d, SubCategoryID=%d, Type=%d, Amount=%.2f, Date=%v", accountID, categoryID, subCategoryID, transactionType, amount, transactionDate)
 
 	err = database.AddTransaction(db, tx)
 	if err != nil {
@@ -276,40 +297,26 @@ func UpdateTransactionHandler(w http.ResponseWriter, r *http.Request, db *gorm.D
 		return
 	}
 
-	dateStr := r.FormValue("Date")
-	timeStr := r.FormValue("Time")
+	dateTimeStr := r.FormValue("Date")
+	var transactionDate time.Time
 
-	newDate, err := time.Parse("2006-01-02", dateStr)
-	if err != nil {
-		log.Printf("UpdateTransactionHandler: Invalid date '%s': %v", dateStr, err)
-		http.Error(w, "problem with date. use format YYYY-MM-DD", http.StatusBadRequest)
-		return
-	}
-
-	var parsedTime time.Time
-	if timeStr != "" {
-		parsedTime, err = time.Parse("15:04:05", timeStr)
+	if dateTimeStr != "" {
+		location, err := time.LoadLocation("Local")
 		if err != nil {
-			log.Printf("UpdateTransactionHandler: Invalid time format '%s', falling back to original. Error: %v", timeStr, err)
-			parsedTime = originalTx.Date
+			location = time.UTC
 		}
+
+		transactionDate, err = time.ParseInLocation("2006-01-02T15:04", dateTimeStr, location)
+		if err != nil {
+			log.Printf("UpdateTransactionHandler: Invalid datetime format '%s': %v", dateTimeStr, err)
+			http.Error(w, "problem with datetime. use format YYYY-MM-DDTHH:MM", http.StatusBadRequest)
+			return
+		}
+		log.Printf("UpdateTransactionHandler: User selected datetime: %v", transactionDate)
 	} else {
-		log.Printf("UpdateTransactionHandler: Time not provided in form, using original transaction time.")
-		parsedTime = originalTx.Date
+		transactionDate = originalTx.Date
+		log.Printf("UpdateTransactionHandler: Using original transaction date: %v (Local: %v)", transactionDate, transactionDate.Local())
 	}
-
-	transactionDate := time.Date(
-		newDate.Year(),
-		newDate.Month(),
-		newDate.Day(),
-		parsedTime.Hour(),
-		parsedTime.Minute(),
-		parsedTime.Second(),
-		parsedTime.Nanosecond(),
-		originalTx.Date.Location(),
-	)
-
-	log.Printf("UpdateTransactionHandler: Combined new date and time: %v", transactionDate)
 
 	tx := database.Transaction{
 		ID:            uint(transactionID),

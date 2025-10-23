@@ -96,6 +96,7 @@ func UpdateTransferHandler(w http.ResponseWriter, r *http.Request, db *gorm.DB) 
 	log.Printf("UpdateTransferHandler: Starting transfer update")
 
 	if r.Method != http.MethodPost {
+		log.Printf("UpdateTransferHandler: Invalid method %s", r.Method)
 		http.Redirect(w, r, "/transactions", http.StatusSeeOther)
 		return
 	}
@@ -106,41 +107,75 @@ func UpdateTransferHandler(w http.ResponseWriter, r *http.Request, db *gorm.DB) 
 		return
 	}
 
-	transferID, err := strconv.Atoi(r.FormValue("ID"))
+	log.Printf("UpdateTransferHandler: Form data received - %+v", r.Form)
+
+	transferIDStr := r.FormValue("ID")
+	if transferIDStr == "" {
+		log.Printf("UpdateTransferHandler: Missing transfer ID")
+		http.Error(w, "transfer ID is required", http.StatusBadRequest)
+		return
+	}
+
+	transferID, err := strconv.Atoi(transferIDStr)
 	if err != nil {
-		log.Printf("UpdateTransferHandler: Invalid transfer ID: %v", err)
-		http.Error(w, "invalid transfer ID", http.StatusBadRequest)
+		log.Printf("UpdateTransferHandler: Invalid transfer ID '%s': %v", transferIDStr, err)
+		http.Error(w, "problem with transfer id", http.StatusBadRequest)
 		return
 	}
 
 	fromAccountID, err := strconv.Atoi(r.FormValue("AccountID"))
 	if err != nil {
 		log.Printf("UpdateTransferHandler: Invalid from account ID: %v", err)
-		http.Error(w, "invalid from account ID", http.StatusBadRequest)
+		http.Error(w, "problem with from account id", http.StatusBadRequest)
 		return
 	}
 
 	toAccountID, err := strconv.Atoi(r.FormValue("TransferAccountID"))
 	if err != nil {
 		log.Printf("UpdateTransferHandler: Invalid to account ID: %v", err)
-		http.Error(w, "invalid to account ID", http.StatusBadRequest)
+		http.Error(w, "problem with to account id", http.StatusBadRequest)
 		return
 	}
 
 	amount, err := strconv.ParseFloat(r.FormValue("Amount"), 64)
 	if err != nil {
 		log.Printf("UpdateTransferHandler: Invalid amount: %v", err)
-		http.Error(w, "invalid amount", http.StatusBadRequest)
+		http.Error(w, "problem with amount", http.StatusBadRequest)
 		return
 	}
 
-	description := r.FormValue("Description")
 	dateStr := r.FormValue("Date")
+	log.Printf("UpdateTransferHandler: Raw date string: '%s'", dateStr)
 
-	date, err := time.Parse("2006-01-02", dateStr)
-	if err != nil {
-		log.Printf("UpdateTransferHandler: Invalid date: %v", err)
-		http.Error(w, "invalid date", http.StatusBadRequest)
+	var transferDate time.Time
+	if dateStr != "" {
+		var err error
+		location, _ := time.LoadLocation("Local")
+
+		transferDate, err = time.ParseInLocation("2006-01-02T15:04", dateStr, location)
+		if err != nil {
+			log.Printf("UpdateTransferHandler: Failed to parse as datetime-local, trying other formats: %v", err)
+
+			transferDate, err = time.ParseInLocation("2006-01-02 15:04", dateStr, location)
+			if err != nil {
+				log.Printf("UpdateTransferHandler: Failed to parse as '2006-01-02 15:04': %v", err)
+				http.Error(w, "problem with date format. use YYYY-MM-DDTHH:MM", http.StatusBadRequest)
+				return
+			}
+		}
+
+		log.Printf("UpdateTransferHandler: Parsed date: %v", transferDate)
+	} else {
+		transferDate = time.Now()
+		log.Printf("UpdateTransferHandler: Using current date: %v", transferDate)
+	}
+
+	description := r.FormValue("Description")
+
+	var originalTransfer database.TransferTransaction
+	if err := db.First(&originalTransfer, transferID).Error; err != nil {
+		log.Printf("UpdateTransferHandler: Transfer with ID %d not found: %v", transferID, err)
+		http.Error(w, "transfer not found", http.StatusNotFound)
 		return
 	}
 
@@ -150,18 +185,17 @@ func UpdateTransferHandler(w http.ResponseWriter, r *http.Request, db *gorm.DB) 
 		TransferAccountID: uint(toAccountID),
 		Amount:            amount,
 		Comment:           description,
-		Date:              date,
-		Type:              database.Transfer,
+		Date:              transferDate,
 	}
 
 	err = database.UpdateTransfer(db, transfer)
 	if err != nil {
-		log.Printf("UpdateTransferHandler: Error updating transfer: %v", err)
-		http.Error(w, "error updating transfer", http.StatusInternalServerError)
+		log.Printf("UpdateTransferHandler: Failed to update transfer: %v", err)
+		http.Error(w, fmt.Sprintf("failed to update transfer: %v", err), http.StatusInternalServerError)
 		return
 	}
 
-	log.Printf("UpdateTransferHandler: Transfer %d updated successfully", transferID)
+	log.Printf("UpdateTransferHandler: Transfer ID %d updated successfully", transferID)
 	http.Redirect(w, r, "/transactions", http.StatusSeeOther)
 }
 

@@ -150,7 +150,6 @@ func getTransactionsForView(db *gorm.DB) ([]TransactionView, error) {
 		}
 
 		formattedDate := tx.Date.Format("02.01.2006")
-		dateOnly := tx.Date.Format("2006-01-02")
 		formattedTime := tx.Date.Format("15:04")
 
 		var (
@@ -214,7 +213,7 @@ func getTransactionsForView(db *gorm.DB) ([]TransactionView, error) {
 			CategoryIconHTML:   displayIconHTML,
 			DisplayName:        displayName,
 			ParentCategoryName: parentCategoryName,
-			Date:               dateOnly,
+			Date:               tx.Date,
 			FormattedDate:      formattedDate,
 			FormattedTime:      formattedTime,
 			Description:        tx.Comment,
@@ -253,7 +252,6 @@ func getTransfersForView(db *gorm.DB) ([]TransferView, error) {
 		}
 
 		formattedDate := transfer.Date.Format("02.01.2006")
-		dateOnly := transfer.Date.Format("2006-01-02")
 		formattedTime := transfer.Date.Format("15:04")
 
 		transferView := TransferView{
@@ -267,11 +265,14 @@ func getTransfersForView(db *gorm.DB) ([]TransferView, error) {
 			TransferAccountName:  transfer.TransferAccount.Name,
 			TransferAccountColor: transfer.TransferAccount.Color,
 			CurrencySymbol:       symbol,
-			Date:                 dateOnly,
+			Date:                 transfer.Date,
 			FormattedDate:        formattedDate,
 			FormattedTime:        formattedTime,
 			Description:          transfer.Comment,
 		}
+
+		log.Printf("Transfer ID %d: Date=%v, FormattedTime=%s",
+			transfer.ID, transfer.Date, formattedTime)
 
 		transfersForView = append(transfersForView, transferView)
 	}

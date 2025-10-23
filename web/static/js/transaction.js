@@ -21,6 +21,8 @@ function closeModal(modalId) {
 }
 
 function openCreateTransactionModal() {
+    const now = new Date();
+
     document.getElementById('transactionAccount').value = '';
     document.getElementById('transactionCategory').value = '';
     createTransactionAmountInput.value = '';
@@ -33,8 +35,14 @@ function openCreateTransactionModal() {
     document.getElementById('transactionType').value = '0';
 
     const today = new Date();
-    const formattedDate = today.toISOString().split('T')[0];
-    document.getElementById('transactionDate').value = formattedDate;
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, '0');
+    const day = String(today.getDate()).padStart(2, '0');
+    const hours = String(today.getHours()).padStart(2, '0');
+    const minutes = String(today.getMinutes()).padStart(2, '0');
+
+    const currentDateTime = `${year}-${month}-${day}T${hours}:${minutes}`;
+    document.getElementById('transactionDate').value = currentDateTime;
 
     // automatic point 0.00 to amount
     const createForm = document.querySelector('form[action="/submit_transaction"]');
@@ -228,8 +236,8 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
-    const transactionCards = document.querySelectorAll('.transaction-card');
-    transactionCards.forEach(card => {
+    const incomeExpenseCards = document.querySelectorAll('.transaction-card:not(.transfer-card)');
+    incomeExpenseCards.forEach(card => {
         card.addEventListener('click', function (e) {
             e.stopPropagation();
 
@@ -246,7 +254,7 @@ document.addEventListener('DOMContentLoaded', function () {
             const description = this.getAttribute('data-description') || '';
             const date = this.getAttribute('data-date');
 
-            console.log('Opening edit modal for transaction:', transactionId);
+            console.log('Opening edit modal for TRANSACTION:', transactionId);
 
             openEditTransactionModal(
                 transactionId,
@@ -259,6 +267,41 @@ document.addEventListener('DOMContentLoaded', function () {
                 categoryName,
                 categoryColor,
                 subCategoryId,
+                description,
+                date
+            );
+        });
+
+        card.style.cursor = 'pointer';
+    });
+
+    const transferCards = document.querySelectorAll('.transfer-card');
+    transferCards.forEach(card => {
+        card.addEventListener('click', function (e) {
+            e.stopPropagation();
+
+            const transferId = this.getAttribute('data-transfer-id');
+            const amount = this.getAttribute('data-amount');
+            const accountId = this.getAttribute('data-account-id');
+            const accountName = this.getAttribute('data-account-name');
+            const accountColor = this.getAttribute('data-account-color');
+            const transferAccountId = this.getAttribute('data-transfer-account-id');
+            const transferAccountName = this.getAttribute('data-transfer-account-name');
+            const transferAccountColor = this.getAttribute('data-transfer-account-color');
+            const description = this.getAttribute('data-description') || '';
+            const date = this.getAttribute('data-date');
+
+            console.log('Opening edit modal for TRANSFER:', transferId);
+
+            openEditTransferModal(
+                transferId,
+                amount,
+                accountId,
+                accountName,
+                accountColor,
+                transferAccountId,
+                transferAccountName,
+                transferAccountColor,
                 description,
                 date
             );
@@ -725,10 +768,12 @@ function openEditTransactionModal(id, type, amount, accountId, accountName, acco
 
     let transactionDate;
     if (date) {
-        const originalDate = new Date(date);
-        if (!isNaN(originalDate.getTime())) {
-            transactionDate = originalDate;
-        } else {
+        transactionDate = new Date(date);
+        console.log('Parsed date:', transactionDate);
+        console.log('UTC Hours:', transactionDate.getUTCHours(), 'Local Hours:', transactionDate.getHours());
+
+        if (isNaN(transactionDate.getTime())) {
+            console.log('Date parsing failed, using current date');
             transactionDate = new Date();
         }
     } else {
@@ -738,7 +783,11 @@ function openEditTransactionModal(id, type, amount, accountId, accountName, acco
     const year = transactionDate.getFullYear();
     const month = String(transactionDate.getMonth() + 1).padStart(2, '0');
     const day = String(transactionDate.getDate()).padStart(2, '0');
-    document.getElementById('editTransactionDate').value = `${year}-${month}-${day}`;
+    const hours = String(transactionDate.getHours()).padStart(2, '0');
+    const minutes = String(transactionDate.getMinutes()).padStart(2, '0');
+
+    const datetimeValue = `${year}-${month}-${day}T${hours}:${minutes}`;
+    document.getElementById('editTransactionDate').value = datetimeValue;
 
     const typeButtons = document.querySelectorAll('#editTransactionModal .type-btn');
     typeButtons.forEach(btn => btn.classList.remove('active'));
@@ -1050,7 +1099,11 @@ function openEditTransferModal(id, amount, accountId, accountName, accountColor,
     const year = transferDate.getFullYear();
     const month = String(transferDate.getMonth() + 1).padStart(2, '0');
     const day = String(transferDate.getDate()).padStart(2, '0');
-    document.getElementById('editTransferDate').value = `${year}-${month}-${day}`;
+    const hours = String(transferDate.getHours()).padStart(2, '0');
+    const minutes = String(transferDate.getMinutes()).padStart(2, '0');
+
+    const datetimeValue = `${year}-${month}-${day}T${hours}:${minutes}`;
+    document.getElementById('editTransferDate').value = datetimeValue;
 
     document.getElementById('editFromSelectedAccountIcon').innerHTML = '';
     document.getElementById('editFromSelectedAccountIcon').style.backgroundColor = '';

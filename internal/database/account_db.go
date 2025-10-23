@@ -37,6 +37,8 @@ func DeleteAccount(db *gorm.DB, id int) error {
 		return fmt.Errorf("problem starting transaction: %v", tx.Error)
 	}
 
+	// delete transactions and transfers before delete account
+	// it needs to recover balance
 	var transactions []Transaction
 	if err := tx.Where("account_id = ?", id).Find(&transactions).Error; err != nil {
 		tx.Rollback()

@@ -20,7 +20,7 @@
             <a href="/">Счета</a>
             <a href="/categories" class="active">Категории</a>
             <a href="/transactions">Записи</a>
-            <a href="#">Аналитика</a>
+            <a href="/analyze">Аналитика</a>
             <a href="#">Нейронка</a>
         </nav>
     </header>
@@ -44,6 +44,7 @@
 
             <div class="subcategories-container">
                 {{range .Subcategories}}
+
                 <div class="subcategory-card" style="background-color: {{.Color}};"
                     onclick="openSubcategoryModal({{.ID}}, '{{.Name}}', '{{.Color}}', '{{.IconKey}}', {{.ParentID}})">
                     <div class="subcategory-icon">{{.IconHTML}}</div>
@@ -77,6 +78,7 @@
                 <h2>Создать новую категорию</h2>
                 <span class="close" onclick="closeModal('createCategoryModal')">&times;</span>
             </div>
+
             <form action="/create_category" method="post">
                 <div class="form-row">
 
@@ -101,11 +103,13 @@
                     <div class="form-group icon-group">
                         <label>Иконка <span class="required">*</span></label>
                         <div class="custom-icon-select">
+
                             <input type="hidden" id="createCategoryIcon" name="Icon">
                             <div id="createCategorySelectedIconDisplay" class="select-selected-icon">
                                 <span class="selected-icon-svg"></span>
                                 <span class="selected-icon-key">Выберите иконку</span>
                             </div>
+
                             <div id="createCategoryIconOptionsContainer" class="select-icon-options">
                                 {{range $key, $svg := .CategoryIcons}}
                                 <div class="select-icon-option" data-key="{{$key}}">
@@ -128,6 +132,7 @@
                 <h2>Создать новую подкатегорию</h2>
                 <span class="close" onclick="closeModal('createSubcategoryModal')">&times;</span>
             </div>
+
             <form action="/create_subcategory" method="post">
                 <input type="hidden" id="createSubcategoryParentId" name="ParentID">
 
@@ -158,6 +163,7 @@
                                 <span class="selected-icon-svg"></span>
                                 <span class="selected-icon-key">Выберите иконку</span>
                             </div>
+
                             <div id="createSubcategoryIconOptionsContainer" class="select-icon-options">
                                 {{range $key, $svg := .SubcategoryIcons}}
                                 <div class="select-icon-option" data-key="{{$key}}">
@@ -181,6 +187,7 @@
                 <h2>Редактировать категорию</h2>
                 <span class="close" onclick="closeModal('categoryModal')">&times;</span>
             </div>
+
             <form action="/update_category" method="post">
                 <input type="hidden" id="editCategoryId" name="ID">
                 <div class="form-row">

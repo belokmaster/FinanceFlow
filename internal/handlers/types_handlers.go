@@ -3,6 +3,7 @@ package handlers
 import (
 	"finance_flow/internal/database"
 	"html/template"
+	"time"
 )
 
 type AccountView struct {
@@ -51,6 +52,7 @@ type SubCategoryPageData struct {
 
 type GroupedTransactions struct {
 	Date           string
+	DateKey        time.Time
 	TotalAmount    float64
 	CurrencySymbol string
 	Transactions   []TransactionView
@@ -80,7 +82,7 @@ type TransactionView struct {
 	ParentCategoryName string
 	SubCategoryID      *uint
 	SubCategoryName    *string
-	Date               string
+	Date               time.Time
 	FormattedTime      string
 	FormattedDate      string
 	Description        string
@@ -97,8 +99,15 @@ type TransferView struct {
 	TransferAccountName  string
 	TransferAccountColor string
 	CurrencySymbol       string
-	Date                 string
+	Date                 time.Time
 	FormattedTime        string
 	FormattedDate        string
 	Description          string
+}
+
+type AnalyzePageData struct {
+	Accounts            []AccountView
+	Categories          []CategoryView
+	Transactions        []TransactionView
+	GroupedTransactions []GroupedTransactions
 }

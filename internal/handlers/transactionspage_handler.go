@@ -15,12 +15,7 @@ func groupTransactionsByDate(transactions []TransactionView, transfers []Transfe
 	grouped := make(map[string]*GroupedTransactions)
 
 	for _, t := range transactions {
-		parsedDate, err := time.Parse("2006-01-02", t.Date)
-		if err != nil {
-			log.Printf("Error parsing date '%s': %v", t.Date, err)
-			continue
-		}
-		date := parsedDate.Format("02.01.2006")
+		date := t.Date.Format("02.01.2006")
 
 		if _, exists := grouped[date]; !exists {
 			grouped[date] = &GroupedTransactions{
@@ -43,12 +38,7 @@ func groupTransactionsByDate(transactions []TransactionView, transfers []Transfe
 	}
 
 	for _, t := range transfers {
-		parsedDate, err := time.Parse("2006-01-02", t.Date)
-		if err != nil {
-			log.Printf("Error parsing date '%s': %v", t.Date, err)
-			continue
-		}
-		date := parsedDate.Format("02.01.2006")
+		date := t.Date.Format("02.01.2006")
 
 		if _, exists := grouped[date]; !exists {
 			grouped[date] = &GroupedTransactions{
@@ -77,6 +67,71 @@ func groupTransactionsByDate(transactions []TransactionView, transfers []Transfe
 	return result
 }
 
+func groupTransactionsByDateV2(transactions []TransactionView, transfers []TransferView) []GroupedTransactions {
+	grouped := make(map[time.Time]*GroupedTransactions)
+
+	for _, t := range transactions {
+		dateKey := time.Date(t.Date.Year(), t.Date.Month(), t.Date.Day(), 0, 0, 0, 0, t.Date.Location())
+		dateStr := dateKey.Format("02.01.2006")
+
+		if _, exists := grouped[dateKey]; !exists {
+			grouped[dateKey] = &GroupedTransactions{
+				Date:           dateStr,
+				DateKey:        dateKey,
+				TotalAmount:    0,
+				CurrencySymbol: t.CurrencySymbol,
+				Transactions:   []TransactionView{},
+				Transfers:      []TransferView{},
+			}
+		}
+
+		grouped[dateKey].Transactions = append(grouped[dateKey].Transactions, t)
+
+		switch t.Type {
+		case 0:
+			grouped[dateKey].TotalAmount += t.Amount
+		case 1:
+			grouped[dateKey].TotalAmount -= t.Amount
+		}
+	}
+
+	for _, t := range transfers {
+		dateKey := time.Date(t.Date.Year(), t.Date.Month(), t.Date.Day(), 0, 0, 0, 0, t.Date.Location())
+		dateStr := dateKey.Format("02.01.2006")
+
+		if _, exists := grouped[dateKey]; !exists {
+			grouped[dateKey] = &GroupedTransactions{
+				Date:           dateStr,
+				DateKey:        dateKey,
+				TotalAmount:    0,
+				CurrencySymbol: t.CurrencySymbol,
+				Transactions:   []TransactionView{},
+				Transfers:      []TransferView{},
+			}
+		}
+
+		grouped[dateKey].Transfers = append(grouped[dateKey].Transfers, t)
+	}
+
+	var result []GroupedTransactions
+	for _, group := range grouped {
+		sort.Slice(group.Transactions, func(i, j int) bool {
+			return group.Transactions[i].Date.After(group.Transactions[j].Date)
+		})
+
+		sort.Slice(group.Transfers, func(i, j int) bool {
+			return group.Transfers[i].Date.After(group.Transfers[j].Date)
+		})
+
+		result = append(result, *group)
+	}
+
+	sort.Slice(result, func(i, j int) bool {
+		return result[i].DateKey.After(result[j].DateKey)
+	})
+
+	return result
+}
 func NewTransactionPageHandler(w http.ResponseWriter, r *http.Request, db *gorm.DB, path string) {
 	log.Printf("NewTransactionPageHandler: Preparing data for new transaction page")
 
@@ -134,7 +189,7 @@ func NewTransactionPageHandler(w http.ResponseWriter, r *http.Request, db *gorm.
 
 	log.Printf("NewTransactionPageHandler: Retrieved %d transactions from database", len(transactionsForView))
 
-	groupedTransactions := groupTransactionsByDate(transactionsForView, transfersForView)
+	groupedTransactions := groupTransactionsByDateV2(transactionsForView, transfersForView)
 
 	subcategoriesByParent := convertSubcategoriesToView(subCategories)
 	categoriesForView := convertCategoriesToView(categories, subcategoriesByParent)

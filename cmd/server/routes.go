@@ -28,6 +28,11 @@ func setupRoutes(db *gorm.DB) {
 		handlers.NewTransactionPageHandler(w, r, db, path)
 	})
 
+	http.HandleFunc("/analyze", func(w http.ResponseWriter, r *http.Request) {
+		path := "web/templates/analyze.html"
+		handlers.AnalyzePageHandler(w, r, db, path)
+	})
+
 	// POST routes
 	http.HandleFunc("/create_account", func(w http.ResponseWriter, r *http.Request) {
 		handlers.CreateAccountHandler(w, r, db)
