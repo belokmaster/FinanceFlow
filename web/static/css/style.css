@@ -868,6 +868,7 @@ form button[type="submit"]:hover {
     cursor: pointer;
     background: white;
     transition: all 0.2s ease;
+    font-weight: bold;
 }
 
 .select-selected-account:hover {
@@ -901,9 +902,8 @@ form button[type="submit"]:hover {
 }
 
 .selected-account-name {
-    font-weight: 600;
-    color: #2d3748;
-    font-size: 14px;
+    font-weight: 500;
+    color: #333;
 }
 
 .selected-account-balance {
@@ -935,6 +935,8 @@ form button[type="submit"]:hover {
     overflow-y: auto;
     margin-top: 4px;
     max-height: 300px;
+    font-weight: 500;
+    color: #333;
 }
 
 .select-account-options.show {
@@ -985,7 +987,7 @@ form button[type="submit"]:hover {
 .option-account-name {
     font-weight: 600;
     color: #2d3748;
-    font-size: 14px;
+    font-size: 16px;
 }
 
 .option-account-balance {
@@ -1803,4 +1805,124 @@ form button[type="submit"]:hover {
 
 .datetime-input-container input {
     padding-right: 40px;
+}
+
+.custom-type-select {
+    position: relative;
+    width: 100%;
+    margin-bottom: 15px;
+}
+
+.select-selected-type {
+    background-color: #ffffff;
+    border: 1px solid #e1e5e9;
+    border-radius: 8px;
+    padding: 12px 16px;
+    cursor: pointer;
+    background: white;
+    transition: all 0.2s ease;
+}
+
+.select-selected-type:hover {
+    border-color: #007bff;
+}
+
+.select-selected-type.active {
+    border-color: #007bff;
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+.selected-type-display {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.selected-type-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    width: 40px;
+    height: 40px;
+    font-size: 18px;
+}
+
+.selected-type-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.selected-type-name {
+    font-weight: 500;
+    color: #333;
+}
+
+.dropdown-arrow {
+    color: #666;
+    transition: transform 0.3s ease;
+}
+
+.select-selected-type.active .dropdown-arrow {
+    transform: rotate(180deg);
+}
+
+.select-type-options {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    max-height: 200px;
+    overflow-y: auto;
+    margin-top: 5px;
+}
+
+.select-type-options.show {
+    display: block;
+}
+
+.select-type-option {
+    display: flex;
+    align-items: center;
+    padding: 12px 15px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    gap: 10px;
+}
+
+.select-type-option:hover {
+    background-color: #f8f9fa;
+}
+
+.select-type-option.selected {
+    background-color: #e3f2fd;
+}
+
+.option-type-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    width: 40px;
+    height: 40px;
+    font-size: 18px;
+    color: inherit !important;
+}
+
+.option-type-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.option-type-name {
+    font-weight: 500;
+    color: #333;
 }

@@ -51,7 +51,7 @@ function openCreateTransactionModal() {
             const type = document.getElementById('transactionType').value;
             const amount = document.getElementById('transactionAmount').value.trim();
 
-            if (type === '0' || type === '1') { // Доход или Расход
+            if (type === '0' || type === '1') {
                 const account = document.getElementById('transactionAccount').value;
                 const category = document.getElementById('transactionCategory').value;
 
@@ -67,7 +67,7 @@ function openCreateTransactionModal() {
                     return false;
                 }
 
-            } else if (type === '2') { // Перевод
+            } else if (type === '2') {
                 const fromAccount = document.getElementById('fromAccount').value;
                 const toAccount = document.getElementById('toAccount').value;
 
@@ -777,6 +777,9 @@ function closeAllDropdowns() {
     const filterAccountOptions = document.getElementById('filterAccountOptions');
     const filterAccountSelected = document.querySelector('#filterAccount + .select-selected-account');
 
+    const filterTypeOptions = document.getElementById('filterTypeOptions');
+    const filterTypeSelected = document.querySelector('#filterType + .select-selected-type');
+
     if (accountOptions) accountOptions.classList.remove('show');
     if (accountSelected) accountSelected.classList.remove('active');
     if (categoryOptions) categoryOptions.classList.remove('show');
@@ -803,16 +806,26 @@ function closeAllDropdowns() {
 
     if (filterAccountOptions) filterAccountOptions.classList.remove('show');
     if (filterAccountSelected) filterAccountSelected.classList.remove('active');
+
+    if (filterTypeOptions) filterTypeOptions.classList.remove('show');
+    if (filterTypeSelected) filterTypeSelected.classList.remove('active');
 }
 
 document.addEventListener('click', function (event) {
     const accountSelectContainers = document.querySelectorAll('.custom-account-select');
     const categorySelectContainers = document.querySelectorAll('.custom-category-select');
     const subcategorySelectContainers = document.querySelectorAll('.custom-subcategory-select');
+    const typeSelectContainers = document.querySelectorAll('.custom-type-select');
 
     let isClickInside = false;
 
     accountSelectContainers.forEach(container => {
+        if (container.contains(event.target)) {
+            isClickInside = true;
+        }
+    });
+
+    typeSelectContainers.forEach(container => {
         if (container.contains(event.target)) {
             isClickInside = true;
         }
@@ -1368,7 +1381,7 @@ function deleteCategory(categoryId) {
     }
 }
 
-function deleteCategory(categoryId) {
+function deleteAccount(categoryId) {
     if (confirm('Внимание! При удалении счета будут также удалены все связанные с ним транзакции. Вы уверены, что хотите продолжить?')) {
         const form = document.createElement('form');
         form.method = 'POST';
@@ -1383,4 +1396,145 @@ function deleteCategory(categoryId) {
         document.body.appendChild(form);
         form.submit();
     }
+}
+
+function toggleTypeDropdown() {
+    const options = document.getElementById('filterTypeOptions');
+    const selected = document.querySelector('#filterType + .select-selected-type');
+
+    if (options && selected) {
+        const isShowing = options.classList.contains('show');
+        closeAllDropdowns();
+        if (!isShowing) {
+            options.classList.add('show');
+            selected.classList.add('active');
+        }
+    }
+}
+
+function selectTypeOption(optionElement) {
+    const type = optionElement.getAttribute('data-type');
+    const typeName = optionElement.getAttribute('data-type-name');
+    const typeIconHTML = optionElement.querySelector('.option-type-icon')?.innerHTML || '';
+
+    document.getElementById('filterType').value = type;
+
+    const selectedIcon = document.getElementById('filterSelectedTypeIcon');
+    const selectedName = document.getElementById('filterSelectedTypeName');
+
+    if (selectedIcon && selectedName) {
+        if (!type) {
+            selectedIcon.style.display = 'none';
+            selectedIcon.innerHTML = '';
+        } else {
+            selectedIcon.innerHTML = typeIconHTML;
+            selectedIcon.style.display = 'flex';
+            selectedIcon.style.alignItems = 'center';
+            selectedIcon.style.justifyContent = 'center';
+            selectedIcon.style.borderRadius = '10px';
+            selectedIcon.style.width = '40px';
+            selectedIcon.style.height = '40px';
+            selectedIcon.style.fontSize = '18px';
+
+            if (type === '0') {
+                selectedIcon.style.backgroundColor = '#4cd67a';
+                selectedIcon.innerHTML = '<i class="fa-solid fa-arrow-down" style="color: white;"></i>';
+            } else if (type === '1') {
+                selectedIcon.style.backgroundColor = '#dc3545';
+                selectedIcon.innerHTML = '<i class="fa-solid fa-arrow-up" style="color: white;"></i>';
+            } else if (type === '2') {
+                selectedIcon.style.backgroundColor = '#17a2b8';
+                selectedIcon.innerHTML = '<i class="fa-solid fa-arrow-right-arrow-left" style="color: white;"></i>';
+            }
+        }
+
+        selectedName.textContent = typeName;
+    }
+
+    closeAllDropdowns();
+
+    const allOptions = document.querySelectorAll('#filterTypeOptions .select-type-option');
+    allOptions.forEach(option => {
+        option.classList.remove('selected');
+    });
+    optionElement.classList.add('selected');
+
+    applyTypeFilter(type);
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+    initializeTypeFilter();
+});
+
+function initializeTypeFilter() {
+    const selectedIcon = document.getElementById('filterSelectedTypeIcon');
+    if (selectedIcon) {
+        selectedIcon.style.display = 'none';
+        selectedIcon.innerHTML = '';
+    }
+
+    const allTypesOption = document.querySelector('.all-types-option');
+    if (allTypesOption) {
+        allTypesOption.classList.add('selected');
+    }
+}
+
+function applyTypeFilter(type) {
+    const transactionCards = document.querySelectorAll('.transaction-card');
+    const transferCards = document.querySelectorAll('.transfer-card');
+
+    if (!type || type === '') {
+        transactionCards.forEach(card => {
+            card.style.display = 'flex';
+        });
+        transferCards.forEach(card => {
+            card.style.display = 'flex';
+        });
+        return;
+    }
+
+    transactionCards.forEach(card => {
+        const cardType = card.getAttribute('data-transaction-type');
+        if (type === '0' || type === '1') {
+            card.style.display = cardType === type ? 'flex' : 'none';
+        } else {
+            card.style.display = 'none';
+        }
+    });
+
+    transferCards.forEach(card => {
+        if (type === '2') {
+            card.style.display = 'flex';
+        } else {
+            card.style.display = 'none';
+        }
+    });
+}
+
+function applyAccountFilter(accountId) {
+    const transactionCards = document.querySelectorAll('.transaction-card');
+    const transferCards = document.querySelectorAll('.transfer-card');
+
+    transactionCards.forEach(card => {
+        const cardAccountId = card.getAttribute('data-account-id');
+        const isVisibleByType = card.style.display !== 'none';
+
+        if ((!accountId || accountId === '' || cardAccountId === accountId) && isVisibleByType) {
+            card.style.display = 'flex';
+        } else {
+            card.style.display = 'none';
+        }
+    });
+
+    transferCards.forEach(card => {
+        const fromAccountId = card.getAttribute('data-account-id');
+        const toAccountId = card.getAttribute('data-transfer-account-id');
+        const isVisibleByType = card.style.display !== 'none';
+
+        if ((!accountId || accountId === '' || fromAccountId === accountId || toAccountId === accountId) && isVisibleByType) {
+            card.style.display = 'flex';
+        } else {
+            card.style.display = 'none';
+        }
+    });
 }

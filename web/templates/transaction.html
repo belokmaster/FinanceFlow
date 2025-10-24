@@ -69,6 +69,57 @@
                         {{end}}
                     </div>
                 </div>
+
+                <div class="transaction-label">Тип операции</div>
+                <div class="custom-type-select">
+                    <input type="hidden" id="filterType" name="filterType">
+
+                    <div class="select-selected-type" onclick="toggleTypeDropdown()">
+                        <div class="selected-type-display">
+                            <span class="selected-type-icon" id="filterSelectedTypeIcon"></span>
+                            <span class="selected-type-info">
+                                <span class="selected-type-name" id="filterSelectedTypeName">Все операции</span>
+                            </span>
+                            <i class="fa-solid fa-chevron-down dropdown-arrow"></i>
+                        </div>
+                    </div>
+
+                    <div class="select-type-options" id="filterTypeOptions">
+                        <div class="select-type-option all-types-option" data-type="" data-type-name="Все операции"
+                            onclick="selectTypeOption(this)">
+                            <span class="option-type-info">
+                                <span class="option-type-name">Все операции</span>
+                            </span>
+                        </div>
+                        <div class="select-type-option" data-type="0" data-type-name="Доход"
+                            onclick="selectTypeOption(this)">
+                            <span class="option-type-icon" style="background-color: #4cd67a;">
+                                <i class="fa-solid fa-arrow-down" style="color: white;"></i>
+                            </span>
+                            <span class="option-type-info">
+                                <span class="option-type-name">Доход</span>
+                            </span>
+                        </div>
+                        <div class="select-type-option" data-type="1" data-type-name="Расход"
+                            onclick="selectTypeOption(this)">
+                            <span class="option-type-icon" style="background-color: #dc3545;">
+                                <i class="fa-solid fa-arrow-up" style="color: white;"></i>
+                            </span>
+                            <span class="option-type-info">
+                                <span class="option-type-name">Расход</span>
+                            </span>
+                        </div>
+                        <div class="select-type-option" data-type="2" data-type-name="Перевод"
+                            onclick="selectTypeOption(this)">
+                            <span class="option-type-icon" style="background-color: #17a2b8;">
+                                <i class="fa-solid fa-arrow-right-arrow-left" style="color: white;"></i>
+                            </span>
+                            <span class="option-type-info">
+                                <span class="option-type-name">Перевод</span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
