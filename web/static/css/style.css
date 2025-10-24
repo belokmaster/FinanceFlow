@@ -1339,6 +1339,9 @@ form button[type="submit"]:hover {
 .filter-actions {
     text-align: center;
     width: 100%;
+    border-top: 1px solid #eee;
+    padding-top: 30px;
+    margin-top: -5px;
 }
 
 .btn-secondary {
@@ -1965,4 +1968,70 @@ form button[type="submit"]:hover {
 .option-type-name {
     font-weight: 500;
     color: #333;
+}
+
+.sorting-controls {
+    border-top: 1px solid #eee;
+    border-bottom: 1px solid #eee;
+    padding-top: 10px;
+    padding-bottom: 20px;
+    width: 100%;
+}
+
+.sort-buttons {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 15px;
+    margin-top: 20px;
+}
+
+.sort-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 12px;
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 12px;
+    color: #495057;
+    height: 35px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.sort-btn:hover {
+    background: #e9ecef;
+    border-color: #4cd67a;
+}
+
+.sort-btn.active {
+    background: #4cd67a;
+    border-color: #4cd67a;
+    color: white;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.sort-btn i {
+    font-size: 14px;
+}
+
+.sort-btn span {
+    flex: 1;
+    text-align: left;
+}
+
+.current-sort-indicator {
+    text-align: center;
+    padding: 8px;
+    background: #f8f9fa;
+    border-radius: 6px;
+    font-size: 14px;
+    color: #333;
+    border: 1px solid #e9ecef;
+    margin-top: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    font-weight: bold;
 }

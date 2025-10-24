@@ -36,6 +36,31 @@
                 <div class="transaction-label">Поиск транзакций</div>
                 <input type="text" class="transaction-filter" placeholder="Поиск транзакций...">
 
+                <div class="sorting-controls">
+                    <div class="transaction-label">Сортировка</div>
+                    <div class="sort-buttons">
+                        <button type="button" class="sort-btn" data-sort="date-desc">
+                            <i class="fa-solid fa-arrow-down-wide-short"></i>
+                            <span>Сначала новые</span>
+                        </button>
+                        <button type="button" class="sort-btn" data-sort="date-asc">
+                            <i class="fa-solid fa-arrow-up-wide-short"></i>
+                            <span>Сначала старые</span>
+                        </button>
+                        <button type="button" class="sort-btn" data-sort="amount-desc">
+                            <i class="fa-solid fa-arrow-down-1-9"></i>
+                            <span>По убыванию суммы</span>
+                        </button>
+                        <button type="button" class="sort-btn" data-sort="amount-asc">
+                            <i class="fa-solid fa-arrow-up-1-9"></i>
+                            <span>По возрастанию суммы</span>
+                        </button>
+                    </div>
+                    <div class="current-sort-indicator">
+                        <span id="currentSortText">Сортировка: по умолчанию</span>
+                    </div>
+                </div>
+
                 <div class="transaction-label">Счет</div>
                 <div class="custom-account-select">
                     <input type="hidden" id="filterAccount" name="filterAccountID">
@@ -122,7 +147,7 @@
                 </div>
 
                 <div class="filter-actions">
-                    <button type="button" class="btn-secondary" onclick="resetFilters()">
+                    <button type="button" class="btn btn-secondary" onclick="resetFilters()">
                         <i class="fa-solid fa-rotate-left"></i>
                         Сбросить фильтры
                     </button>

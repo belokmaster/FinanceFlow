@@ -879,6 +879,9 @@ function closeAllDropdowns() {
     const filterTypeOptions = document.getElementById('filterTypeOptions');
     const filterTypeSelected = document.querySelector('#filterType + .select-selected-type');
 
+    const sortOptions = document.getElementById('sortOptions');
+    const sortSelected = document.querySelector('.select-selected-sort');
+
     if (accountOptions) accountOptions.classList.remove('show');
     if (accountSelected) accountSelected.classList.remove('active');
     if (categoryOptions) categoryOptions.classList.remove('show');
@@ -916,7 +919,14 @@ document.addEventListener('click', function (event) {
     const subcategorySelectContainers = document.querySelectorAll('.custom-subcategory-select');
     const typeSelectContainers = document.querySelectorAll('.custom-type-select');
 
+    const sortButtons = document.querySelectorAll('.sort-btn');
+    const isSortButton = Array.from(sortButtons).some(button => button.contains(event.target));
+
     let isClickInside = false;
+
+    if (isSortButton) {
+        return;
+    }
 
     accountSelectContainers.forEach(container => {
         if (container.contains(event.target)) {
@@ -1761,6 +1771,12 @@ function resetFilters() {
         searchInput.value = '';
     }
 
+    const defaultSortButton = document.querySelector('.sort-btn[data-sort="date-desc"]');
+    if (defaultSortButton) {
+        applySorting('date-desc');
+        updateActiveSortButton(defaultSortButton);
+    }
+
     const allCards = document.querySelectorAll('.transaction-card, .transfer-card');
     allCards.forEach(card => {
         card.style.display = 'flex';
@@ -1778,6 +1794,8 @@ function resetFilters() {
 }
 
 document.addEventListener('DOMContentLoaded', function () {
+    initializeSorting();
+
     setupSearch();
 
     const searchInput = document.querySelector('.transaction-filter');
@@ -1785,3 +1803,246 @@ document.addEventListener('DOMContentLoaded', function () {
         searchInput.addEventListener('input', applyCombinedFilter);
     }
 });
+
+function setupSorting() {
+    initializeSorting();
+}
+
+function toggleSortDropdown() {
+    const options = document.getElementById('sortOptions');
+    const selected = document.querySelector('.select-selected-sort');
+
+    if (options && selected) {
+        const isShowing = options.classList.contains('show');
+        closeAllDropdowns();
+        if (!isShowing) {
+            options.classList.add('show');
+            selected.classList.add('active');
+        }
+    }
+}
+
+function selectSortOption(optionElement) {
+    const sortType = optionElement.getAttribute('data-sort');
+    const sortName = optionElement.getAttribute('data-sort-name');
+    const sortIconHTML = optionElement.querySelector('.option-sort-icon').innerHTML;
+
+    document.getElementById('sortType').value = sortType;
+
+    const selectedIcon = document.getElementById('selectedSortIcon');
+    const selectedName = document.getElementById('selectedSortName');
+
+    if (selectedIcon && selectedName) {
+        selectedIcon.innerHTML = sortIconHTML;
+        selectedIcon.style.display = 'flex';
+        selectedIcon.style.alignItems = 'center';
+        selectedIcon.style.justifyContent = 'center';
+        selectedIcon.style.borderRadius = '10px';
+        selectedIcon.style.width = '40px';
+        selectedIcon.style.height = '40px';
+        selectedIcon.style.fontSize = '18px';
+        selectedIcon.style.backgroundColor = '#f8f9fa';
+
+        selectedName.textContent = sortName;
+    }
+
+    closeAllDropdowns();
+
+    const allOptions = document.querySelectorAll('.select-sort-option');
+    allOptions.forEach(option => {
+        option.classList.remove('selected');
+    });
+    optionElement.classList.add('selected');
+
+    applySorting(sortType);
+}
+
+function applySorting(sortType) {
+    console.log('Applying sorting:', sortType);
+
+    const transactionsContainer = document.querySelector('.transactions-container');
+    const dateGroups = Array.from(document.querySelectorAll('.transaction-date-group'));
+
+    dateGroups.forEach(group => {
+        const transactionCards = Array.from(group.querySelectorAll('.transaction-card:not(.transfer-card)'));
+        const transferCards = Array.from(group.querySelectorAll('.transfer-card'));
+        const allCards = [...transactionCards, ...transferCards];
+
+        if (allCards.length > 0) {
+            allCards.forEach(card => card.remove());
+
+            const sortedCards = sortCards(allCards, sortType);
+
+            sortedCards.forEach(card => {
+                group.appendChild(card);
+            });
+        }
+    });
+
+    if (sortType === 'date-desc' || sortType === 'date-asc') {
+        sortDateGroups(dateGroups, sortType, transactionsContainer);
+    }
+}
+
+
+function addSortingControls() {
+    const sortButtons = document.querySelectorAll('.sort-btn');
+
+    if (sortButtons.length === 0) {
+        return;
+    }
+
+    sortButtons.forEach(button => {
+        button.addEventListener('click', function () {
+            const sortType = this.getAttribute('data-sort');
+            applySorting(sortType);
+            updateActiveSortButton(this);
+        });
+    });
+}
+
+function initializeSorting() {
+    const sortButtons = document.querySelectorAll('.sort-btn');
+
+    sortButtons.forEach(button => {
+        button.addEventListener('click', function () {
+            const sortType = this.getAttribute('data-sort');
+            applySorting(sortType);
+            updateActiveSortButton(this);
+        });
+    });
+
+    const defaultSortButton = document.querySelector('.sort-btn[data-sort="date-desc"]');
+    if (defaultSortButton) {
+        updateActiveSortButton(defaultSortButton);
+    }
+}
+
+function updateActiveSortButton(activeButton) {
+    const allButtons = document.querySelectorAll('.sort-btn');
+    allButtons.forEach(btn => {
+        btn.classList.remove('active');
+    });
+
+    activeButton.classList.add('active');
+
+    const sortTextMap = {
+        'date-desc': 'Сначала новые',
+        'date-asc': 'Сначала старые',
+        'amount-desc': 'По убыванию суммы',
+        'amount-asc': 'По возрастанию суммы'
+    };
+
+    const sortType = activeButton.getAttribute('data-sort');
+    const currentSortText = document.getElementById('currentSortText');
+    if (currentSortText) {
+        currentSortText.textContent = `Сортировка: ${sortTextMap[sortType]}`;
+    }
+}
+
+function applySorting(sortType) {
+    console.log('Applying sorting:', sortType);
+
+    const transactionsContainer = document.querySelector('.transactions-container');
+    const dateGroups = Array.from(document.querySelectorAll('.transaction-date-group'));
+
+    dateGroups.forEach(group => {
+        const transactionCards = Array.from(group.querySelectorAll('.transaction-card:not(.transfer-card)'));
+        const transferCards = Array.from(group.querySelectorAll('.transfer-card'));
+        const allCards = [...transactionCards, ...transferCards];
+
+        if (allCards.length > 0) {
+            allCards.forEach(card => card.remove());
+
+            const sortedCards = sortCards(allCards, sortType);
+
+            sortedCards.forEach(card => {
+                group.appendChild(card);
+            });
+        }
+    });
+
+    if (sortType === 'date-desc' || sortType === 'date-asc') {
+        sortDateGroups(dateGroups, sortType, transactionsContainer);
+    }
+}
+
+function sortCards(cards, sortType) {
+    return cards.sort((a, b) => {
+        switch (sortType) {
+            case 'date-desc':
+                return compareByDate(a, b, false);
+            case 'date-asc':
+                return compareByDate(a, b, true);
+            case 'amount-desc':
+                return compareByAmount(a, b, false);
+            case 'amount-asc':
+                return compareByAmount(a, b, true);
+            default:
+                return 0;
+        }
+    });
+}
+
+function compareByDate(a, b, ascending = false) {
+    const dateA = new Date(a.getAttribute('data-date'));
+    const dateB = new Date(b.getAttribute('data-date'));
+
+    if (ascending) {
+        return dateA - dateB;
+    } else {
+        return dateB - dateA;
+    }
+}
+
+function compareByAmount(a, b, ascending = false) {
+    let amountA, amountB;
+
+    if (a.classList.contains('transfer-card')) {
+        amountA = Math.abs(parseFloat(a.getAttribute('data-amount')));
+    } else {
+        amountA = Math.abs(parseFloat(a.getAttribute('data-amount')));
+    }
+
+    if (b.classList.contains('transfer-card')) {
+        amountB = Math.abs(parseFloat(b.getAttribute('data-amount')));
+    } else {
+        amountB = Math.abs(parseFloat(b.getAttribute('data-amount')));
+    }
+
+    if (ascending) {
+        return amountA - amountB;
+    } else {
+        return amountB - amountA;
+    }
+}
+
+function sortDateGroups(groups, sortType, container) {
+    const sortedGroups = groups.sort((a, b) => {
+        const dateTextA = a.querySelector('.transaction-date-header span').textContent;
+        const dateTextB = b.querySelector('.transaction-date-header span').textContent;
+
+        const dateA = parseDateString(dateTextA);
+        const dateB = parseDateString(dateTextB);
+
+        if (sortType === 'date-desc') {
+            return dateB - dateA;
+        } else {
+            return dateA - dateB;
+        }
+    });
+
+    groups.forEach(group => group.remove());
+
+    sortedGroups.forEach(group => {
+        container.appendChild(group);
+    });
+}
+
+function parseDateString(dateString) {
+    const parts = dateString.split('.');
+    if (parts.length === 3) {
+        return new Date(parts[2], parts[1] - 1, parts[0]);
+    }
+    return new Date(dateString);
+}
