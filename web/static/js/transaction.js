@@ -580,6 +580,96 @@ function selectAccountOption(optionElement, prefix = 'income') {
     }
 }
 
+function setupSearch() {
+    const searchInput = document.querySelector('.transaction-filter');
+
+    if (searchInput) {
+        searchInput.addEventListener('input', function (e) {
+            const searchTerm = e.target.value.toLowerCase().trim();
+            applySearchFilter(searchTerm);
+        });
+    }
+}
+
+function applySearchFilter(searchTerm) {
+    const transactionCards = document.querySelectorAll('.transaction-card');
+    const transferCards = document.querySelectorAll('.transfer-card');
+    const dateGroups = document.querySelectorAll('.transaction-date-group');
+
+    let hasVisibleTransactions = false;
+
+    transactionCards.forEach(card => {
+        const categoryName = card.querySelector('.transaction-main-category')?.textContent?.toLowerCase() || '';
+        const subcategoryName = card.querySelector('.transaction-subcategory')?.textContent?.toLowerCase() || '';
+        const accountName = card.querySelector('.transaction-account')?.textContent?.toLowerCase() || '';
+        const description = card.getAttribute('data-description')?.toLowerCase() || '';
+        const amount = card.querySelector('.transaction-amount')?.textContent?.toLowerCase() || '';
+
+        const isVisible = searchTerm === '' ||
+            categoryName.includes(searchTerm) ||
+            subcategoryName.includes(searchTerm) ||
+            accountName.includes(searchTerm) ||
+            description.includes(searchTerm) ||
+            amount.includes(searchTerm);
+
+        card.style.display = isVisible ? 'flex' : 'none';
+
+        if (isVisible) {
+            hasVisibleTransactions = true;
+        }
+    });
+
+    transferCards.forEach(card => {
+        const fromAccount = card.querySelector('.transaction-account:nth-child(2)')?.textContent?.toLowerCase() || '';
+        const toAccount = card.querySelector('.transaction-account:nth-child(5)')?.textContent?.toLowerCase() || '';
+        const description = card.getAttribute('data-description')?.toLowerCase() || '';
+        const amount = card.querySelector('.transaction-amount')?.textContent?.toLowerCase() || '';
+
+        const isVisible = searchTerm === '' ||
+            fromAccount.includes(searchTerm) ||
+            toAccount.includes(searchTerm) ||
+            description.includes(searchTerm) ||
+            amount.includes(searchTerm);
+
+        card.style.display = isVisible ? 'flex' : 'none';
+
+        if (isVisible) {
+            hasVisibleTransactions = true;
+        }
+    });
+
+    dateGroups.forEach(group => {
+        const transactionsInGroup = group.querySelectorAll('.transaction-card, .transfer-card');
+        const visibleTransactions = Array.from(transactionsInGroup).filter(card =>
+            card.style.display !== 'none'
+        );
+
+        if (visibleTransactions.length > 0) {
+            group.style.display = 'block';
+        } else {
+            group.style.display = 'none';
+        }
+    });
+
+    const transactionsContainer = document.querySelector('.transactions-container');
+    const noResultsMessage = transactionsContainer.querySelector('.no-results-message');
+
+    if (!hasVisibleTransactions && searchTerm !== '') {
+        if (!noResultsMessage) {
+            const message = document.createElement('p');
+            message.className = 'no-results-message';
+            message.textContent = 'Транзакции не найдены';
+            message.style.textAlign = 'center';
+            message.style.padding = '20px';
+            message.style.color = '#666';
+            transactionsContainer.appendChild(message);
+        }
+    } else if (noResultsMessage) {
+        noResultsMessage.remove();
+    }
+}
+
+
 function selectCategoryOption(optionElement) {
     const categoryId = optionElement.getAttribute('data-category-id');
     const categoryName = optionElement.getAttribute('data-category-name');
@@ -1507,13 +1597,20 @@ function applyAccountFilter(accountId) {
 }
 
 function applyCombinedFilter() {
+    const searchInput = document.querySelector('.transaction-filter');
+    const searchTerm = searchInput ? searchInput.value.toLowerCase().trim() : '';
+
     console.log('Применение комбинированного фильтра:', {
         type: currentTypeFilter,
-        account: currentAccountFilter
+        account: currentAccountFilter,
+        search: searchTerm
     });
 
     const transactionCards = document.querySelectorAll('.transaction-card');
     const transferCards = document.querySelectorAll('.transfer-card');
+    const dateGroups = document.querySelectorAll('.transaction-date-group');
+
+    let hasVisibleTransactions = false;
 
     transactionCards.forEach(card => {
         card.style.display = 'flex';
@@ -1561,6 +1658,87 @@ function applyCombinedFilter() {
             }
         });
     }
+
+    if (searchTerm !== '') {
+        transactionCards.forEach(card => {
+            if (card.style.display !== 'none') {
+                const categoryName = card.querySelector('.transaction-main-category')?.textContent?.toLowerCase() || '';
+                const subcategoryName = card.querySelector('.transaction-subcategory')?.textContent?.toLowerCase() || '';
+                const accountName = card.querySelector('.transaction-account')?.textContent?.toLowerCase() || '';
+                const description = card.getAttribute('data-description')?.toLowerCase() || '';
+                const amount = card.querySelector('.transaction-amount')?.textContent?.toLowerCase() || '';
+
+                const isVisible = categoryName.includes(searchTerm) ||
+                    subcategoryName.includes(searchTerm) ||
+                    accountName.includes(searchTerm) ||
+                    description.includes(searchTerm) ||
+                    amount.includes(searchTerm);
+
+                card.style.display = isVisible ? 'flex' : 'none';
+
+                if (isVisible) {
+                    hasVisibleTransactions = true;
+                }
+            }
+        });
+
+        transferCards.forEach(card => {
+            if (card.style.display !== 'none') {
+                const fromAccount = card.querySelector('.transaction-account:nth-child(2)')?.textContent?.toLowerCase() || '';
+                const toAccount = card.querySelector('.transaction-account:nth-child(5)')?.textContent?.toLowerCase() || '';
+                const description = card.getAttribute('data-description')?.toLowerCase() || '';
+                const amount = card.querySelector('.transaction-amount')?.textContent?.toLowerCase() || '';
+
+                const isVisible = fromAccount.includes(searchTerm) ||
+                    toAccount.includes(searchTerm) ||
+                    description.includes(searchTerm) ||
+                    amount.includes(searchTerm);
+
+                card.style.display = isVisible ? 'flex' : 'none';
+
+                if (isVisible) {
+                    hasVisibleTransactions = true;
+                }
+            }
+        });
+    } else {
+        transactionCards.forEach(card => {
+            if (card.style.display !== 'none') hasVisibleTransactions = true;
+        });
+        transferCards.forEach(card => {
+            if (card.style.display !== 'none') hasVisibleTransactions = true;
+        });
+    }
+
+    dateGroups.forEach(group => {
+        const transactionsInGroup = group.querySelectorAll('.transaction-card, .transfer-card');
+        const visibleTransactions = Array.from(transactionsInGroup).filter(card =>
+            card.style.display !== 'none'
+        );
+
+        if (visibleTransactions.length > 0) {
+            group.style.display = 'block';
+        } else {
+            group.style.display = 'none';
+        }
+    });
+
+    const transactionsContainer = document.querySelector('.transactions-container');
+    const noResultsMessage = transactionsContainer.querySelector('.no-results-message');
+
+    if (!hasVisibleTransactions && (searchTerm !== '' || currentTypeFilter !== '' || currentAccountFilter !== '')) {
+        if (!noResultsMessage) {
+            const message = document.createElement('p');
+            message.className = 'no-results-message';
+            message.textContent = 'Транзакции не найдены';
+            message.style.textAlign = 'center';
+            message.style.padding = '20px';
+            message.style.color = '#666';
+            transactionsContainer.appendChild(message);
+        }
+    } else if (noResultsMessage) {
+        noResultsMessage.remove();
+    }
 }
 
 function resetFilters() {
@@ -1578,8 +1756,32 @@ function resetFilters() {
         selectAccountOption(accountAllOption, 'filter');
     }
 
+    const searchInput = document.querySelector('.transaction-filter');
+    if (searchInput) {
+        searchInput.value = '';
+    }
+
     const allCards = document.querySelectorAll('.transaction-card, .transfer-card');
     allCards.forEach(card => {
         card.style.display = 'flex';
     });
+
+    const dateGroups = document.querySelectorAll('.transaction-date-group');
+    dateGroups.forEach(group => {
+        group.style.display = 'block';
+    });
+
+    const noResultsMessage = document.querySelector('.no-results-message');
+    if (noResultsMessage) {
+        noResultsMessage.remove();
+    }
 }
+
+document.addEventListener('DOMContentLoaded', function () {
+    setupSearch();
+
+    const searchInput = document.querySelector('.transaction-filter');
+    if (searchInput) {
+        searchInput.addEventListener('input', applyCombinedFilter);
+    }
+});
