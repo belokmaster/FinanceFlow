@@ -26,10 +26,49 @@
     </header>
 
     <div class="transactions-wrapper">
-        <div class="new_transaction-container">
-            <div class="new_transaction-card" onclick="openCreateTransactionModal()">
-                <i class="fa-solid fa-plus"></i>
-                <span>Добавить запись</span>
+        <div class="transactions-filter-container">
+            <div class="new_transaction-container">
+                <div class="new_transaction-card" onclick="openCreateTransactionModal()">
+                    <i class="fa-solid fa-plus"></i>
+                    <span>Добавить запись</span>
+                </div>
+
+                <div class="transaction-label">Поиск транзакций</div>
+                <input type="text" class="transaction-filter" placeholder="Поиск транзакций...">
+
+                <div class="transaction-label">Счет</div>
+                <div class="custom-account-select">
+                    <input type="hidden" id="filterAccount" name="filterAccountID">
+
+                    <div class="select-selected-account" onclick="toggleAccountDropdown('filter')">
+                        <div class="selected-account-display">
+                            <span class="selected-account-icon" id="filterSelectedAccountIcon"
+                                style="display: none;"></span>
+                            <span class="selected-account-info">
+                                <span class="selected-account-name" id="filterSelectedAccountName">Все счета</span>
+                            </span>
+                            <i class="fa-solid fa-chevron-down dropdown-arrow"></i>
+                        </div>
+                    </div>
+
+                    <div class="select-account-options" id="filterAccountOptions">
+                        <div class="select-account-option all-accounts-option" data-account-id=""
+                            data-account-name="Все счета" onclick="selectAccountOption(this, 'filter')">
+                            <span class="option-account-info">
+                                <span class="option-account-name">Все счета</span>
+                            </span>
+                        </div>
+                        {{range .Accounts}}
+                        <div class="select-account-option" data-account-id="{{.ID}}" data-account-name="{{.Name}}"
+                            data-account-color="{{.Color}}" onclick="selectAccountOption(this, 'filter')">
+                            <span class="option-account-icon" style="background-color: {{.Color}};">{{.IconHTML}}</span>
+                            <span class="option-account-info">
+                                <span class="option-account-name">{{.Name}}</span>
+                            </span>
+                        </div>
+                        {{end}}
+                    </div>
+                </div>
             </div>
         </div>
 

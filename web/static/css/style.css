@@ -688,6 +688,67 @@ form button[type="submit"]:hover {
     padding: 20px 30px;
 }
 
+.transactions-filter-container {
+    padding: 5px;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    background-color: #ffffff;
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
+    min-height: calc(100vh - 40px);
+    height: auto;
+    box-sizing: border-box;
+    overflow-y: auto;
+    width: 450px;
+}
+
+.transaction-filter {
+    background-color: #ffffff;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 12px 15px;
+    height: 40px;
+    width: 100%;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    font-weight: normal;
+    font-size: 14px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    color: #333;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    box-sizing: border-box;
+}
+
+.transaction-filter:focus {
+    outline: none;
+    border-color: #4cd67a;
+    box-shadow: 0 0 0 3px rgba(76, 214, 122, 0.1);
+}
+
+.transaction-filter::placeholder {
+    color: #999;
+    font-weight: normal;
+}
+
+.transaction-filter:hover {
+    border-color: #4cd67a;
+}
+
+.transaction-label {
+    margin-bottom: -10px;
+    font-weight: bold;
+    color: #333;
+}
+
+.all-accounts-option .option-account-icon {
+    display: none !important;
+}
+
+.all-accounts-option .option-account-info {
+    margin-left: 0;
+}
+
 .new_transaction-card {
     background-color: #ffffff;
     border: 1px solid #e0e0e0;
@@ -698,6 +759,7 @@ form button[type="submit"]:hover {
     width: 300px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     font-weight: bold;
+    width: 100%;
 }
 
 .new_transaction-card:hover {

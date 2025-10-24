@@ -351,11 +351,41 @@ function toggleAccountDropdown(prefix = 'income') {
     let options, selected;
 
     if (prefix === 'from') {
+        options = document.querySelector('#fromAccount + .select-selected-account')?.nextElementSibling;
+        selected = document.querySelector('#fromAccount + .select-selected-account');
+    } else if (prefix === 'to') {
+        options = document.querySelector('#toAccount + .select-selected-account')?.nextElementSibling;
+        selected = document.querySelector('#toAccount + .select-selected-account');
+    } else if (prefix === 'filter') {
+        options = document.getElementById('filterAccountOptions');
+        selected = document.querySelector('#filterAccount + .select-selected-account');
+    } else {
+        options = document.getElementById('accountOptions');
+        selected = document.querySelector('#createTransactionModal .select-selected-account');
+    }
+
+    if (options && selected) {
+        const isShowing = options.classList.contains('show');
+        closeAllDropdowns();
+        if (!isShowing) {
+            options.classList.add('show');
+            selected.classList.add('active');
+        }
+    }
+}
+
+function toggleAccountDropdown(prefix = 'income') {
+    let options, selected;
+
+    if (prefix === 'from') {
         options = document.querySelector('#fromAccount + .select-selected-account').nextElementSibling;
         selected = document.querySelector('#fromAccount + .select-selected-account');
     } else if (prefix === 'to') {
         options = document.querySelector('#toAccount + .select-selected-account').nextElementSibling;
         selected = document.querySelector('#toAccount + .select-selected-account');
+    } else if (prefix === 'filter') {
+        options = document.getElementById('filterAccountOptions');
+        selected = document.querySelector('#filterAccount + .select-selected-account');
     } else {
         options = document.getElementById('accountOptions');
         selected = document.querySelector('#createTransactionModal .select-selected-account');
@@ -447,7 +477,8 @@ function selectAccountOption(optionElement, prefix = 'income') {
     const accountBalance = optionElement.getAttribute('data-account-balance');
     const accountColor = optionElement.getAttribute('data-account-color');
     const accountIconElement = optionElement.querySelector('.option-account-icon');
-    const accountIconHTML = accountIconElement.innerHTML;
+    const accountIconHTML = accountIconElement ? accountIconElement.innerHTML : '';
+    const isAllAccounts = accountId === '' || accountId === null;
 
     let accountInput, selectedIcon, selectedName, selectedBalance;
 
@@ -463,6 +494,12 @@ function selectAccountOption(optionElement, prefix = 'income') {
         selectedName = document.getElementById('toSelectedAccountName');
         selectedBalance = document.getElementById('toSelectedAccountBalance');
         optionsContainer = document.getElementById('toAccountOptions');
+    } else if (prefix === 'filter') {
+        accountInput = document.getElementById('filterAccount');
+        selectedIcon = document.getElementById('filterSelectedAccountIcon');
+        selectedName = document.getElementById('filterSelectedAccountName');
+        optionsContainer = document.getElementById('filterAccountOptions');
+        applyAccountFilter(accountId);
     } else {
         accountInput = document.getElementById('transactionAccount');
         selectedIcon = document.getElementById('selectedAccountIcon');
@@ -472,24 +509,30 @@ function selectAccountOption(optionElement, prefix = 'income') {
     }
 
     if (accountInput) {
-        accountInput.value = accountId.trim();
-        console.log(`Set ${prefix} account input to:`, accountId.trim());
+        accountInput.value = accountId ? accountId.trim() : '';
+        console.log(`Set ${prefix} account input to:`, accountId ? accountId.trim() : '');
     }
 
-    if (selectedIcon && selectedName && selectedBalance) {
-        selectedIcon.innerHTML = accountIconHTML;
-        selectedIcon.style.backgroundColor = accountColor;
-
-        selectedIcon.style.display = 'flex';
-        selectedIcon.style.alignItems = 'center';
-        selectedIcon.style.justifyContent = 'center';
-        selectedIcon.style.borderRadius = '10px';
-        selectedIcon.style.width = '40px';
-        selectedIcon.style.height = '40px';
-        selectedIcon.style.fontSize = '18px';
+    if (selectedIcon && selectedName) {
+        if (isAllAccounts) {
+            selectedIcon.style.display = 'none';
+            selectedIcon.innerHTML = '';
+        } else {
+            selectedIcon.innerHTML = accountIconHTML;
+            selectedIcon.style.backgroundColor = accountColor;
+            selectedIcon.style.display = 'flex';
+            selectedIcon.style.alignItems = 'center';
+            selectedIcon.style.justifyContent = 'center';
+            selectedIcon.style.borderRadius = '10px';
+            selectedIcon.style.width = '40px';
+            selectedIcon.style.height = '40px';
+            selectedIcon.style.fontSize = '18px';
+        }
 
         selectedName.textContent = accountName;
-        selectedBalance.textContent = accountBalance;
+        if (selectedBalance && accountBalance) {
+            selectedBalance.textContent = accountBalance;
+        }
     }
 
     closeAllDropdowns();
@@ -501,6 +544,31 @@ function selectAccountOption(optionElement, prefix = 'income') {
         });
         optionElement.classList.add('selected');
     }
+}
+
+function applyAccountFilter(accountId) {
+    console.log('Фильтр по счету:', accountId);
+
+    const transactionCards = document.querySelectorAll('.transaction-card');
+    transactionCards.forEach(card => {
+        const cardAccountId = card.getAttribute('data-account-id');
+        if (!accountId || accountId === '' || cardAccountId === accountId) {
+            card.style.display = 'flex';
+        } else {
+            card.style.display = 'none';
+        }
+    });
+
+    const transferCards = document.querySelectorAll('.transfer-card');
+    transferCards.forEach(card => {
+        const fromAccountId = card.getAttribute('data-account-id');
+        const toAccountId = card.getAttribute('data-transfer-account-id');
+        if (!accountId || accountId === '' || fromAccountId === accountId || toAccountId === accountId) {
+            card.style.display = 'flex';
+        } else {
+            card.style.display = 'none';
+        }
+    });
 }
 
 function selectCategoryOption(optionElement) {
@@ -706,6 +774,9 @@ function closeAllDropdowns() {
     const editToAccountOptions = document.getElementById('editToAccountOptions');
     const editToAccountSelected = document.querySelector('#editTransferModal #editToAccount + .select-selected-account');
 
+    const filterAccountOptions = document.getElementById('filterAccountOptions');
+    const filterAccountSelected = document.querySelector('#filterAccount + .select-selected-account');
+
     if (accountOptions) accountOptions.classList.remove('show');
     if (accountSelected) accountSelected.classList.remove('active');
     if (categoryOptions) categoryOptions.classList.remove('show');
@@ -729,6 +800,9 @@ function closeAllDropdowns() {
     if (editFromAccountSelected) editFromAccountSelected.classList.remove('active');
     if (editToAccountOptions) editToAccountOptions.classList.remove('show');
     if (editToAccountSelected) editToAccountSelected.classList.remove('active');
+
+    if (filterAccountOptions) filterAccountOptions.classList.remove('show');
+    if (filterAccountSelected) filterAccountSelected.classList.remove('active');
 }
 
 document.addEventListener('click', function (event) {
