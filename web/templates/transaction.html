@@ -146,6 +146,55 @@
                     </div>
                 </div>
 
+                <div class="transaction-label">Категория/Подкатегория</div>
+                <div class="custom-category-filter-select">
+                    <input type="hidden" id="filterCategory" name="filterCategory">
+                    <input type="hidden" id="filterSubCategory" name="filterSubCategory">
+
+                    <div class="select-selected-category-filter" onclick="toggleCategoryFilterDropdown()">
+                        <div class="selected-category-filter-display">
+                            <span class="selected-category-filter-icon" id="filterSelectedCategoryIcon"
+                                style="display: none;"></span>
+                            <span class="selected-category-filter-info">
+                                <span class="selected-category-filter-name" id="filterSelectedCategoryName">Все
+                                    категории</span>
+                            </span>
+                            <i class="fa-solid fa-chevron-down dropdown-arrow"></i>
+                        </div>
+                    </div>
+
+                    <div class="select-category-filter-options" id="filterCategoryOptions">
+                        <div class="select-category-filter-option all-categories-option" data-category-id=""
+                            data-category-name="Все категории" onclick="selectCategoryFilterOption(this)">
+                            <span class="option-category-filter-info">
+                                <span class="option-category-filter-name">Все категории</span>
+                            </span>
+                        </div>
+                        {{range .Categories}}
+                        <div class="select-category-filter-option category-option" data-category-id="{{.ID}}"
+                            data-category-name="{{.Name}}" data-category-color="{{.Color}}"
+                            onclick="selectCategoryFilterOption(this)">
+                            <span class="option-category-filter-icon"
+                                style="background-color: {{.Color}};">{{.IconHTML}}</span>
+                            <span class="option-category-filter-info">
+                                <span class="option-category-filter-name">{{.Name}}</span>
+                            </span>
+                        </div>
+                        {{range .Subcategories}}
+                        <div class="select-category-filter-option subcategory-option" data-category-id="{{.ParentID}}"
+                            data-subcategory-id="{{.ID}}" data-subcategory-name="{{.Name}}"
+                            data-subcategory-color="{{.Color}}" onclick="selectCategoryFilterOption(this)">
+                            <span class="option-category-filter-icon"
+                                style="background-color: {{.Color}}; margin-left: 20px;">{{.IconHTML}}</span>
+                            <span class="option-category-filter-info">
+                                <span class="option-category-filter-name" style="margin-left: 20px;">{{.Name}}</span>
+                            </span>
+                        </div>
+                        {{end}}
+                        {{end}}
+                    </div>
+                </div>
+
                 <div class="filter-actions">
                     <button type="button" class="btn btn-secondary" onclick="resetFilters()">
                         <i class="fa-solid fa-rotate-left"></i>

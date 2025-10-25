@@ -882,6 +882,9 @@ function closeAllDropdowns() {
     const sortOptions = document.getElementById('sortOptions');
     const sortSelected = document.querySelector('.select-selected-sort');
 
+    const filterCategoryOptions = document.getElementById('filterCategoryOptions');
+    const filterCategorySelected = document.querySelector('.select-selected-category-filter');
+
     if (accountOptions) accountOptions.classList.remove('show');
     if (accountSelected) accountSelected.classList.remove('active');
     if (categoryOptions) categoryOptions.classList.remove('show');
@@ -911,13 +914,92 @@ function closeAllDropdowns() {
 
     if (filterTypeOptions) filterTypeOptions.classList.remove('show');
     if (filterTypeSelected) filterTypeSelected.classList.remove('active');
+
+    if (filterCategoryOptions) filterCategoryOptions.classList.remove('show');
+    if (filterCategorySelected) filterCategorySelected.classList.remove('active');
 }
+
+function toggleCategoryFilterDropdown() {
+    const options = document.getElementById('filterCategoryOptions');
+    const selected = document.querySelector('.select-selected-category-filter');
+
+    if (options && selected) {
+        const isShowing = options.classList.contains('show');
+        closeAllDropdowns();
+        if (!isShowing) {
+            options.classList.add('show');
+            selected.classList.add('active');
+        }
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+    const selectedCategoryIcon = document.getElementById('filterSelectedCategoryIcon');
+    const filterCategory = document.getElementById('filterCategory');
+
+    if (selectedCategoryIcon && filterCategory && !filterCategory.value) {
+        selectedCategoryIcon.style.display = 'none';
+        selectedCategoryIcon.innerHTML = '';
+    }
+});
+
+function selectCategoryFilterOption(optionElement) {
+    const categoryId = optionElement.getAttribute('data-category-id');
+    const subcategoryId = optionElement.getAttribute('data-subcategory-id');
+    const categoryName = optionElement.getAttribute('data-category-name') || optionElement.getAttribute('data-subcategory-name');
+    const categoryColor = optionElement.getAttribute('data-category-color') || optionElement.getAttribute('data-subcategory-color');
+    const categoryIconHTML = optionElement.querySelector('.option-category-filter-icon')?.innerHTML || '';
+
+    document.getElementById('filterCategory').value = categoryId || '';
+    document.getElementById('filterSubCategory').value = subcategoryId || '';
+
+    const selectedIcon = document.getElementById('filterSelectedCategoryIcon');
+    const selectedName = document.getElementById('filterSelectedCategoryName');
+
+    if (selectedIcon && selectedName) {
+        if (!categoryId && !subcategoryId) {
+            selectedIcon.style.display = 'none';
+            selectedIcon.innerHTML = '';
+            selectedIcon.style.backgroundColor = '';
+        } else {
+            selectedIcon.innerHTML = categoryIconHTML;
+            selectedIcon.style.backgroundColor = categoryColor;
+            selectedIcon.style.display = 'flex';
+            selectedIcon.style.alignItems = 'center';
+            selectedIcon.style.justifyContent = 'center';
+            selectedIcon.style.borderRadius = '10px';
+            selectedIcon.style.width = '40px';
+            selectedIcon.style.height = '40px';
+            selectedIcon.style.fontSize = '18px';
+        }
+
+        selectedName.textContent = categoryName;
+    }
+
+    closeAllDropdowns();
+
+    const allOptions = document.querySelectorAll('#filterCategoryOptions .select-category-filter-option');
+    allOptions.forEach(option => {
+        option.classList.remove('selected');
+    });
+    optionElement.classList.add('selected');
+
+    applyCategoryFilter(categoryId, subcategoryId);
+}
+
+function applyCategoryFilter(categoryId, subcategoryId) {
+    currentCategoryFilter = categoryId;
+    currentSubcategoryFilter = subcategoryId;
+    applyCombinedFilter();
+}
+
 
 document.addEventListener('click', function (event) {
     const accountSelectContainers = document.querySelectorAll('.custom-account-select');
     const categorySelectContainers = document.querySelectorAll('.custom-category-select');
     const subcategorySelectContainers = document.querySelectorAll('.custom-subcategory-select');
     const typeSelectContainers = document.querySelectorAll('.custom-type-select');
+    const categoryFilterSelectContainers = document.querySelectorAll('.custom-category-filter-select');
 
     const sortButtons = document.querySelectorAll('.sort-btn');
     const isSortButton = Array.from(sortButtons).some(button => button.contains(event.target));
@@ -947,6 +1029,12 @@ document.addEventListener('click', function (event) {
     });
 
     subcategorySelectContainers.forEach(container => {
+        if (container.contains(event.target)) {
+            isClickInside = true;
+        }
+    });
+
+    categoryFilterSelectContainers.forEach(container => {
         if (container.contains(event.target)) {
             isClickInside = true;
         }
@@ -1583,6 +1671,9 @@ document.addEventListener('DOMContentLoaded', function () {
 let currentTypeFilter = '';
 let currentAccountFilter = '';
 
+let currentCategoryFilter = '';
+let currentSubcategoryFilter = '';
+
 function initializeTypeFilter() {
     const selectedIcon = document.getElementById('filterSelectedTypeIcon');
     if (selectedIcon) {
@@ -1609,12 +1700,6 @@ function applyAccountFilter(accountId) {
 function applyCombinedFilter() {
     const searchInput = document.querySelector('.transaction-filter');
     const searchTerm = searchInput ? searchInput.value.toLowerCase().trim() : '';
-
-    console.log('Применение комбинированного фильтра:', {
-        type: currentTypeFilter,
-        account: currentAccountFilter,
-        search: searchTerm
-    });
 
     const transactionCards = document.querySelectorAll('.transaction-card');
     const transferCards = document.querySelectorAll('.transfer-card');
@@ -1665,6 +1750,31 @@ function applyCombinedFilter() {
                 if (fromAccountId !== currentAccountFilter && toAccountId !== currentAccountFilter) {
                     card.style.display = 'none';
                 }
+            }
+        });
+    }
+
+    if ((currentCategoryFilter && currentCategoryFilter !== '') || (currentSubcategoryFilter && currentSubcategoryFilter !== '')) {
+        transactionCards.forEach(card => {
+            if (card.style.display !== 'none') {
+                const cardCategoryId = card.getAttribute('data-category-id');
+                const cardSubcategoryId = card.getAttribute('data-subcategory-id') || '';
+
+                if (currentSubcategoryFilter && currentSubcategoryFilter !== '') {
+                    if (cardSubcategoryId !== currentSubcategoryFilter) {
+                        card.style.display = 'none';
+                    }
+                } else if (currentCategoryFilter && currentCategoryFilter !== '') {
+                    if (cardCategoryId !== currentCategoryFilter) {
+                        card.style.display = 'none';
+                    }
+                }
+            }
+        });
+
+        transferCards.forEach(card => {
+            if (card.style.display !== 'none') {
+                card.style.display = 'none';
             }
         });
     }
@@ -1764,6 +1874,15 @@ function resetFilters() {
     const accountAllOption = document.querySelector('#filterAccountOptions .all-accounts-option');
     if (accountAllOption) {
         selectAccountOption(accountAllOption, 'filter');
+    }
+
+    currentCategoryFilter = '';
+    currentSubcategoryFilter = '';
+    document.getElementById('filterCategory').value = '';
+    document.getElementById('filterSubCategory').value = '';
+    const categoryAllOption = document.querySelector('#filterCategoryOptions .all-categories-option');
+    if (categoryAllOption) {
+        selectCategoryFilterOption(categoryAllOption);
     }
 
     const searchInput = document.querySelector('.transaction-filter');
