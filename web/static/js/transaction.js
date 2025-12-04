@@ -1701,8 +1701,9 @@ function applyCombinedFilter() {
     const searchInput = document.querySelector('.transaction-filter');
     const searchTerm = searchInput ? searchInput.value.toLowerCase().trim() : '';
 
-    const transactionCards = document.querySelectorAll('.transaction-card');
+    const transactionCards = document.querySelectorAll('.transaction-card:not(.transfer-card)');
     const transferCards = document.querySelectorAll('.transfer-card');
+
     const dateGroups = document.querySelectorAll('.transaction-date-group');
 
     let hasVisibleTransactions = false;
