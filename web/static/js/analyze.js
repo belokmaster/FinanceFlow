@@ -159,6 +159,7 @@ function collectTotals(transactions, period) {
         budget: 0,
         byCategoryIncome: new Map(),
         byCategoryExpense: new Map(),
+        categoryMeta: new Map(),
     };
 
     transactions.forEach((tx) => {
@@ -166,7 +167,18 @@ function collectTotals(transactions, period) {
             return;
         }
 
-        const category = tx.categoryName || "Без категории";
+        const category = tx.categoryKey || tx.displayName || tx.categoryName || "Без категории";
+        const displayName = tx.displayName || tx.categoryName || "Без категории";
+        if (!totals.categoryMeta.has(category)) {
+            totals.categoryMeta.set(category, {
+                name: displayName,
+                parentName: tx.parentCategoryName || "",
+                categoryName: tx.categoryName || displayName,
+                color: tx.displayColor || "#9aa3af",
+                iconHtml: tx.displayIconHtml || '<i class="fa-solid fa-layer-group"></i>',
+            });
+        }
+
         if (tx.type === 0) {
             totals.income += tx.amount;
             totals.byCategoryIncome.set(category, (totals.byCategoryIncome.get(category) || 0) + tx.amount);
@@ -192,17 +204,106 @@ function updateSummary(currentTotals, currency) {
     budgetEl.classList.toggle("negative", currentTotals.budget < 0);
 }
 
-function categoryMetaMap(categories) {
-    const map = new Map();
-    categories.forEach((category) => {
-        map.set(category.name, category);
+function normalizeSigned(value, sign) {
+    return sign === "negative" ? -Math.abs(value) : Math.abs(value);
+}
+
+function buildGroupedRows(keys, currentMap, previousMap, categoryMeta, categoryMetaByName, sign) {
+    const groups = new Map();
+
+    [...keys].forEach((key) => {
+        const meta = categoryMeta.get(key) || {
+            name: "Без категории",
+            parentName: "",
+            categoryName: "Без категории",
+            color: "#9aa3af",
+            iconHtml: '<i class="fa-solid fa-layer-group"></i>',
+        };
+
+        const isSubcategory = key.startsWith("sub:") || Boolean(meta.parentName);
+        const parentName = isSubcategory ? (meta.parentName || meta.categoryName || "Без категории") : (meta.categoryName || meta.name || "Без категории");
+        const groupKey = `cat:${parentName}`;
+
+        if (!groups.has(groupKey)) {
+            const parentMeta = categoryMetaByName.get(parentName);
+            groups.set(groupKey, {
+                name: parentName,
+                color: parentMeta?.color || "#9aa3af",
+                iconHtml: parentMeta?.iconHtml || '<i class="fa-solid fa-layer-group"></i>',
+                currentTotal: 0,
+                previousTotal: 0,
+                subrows: [],
+            });
+        }
+
+        const group = groups.get(groupKey);
+        const current = currentMap.get(key) || 0;
+        const previous = previousMap.get(key) || 0;
+
+        group.currentTotal += current;
+        group.previousTotal += previous;
+
+        if (isSubcategory) {
+            group.subrows.push({
+                name: meta.name,
+                color: meta.color || "#9aa3af",
+                iconHtml: meta.iconHtml || '<i class="fa-solid fa-layer-group"></i>',
+                current,
+                previous,
+            });
+            return;
+        }
+
+        group.color = meta.color || group.color;
+        group.iconHtml = meta.iconHtml || group.iconHtml;
     });
-    return map;
+
+    const sortedGroups = [...groups.values()].sort((a, b) => b.currentTotal - a.currentTotal);
+
+    return sortedGroups
+        .map((group) => {
+            const categoryRow = `
+                <div class="analyze-row category-row">
+                    <div class="analyze-row-name">
+                        <span class="analyze-icon" style="background-color: ${group.color};">${group.iconHtml}</span>
+                        <span>${group.name}</span>
+                    </div>
+                    <div class="analyze-row-value">${formatAmount(normalizeSigned(group.currentTotal, sign))}</div>
+                    <div class="analyze-row-value prev">${formatAmount(normalizeSigned(group.previousTotal, sign))}</div>
+                </div>
+            `;
+
+            const subRows = group.subrows
+                .sort((a, b) => b.current - a.current)
+                .map((sub) => `
+                    <div class="analyze-row subcategory-row">
+                        <div class="analyze-row-name">
+                            <span class="analyze-icon" style="background-color: ${sub.color};">${sub.iconHtml}</span>
+                            <span>${sub.name}</span>
+                        </div>
+                        <div class="analyze-row-value">${formatAmount(normalizeSigned(sub.current, sign))}</div>
+                        <div class="analyze-row-value prev">${formatAmount(normalizeSigned(sub.previous, sign))}</div>
+                    </div>
+                `)
+                .join("");
+
+            return `${categoryRow}${subRows}`;
+        })
+        .join("");
 }
 
 function renderCategoryTable(currentTotals, previousTotals, categories) {
     const tableEl = document.getElementById("analyzeTable");
-    const categoryMeta = categoryMetaMap(categories);
+    const categoryMeta = new Map([
+        ...previousTotals.categoryMeta.entries(),
+        ...currentTotals.categoryMeta.entries(),
+    ]);
+    const categoryMetaByName = new Map(
+        (categories || []).map((category) => [category.name, {
+            color: category.color || "#9aa3af",
+            iconHtml: category.iconHtml || '<i class="fa-solid fa-layer-group"></i>',
+        }])
+    );
 
     const allIncomeKeys = new Set([
         ...currentTotals.byCategoryIncome.keys(),
@@ -214,49 +315,21 @@ function renderCategoryTable(currentTotals, previousTotals, categories) {
         ...previousTotals.byCategoryExpense.keys(),
     ]);
 
-    function renderRows(keys, currentMap, previousMap, sign) {
-        return [...keys]
-            .sort((a, b) => {
-                const bValue = currentMap.get(b) || 0;
-                const aValue = currentMap.get(a) || 0;
-                return bValue - aValue;
-            })
-            .map((key) => {
-                const meta = categoryMeta.get(key) || {
-                    name: key,
-                    color: "#9aa3af",
-                    iconHtml: '<i class="fa-solid fa-layer-group"></i>',
-                };
-                const current = currentMap.get(key) || 0;
-                const previous = previousMap.get(key) || 0;
-                const currentValue = sign === "negative" ? -Math.abs(current) : Math.abs(current);
-                const previousValue = sign === "negative" ? -Math.abs(previous) : Math.abs(previous);
-
-                return `
-                    <div class="analyze-row">
-                        <div class="analyze-row-name">
-                            <span class="analyze-icon" style="background-color: ${meta.color || "#9aa3af"};">${meta.iconHtml}</span>
-                            <span>${meta.name}</span>
-                        </div>
-                        <div class="analyze-row-value">${formatAmount(currentValue)}</div>
-                        <div class="analyze-row-value prev">${formatAmount(previousValue)}</div>
-                    </div>
-                `;
-            })
-            .join("");
-    }
-
-    const incomeRows = renderRows(
+    const incomeRows = buildGroupedRows(
         allIncomeKeys,
         currentTotals.byCategoryIncome,
         previousTotals.byCategoryIncome,
+        categoryMeta,
+        categoryMetaByName,
         "positive"
     );
 
-    const expenseRows = renderRows(
+    const expenseRows = buildGroupedRows(
         allExpenseKeys,
         currentTotals.byCategoryExpense,
         previousTotals.byCategoryExpense,
+        categoryMeta,
+        categoryMetaByName,
         "negative"
     );
 
@@ -374,7 +447,36 @@ function buildCharts(transactions, period) {
         options: {
             responsive: true,
             maintainAspectRatio: false,
-            plugins: { legend: { position: "top" } },
+            interaction: {
+                mode: "index",
+                intersect: false,
+            },
+            scales: {
+                x: {
+                    grid: {
+                        display: false,
+                    },
+                },
+                y: {
+                    ticks: {
+                        callback: (value) => formatAmount(Number(value)),
+                    },
+                },
+            },
+            plugins: {
+                legend: {
+                    position: "bottom",
+                    labels: {
+                        usePointStyle: true,
+                        pointStyle: "circle",
+                    },
+                },
+                tooltip: {
+                    callbacks: {
+                        label: (context) => `${context.dataset.label}: ${formatAmount(Number(context.raw))}`,
+                    },
+                },
+            },
         },
     });
 
@@ -390,13 +492,44 @@ function buildCharts(transactions, period) {
                     backgroundColor: "rgba(31, 60, 136, 0.14)",
                     fill: true,
                     tension: 0.3,
+                    pointRadius: 3,
+                    pointHoverRadius: 5,
                 },
             ],
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
-            plugins: { legend: { position: "top" } },
+            interaction: {
+                mode: "index",
+                intersect: false,
+            },
+            scales: {
+                x: {
+                    grid: {
+                        display: false,
+                    },
+                },
+                y: {
+                    ticks: {
+                        callback: (value) => formatAmount(Number(value)),
+                    },
+                },
+            },
+            plugins: {
+                legend: {
+                    position: "bottom",
+                    labels: {
+                        usePointStyle: true,
+                        pointStyle: "circle",
+                    },
+                },
+                tooltip: {
+                    callbacks: {
+                        label: (context) => `${context.dataset.label}: ${formatAmount(Number(context.raw))}`,
+                    },
+                },
+            },
         },
     });
 }

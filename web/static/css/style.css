@@ -2585,23 +2585,24 @@ body.theme-dark .transaction-description {
 }
 
 .analyze-hero {
-    background: linear-gradient(120deg, #f7f8fb 0%, #eef6ff 100%);
+    background: #ffffff;
     border: 1px solid #dfe6ef;
-    padding: 22px;
-    box-shadow: 0 8px 28px rgba(31, 57, 89, 0.08);
+    padding: 14px 16px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
 }
 
 .analyze-hero h1 {
     margin: 0;
-    font-size: 30px;
-    line-height: 1.15;
-    color: #1d2a3a;
+    font-size: 16px;
+    line-height: 1.35;
+    font-weight: 700;
+    color: #111827;
 }
 
 .analyze-hero p {
-    margin: 8px 0 0;
-    color: #586a81;
-    font-size: 15px;
+    margin: 4px 0 0;
+    color: #4b5563;
+    font-size: 14px;
 }
 
 .analyze-controls {
@@ -2698,20 +2699,21 @@ body.theme-dark .transaction-description {
 .summary-card {
     background: #fff;
     border: 1px solid #e1e8f1;
-    padding: 14px 16px;
+    padding: 12px 15px;
+    min-height: 50px;
 }
 
 .summary-label {
-    color: #6b778a;
-    font-weight: 600;
-    font-size: 13px;
+    color: #1f2a3d;
+    font-weight: 700;
+    font-size: 14px;
 }
 
 .summary-value {
-    margin-top: 6px;
+    margin-top: 4px;
     color: #1f2a3d;
-    font-weight: 700;
-    font-size: 22px;
+    font-weight: 600;
+    font-size: 16px;
 }
 
 .summary-value.negative {
@@ -2719,21 +2721,21 @@ body.theme-dark .transaction-description {
 }
 
 .income-card {
-    border-top: 4px solid #4cd67a;
+    border-top: 2px solid #d8e1ee;
 }
 
 .expense-card {
-    border-top: 4px solid #e06161;
+    border-top: 2px solid #d8e1ee;
 }
 
 .budget-card {
-    border-top: 4px solid #2f5cb6;
+    border-top: 2px solid #d8e1ee;
 }
 
 .analyze-table-card {
     background: #fff;
     border: 1px solid #e1e8f1;
-    padding: 14px;
+    padding: 12px 15px;
 }
 
 .analyze-table-head {
@@ -2748,16 +2750,16 @@ body.theme-dark .transaction-description {
 .analyze-table-head h2 {
     margin: 0;
     color: #1f2a3d;
-    font-size: 20px;
+    font-size: 16px;
 }
 
 .period-labels {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 14px;
-    font-size: 18px;
+    font-size: 13px;
     color: #4d5d74;
-    font-weight: 700;
+    font-weight: 600;
     min-width: 380px;
     text-align: right;
 }
@@ -2770,11 +2772,11 @@ body.theme-dark .transaction-description {
     display: grid;
     grid-template-columns: 1fr 180px 180px;
     align-items: center;
-    font-size: 34px;
-    font-weight: 700;
+    font-size: 14px;
+    font-weight: 600;
     background: #f7f8fa;
-    color: #111827;
-    padding: 12px 14px;
+    color: #1f2a3d;
+    padding: 10px 14px;
 }
 
 .analyze-section-title>span:first-child {
@@ -2787,8 +2789,8 @@ body.theme-dark .transaction-description {
 
 .section-amount {
     text-align: right;
-    font-weight: 700;
-    color: #111827;
+    font-weight: 600;
+    color: #1f2a3d;
 }
 
 .section-amount.prev {
@@ -2800,12 +2802,21 @@ body.theme-dark .transaction-description {
     display: grid;
     grid-template-columns: 1fr 180px 180px;
     align-items: center;
-    padding: 12px 14px;
+    padding: 12px 15px;
+    min-height: 50px;
     border-bottom: 1px solid #edf0f4;
 }
 
 .analyze-row:last-child {
     border-bottom: none;
+}
+
+.analyze-row.category-row {
+    background: #f8fafc;
+}
+
+.analyze-row.subcategory-row .analyze-row-name {
+    padding-left: 20px;
 }
 
 .analyze-row-name {
@@ -2819,13 +2830,14 @@ body.theme-dark .transaction-description {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    font-size: 33px;
+    font-size: 16px;
+    font-weight: 700;
     color: #2d3748;
 }
 
 .analyze-icon {
-    width: 34px;
-    height: 34px;
+    width: 40px;
+    height: 40px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -2835,8 +2847,8 @@ body.theme-dark .transaction-description {
 
 .analyze-icon svg,
 .analyze-icon i {
-    width: 18px;
-    height: 18px;
+    width: 24px;
+    height: 24px;
     display: inline-flex;
     color: #fff !important;
     fill: #fff !important;
@@ -2844,15 +2856,15 @@ body.theme-dark .transaction-description {
 
 .analyze-row-value {
     text-align: right;
-    font-size: 34px;
+    font-size: 16px;
     font-weight: 700;
-    color: #111827;
+    color: #1f2a3d;
 }
 
 .analyze-row-value.prev {
-    font-size: 33px;
+    font-size: 16px;
     color: #303948;
-    font-weight: 500;
+    font-weight: 600;
 }
 
 .analyze-empty {
@@ -2864,42 +2876,46 @@ body.theme-dark .transaction-description {
 .charts-panel {
     background: #fff;
     border: 1px solid #e1e8f1;
-    padding: 16px;
+    padding: 20px;
 }
 
 .charts-header h2 {
     margin: 0;
     color: #1f2a3d;
-    font-size: 24px;
+    font-size: 16px;
 }
 
 .charts-header p {
-    margin: 6px 0 0;
+    margin: 4px 0 0;
     color: #5e6e84;
+    font-size: 14px;
 }
 
 .charts-grid {
     margin-top: 14px;
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 14px;
+    gap: 18px;
 }
 
 .chart-card {
-    border: 1px solid #e6ecf4;
-    padding: 12px;
-    min-height: 320px;
+    border: 1px solid #dbe5f2;
+    background: linear-gradient(180deg, #fbfdff 0%, #f4f8ff 100%);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.65);
+    padding: 16px;
+    min-height: 420px;
 }
 
 .chart-card h3 {
-    margin: 0 0 8px;
-    font-size: 16px;
+    margin: 0 0 12px;
+    font-size: 14px;
+    font-weight: 600;
     color: #27384c;
 }
 
 .chart-card canvas {
     width: 100% !important;
-    height: 260px !important;
+    height: 360px !important;
 }
 
 body.theme-dark .analyze-hero,
@@ -2911,8 +2927,12 @@ body.theme-dark .chart-card {
     border-color: #354153;
 }
 
+body.theme-dark .chart-card {
+    background: linear-gradient(180deg, #1f2834 0%, #243040 100%);
+}
+
 body.theme-dark .analyze-hero {
-    background: linear-gradient(120deg, #202834 0%, #243142 100%);
+    background: #222a35;
 }
 
 body.theme-dark .analyze-hero h1,
@@ -2926,14 +2946,39 @@ body.theme-dark .chart-card h3 {
     color: #e8edf6;
 }
 
+body.theme-dark .analyze-hero h1 {
+    color: #f6f8fc;
+}
+
 body.theme-dark .analyze-hero p,
-body.theme-dark .summary-label,
 body.theme-dark .period-labels,
 body.theme-dark .charts-header p,
 body.theme-dark .analyze-row-value.prev,
 body.theme-dark .section-amount.prev,
 body.theme-dark .analyze-empty {
     color: #aeb8c8;
+}
+
+body.theme-dark .analyze-row-name span:last-child {
+    color: #e8edf6;
+}
+
+body.theme-dark .analyze-section-title>span:first-child {
+    color: #111827;
+}
+
+body.theme-dark .analyze-section-title,
+body.theme-dark .section-amount {
+    color: #111827;
+}
+
+body.theme-dark .section-amount.prev {
+    color: #374151;
+}
+
+body.theme-dark .summary-label {
+    color: #f3f6fb;
+    font-weight: 700;
 }
 
 body.theme-dark .period-chip {
@@ -2965,6 +3010,10 @@ body.theme-dark .analyze-row {
     border-color: #354153;
 }
 
+body.theme-dark .analyze-row.category-row {
+    background: #253244;
+}
+
 @media (max-width: 1100px) {
     .analyze-summary-grid {
         grid-template-columns: 1fr;
@@ -2978,6 +3027,24 @@ body.theme-dark .analyze-row {
     .analyze-section-title,
     .analyze-row {
         grid-template-columns: 1fr 140px 140px;
+    }
+
+    .analyze-row-name span:last-child,
+    .analyze-row-value {
+        font-size: 14px;
+    }
+
+    .analyze-row-value.prev,
+    .section-amount.prev {
+        font-size: 13px;
+    }
+
+    .chart-card {
+        min-height: 360px;
+    }
+
+    .chart-card canvas {
+        height: 300px !important;
     }
 
     .charts-grid {

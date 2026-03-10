@@ -7,6 +7,7 @@ import (
 	htmlTemplate "html/template"
 	"log"
 	"net/http"
+	"strings"
 	"text/template"
 
 	"gorm.io/gorm"
@@ -75,11 +76,16 @@ func AnalyzePageHandler(w http.ResponseWriter, r *http.Request, db *gorm.DB, pat
 	categoriesForView := convertCategoriesToView(categories, subcategoriesByParent)
 
 	type analyzeTransaction struct {
-		Type         int     `json:"type"`
-		Amount       float64 `json:"amount"`
-		CategoryName string  `json:"categoryName"`
-		Date         string  `json:"date"`
-		Currency     string  `json:"currency"`
+		Type               int     `json:"type"`
+		Amount             float64 `json:"amount"`
+		CategoryName       string  `json:"categoryName"`
+		DisplayName        string  `json:"displayName"`
+		ParentCategoryName string  `json:"parentCategoryName"`
+		DisplayColor       string  `json:"displayColor"`
+		DisplayIconHTML    string  `json:"displayIconHtml"`
+		CategoryKey        string  `json:"categoryKey"`
+		Date               string  `json:"date"`
+		Currency           string  `json:"currency"`
 	}
 
 	type analyzeCategory struct {
@@ -90,20 +96,40 @@ func AnalyzePageHandler(w http.ResponseWriter, r *http.Request, db *gorm.DB, pat
 
 	transactionsPayload := make([]analyzeTransaction, 0, len(transactionsForView))
 	for _, tx := range transactionsForView {
+		categoryKey := fmt.Sprintf("cat:%d", tx.CategoryID)
+		if tx.SubCategoryID != nil {
+			categoryKey = fmt.Sprintf("sub:%d", *tx.SubCategoryID)
+		}
+
+		displayColor := strings.TrimPrefix(tx.CategoryColor, "#")
+		if displayColor == "" {
+			displayColor = "9aa3af"
+		}
+
 		transactionsPayload = append(transactionsPayload, analyzeTransaction{
-			Type:         int(tx.Type),
-			Amount:       tx.Amount,
-			CategoryName: tx.CategoryName,
-			Date:         tx.Date.Format("2006-01-02"),
-			Currency:     tx.CurrencySymbol,
+			Type:               int(tx.Type),
+			Amount:             tx.Amount,
+			CategoryName:       tx.CategoryName,
+			DisplayName:        tx.DisplayName,
+			ParentCategoryName: tx.ParentCategoryName,
+			DisplayColor:       fmt.Sprintf("#%s", displayColor),
+			DisplayIconHTML:    string(tx.CategoryIconHTML),
+			CategoryKey:        categoryKey,
+			Date:               tx.Date.Format("2006-01-02"),
+			Currency:           tx.CurrencySymbol,
 		})
 	}
 
 	categoryMetaMap := make(map[string]analyzeCategory)
 	for _, cat := range categoriesForView {
+		color := strings.TrimPrefix(cat.Color, "#")
+		if color == "" {
+			color = "9aa3af"
+		}
+
 		categoryMetaMap[cat.Name] = analyzeCategory{
 			Name:     cat.Name,
-			Color:    fmt.Sprintf("#%s", cat.Color),
+			Color:    fmt.Sprintf("#%s", color),
 			IconHTML: string(cat.IconHTML),
 		}
 	}
