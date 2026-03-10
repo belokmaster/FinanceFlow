@@ -699,8 +699,6 @@ form button[type="submit"]:hover {
     flex-direction: column;
     gap: 10px;
     background-color: #ffffff;
-    border-radius: 8px;
-    border: 1px solid #e0e0e0;
     min-height: calc(100vh - 40px);
     height: auto;
     box-sizing: border-box;
@@ -711,7 +709,6 @@ form button[type="submit"]:hover {
 .transaction-filter {
     background-color: #ffffff;
     border: 1px solid #e1e5e9;
-    border-radius: 8px;
     padding: 12px 16px;
     width: 100%;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -757,8 +754,6 @@ form button[type="submit"]:hover {
 
 .new_transaction-card {
     background-color: #ffffff;
-    border: 1px solid #e0e0e0;
-    border-radius: 8px;
     align-items: center;
     padding: 12px 15px;
     height: 30px;
@@ -866,7 +861,6 @@ form button[type="submit"]:hover {
 }
 
 .select-selected-account {
-    border: 1px solid #e1e5e9;
     border-radius: 8px;
     padding: 12px 16px;
     cursor: pointer;
@@ -1378,6 +1372,14 @@ form button[type="submit"]:hover {
     font-size: 14px;
 }
 
+.filter-actions .btn-secondary {
+    border: none;
+}
+
+.filter-actions .btn-secondary:hover {
+    border: none;
+}
+
 .transaction-card::before {
     content: "";
     position: absolute;
@@ -1585,8 +1587,6 @@ form button[type="submit"]:hover {
 
 .toggle-transactions-btn {
     background: none;
-    border: 1px solid #e0e0e0;
-    border-radius: 6px;
     width: 32px;
     height: 32px;
     display: flex;
@@ -1857,8 +1857,6 @@ form button[type="submit"]:hover {
 
 .select-selected-type {
     background-color: #ffffff;
-    border: 1px solid #e1e5e9;
-    border-radius: 8px;
     padding: 12px 16px;
     cursor: pointer;
     background: white;
@@ -2034,7 +2032,6 @@ form button[type="submit"]:hover {
     border-radius: 6px;
     font-size: 14px;
     color: #333;
-    border: 1px solid #e9ecef;
     margin-top: 10px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     font-weight: bold;
@@ -2048,8 +2045,6 @@ form button[type="submit"]:hover {
 
 .select-selected-category-filter {
     background-color: #ffffff;
-    border: 1px solid #e1e5e9;
-    border-radius: 8px;
     padding: 12px 16px;
     cursor: pointer;
     background: white;
@@ -2474,6 +2469,23 @@ body.theme-dark .btn-secondary {
     border-color: #565e6d;
 }
 
+body.theme-dark .filter-actions .btn-secondary,
+body.theme-dark .filter-actions .btn-secondary:hover {
+    border: none;
+}
+
+.sort-buttons .sort-btn,
+.sort-buttons .sort-btn:hover,
+.sort-buttons .sort-btn.active {
+    border: none;
+}
+
+body.theme-dark .sort-buttons .sort-btn,
+body.theme-dark .sort-buttons .sort-btn:hover,
+body.theme-dark .sort-buttons .sort-btn.active {
+    border: none;
+}
+
 body.theme-dark .transaction-main-category,
 body.theme-dark .transaction-subcategory,
 body.theme-dark .transaction-category,
@@ -2494,4 +2506,11 @@ body.theme-dark .transaction-description {
         display: flex;
         justify-content: flex-end;
     }
+}
+
+/* flat style: disable rounded corners across UI */
+body *,
+body *::before,
+body *::after {
+    border-radius: 0 !important;
 }
