@@ -1332,7 +1332,8 @@ form button[type="submit"]:hover {
     border-radius: 8px;
     padding: 12px 15px;
     min-height: 50px;
-    width: 900px;
+    width: 100%;
+    max-width: 900px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     display: flex;
     align-items: center;
@@ -1431,7 +1432,12 @@ form button[type="submit"]:hover {
     display: flex;
     align-items: center;
     justify-content: flex-start;
+    min-width: 0;
+    gap: 6px;
     margin: 0;
+    flex-wrap: nowrap;
+    white-space: nowrap;
+    overflow: hidden;
 }
 
 .transaction-category {
@@ -1484,12 +1490,16 @@ form button[type="submit"]:hover {
     align-items: center;
     gap: 4px;
     flex: 1;
+    min-width: 0;
 }
 
 .transaction-main-category {
     font-size: 16px;
     font-weight: bold;
     color: #333;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .transaction-subcategory {
@@ -1506,14 +1516,19 @@ form button[type="submit"]:hover {
     font-size: 14px;
     color: #666;
     white-space: nowrap;
-    margin-bottom: -20px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.transfer-card .transaction-account {
+    max-width: 120px;
 }
 
 .transaction-amount {
     font-size: 16px;
     font-weight: bold;
     white-space: nowrap;
-    margin-bottom: 6px;
+    margin: 0;
 }
 
 .transaction-amount.income {
@@ -1524,17 +1539,19 @@ form button[type="submit"]:hover {
     color: #ac4c4c;
 }
 
+.transaction-date {
+    font-size: 12px;
+    color: #777;
+    font-weight: 500;
+    margin: 0;
+}
+
 .transaction-bottom-line {
     display: flex;
     align-items: center;
-    gap: 10px;
+    justify-content: space-between;
+    width: 100%;
     margin-top: 2px;
-}
-
-.transaction-date {
-    font-size: 12px;
-    color: #999;
-    margin-bottom: 0;
 }
 
 .transaction-description {
@@ -1550,11 +1567,15 @@ form button[type="submit"]:hover {
 
 .transaction-top-line {
     display: grid;
-    grid-template-columns: 1fr 1fr 1.5fr 0.5fr;
-    align-items: center;
+    grid-template-columns: minmax(140px, 1fr) minmax(220px, 1.2fr) minmax(120px, 1.2fr) auto;
+    align-items: start;
     margin-bottom: 4px;
     gap: 10px;
     width: 100%;
+}
+
+.transaction-comment-overlay {
+    min-width: 0;
 }
 
 .transactions-wrapper {
@@ -1638,10 +1659,17 @@ form button[type="submit"]:hover {
     flex-shrink: 0;
     display: flex;
     flex-direction: column;
-    width: 100px;
+    min-width: 120px;
     align-items: flex-end;
-    gap: 1px;
-    margin-bottom: 0px;
+    gap: 2px;
+    margin-bottom: 0;
+}
+
+.transaction-meta-line {
+    display: inline-flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 10px;
 }
 
 
@@ -1649,7 +1677,7 @@ form button[type="submit"]:hover {
     font-size: 12px;
     color: #777;
     font-weight: 500;
-    margin-bottom: -25px;
+    margin: 0;
 }
 
 .date-total-amount {
@@ -1672,7 +1700,6 @@ form button[type="submit"]:hover {
     height: 10px;
     border-radius: 50%;
     flex-shrink: 0;
-    margin-bottom: -21px;
     margin-right: 5px;
 }
 
@@ -1717,36 +1744,49 @@ form button[type="submit"]:hover {
     border-left-color: #138496;
 }
 
-.transaction-center-account {
-    display: flex;
-    align-items: center;
-    justify-content: flex-start;
-    gap: 8px;
-    margin: 0;
-    height: 20px;
-    line-height: 20px;
-}
-
-.transaction-center-account .fa-arrow-right-arrow-left,
-.transaction-center-account .fa-right-left {
-    vertical-align: baseline;
-    line-height: inherit;
-    display: inline-flex;
-    align-items: center;
-    margin-bottom: 20px;
-}
-
-.transaction-center-account {
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-}
-
 .transaction-center-account i {
     font-size: 1em;
     line-height: 1;
     display: inline-flex;
     vertical-align: middle;
+}
+
+.transfer-direction-arrow {
+    color: #666;
+    font-size: 12px;
+    margin: 0 4px;
+}
+
+@media (max-width: 1200px) {
+    .transaction-card {
+        max-width: 100%;
+    }
+
+    .transaction-top-line {
+        grid-template-columns: 1fr auto;
+        grid-template-areas:
+            "category amount"
+            "account amount"
+            "comment amount";
+        row-gap: 6px;
+    }
+
+    .transaction-category-line {
+        grid-area: category;
+    }
+
+    .transaction-center-account {
+        grid-area: account;
+    }
+
+    .transaction-comment-overlay {
+        grid-area: comment;
+    }
+
+    .transaction-amount-section {
+        grid-area: amount;
+        align-self: center;
+    }
 }
 
 .form-group input[type="date"],
@@ -2427,6 +2467,7 @@ body.theme-dark .toggle-transactions-btn i,
 body.theme-dark .sort-btn i,
 body.theme-dark .btn-secondary i,
 body.theme-dark .transaction-time,
+body.theme-dark .transaction-date,
 body.theme-dark .date-total-amount {
     color: #c7ced8;
 }
@@ -2519,7 +2560,6 @@ body.theme-dark .transaction-main-category,
 body.theme-dark .transaction-subcategory,
 body.theme-dark .transaction-category,
 body.theme-dark .transaction-account,
-body.theme-dark .transaction-date,
 body.theme-dark .transaction-description {
     color: #edf1f6;
 }

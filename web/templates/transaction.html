@@ -262,13 +262,12 @@
                                 <span class="transaction-amount {{if eq .Type 0}}income{{else}}expense{{end}}">
                                     {{if eq .Type 1}}-{{end}}{{printf "%.2f" .Amount}} {{.CurrencySymbol}}
                                 </span>
-                                <span class="transaction-time">{{.FormattedTime}}</span>
                             </div>
                         </div>
 
                         <div class="transaction-bottom-line">
-                            <div class="transaction-date">{{.FormattedDate}}</div>
-
+                            <span class="transaction-date">{{.FormattedDate}}</span>
+                            <span class="transaction-time">{{.FormattedTime}}</span>
                         </div>
                     </div>
                 </div>
@@ -298,9 +297,7 @@
                             <div class="transaction-center-account">
                                 <div class="account-color-dot" style="background-color: #{{.AccountColor}};"></div>
                                 <span class="transaction-account">{{.AccountName}}</span>
-                                <!-- hs kak v css perenesti -->
-                                <i class="fa-solid fa-arrow-right"
-                                    style="margin: 0 8px; margin-bottom: -21px;color: #666; font-size: 12px;"></i>
+                                <i class="fa-solid fa-arrow-right transfer-direction-arrow"></i>
                                 <div class="account-color-dot" style="background-color: #{{.TransferAccountColor}};">
                                 </div>
                                 <span class="transaction-account">{{.TransferAccountName}}</span>
@@ -316,15 +313,12 @@
                                 <span class="transaction-amount transfer">
                                     -{{printf "%.2f" .Amount}} {{.CurrencySymbol}}
                                 </span>
-                                <span class="transaction-time">{{.FormattedTime}}</span>
                             </div>
                         </div>
 
                         <div class="transaction-bottom-line">
-                            <div class="transaction-date">{{.FormattedDate}}</div>
-                            {{if .Description}}
-                            <div class="transaction-description">{{.Description}}</div>
-                            {{end}}
+                            <span class="transaction-date">{{.FormattedDate}}</span>
+                            <span class="transaction-time">{{.FormattedTime}}</span>
                         </div>
                     </div>
                 </div>
