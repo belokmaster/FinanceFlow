@@ -32,6 +32,104 @@
         </div>
     </header>
 
+    <main class="analyze-page">
+        <section class="analyze-hero">
+            <div class="analyze-hero-title-block">
+                <h1>Финансовая аналитика</h1>
+                <p>Отслеживайте расходы, доходы и общий баланс по периодам</p>
+            </div>
+
+            <div class="analyze-controls">
+                <div class="period-mode-group" role="group" aria-label="Период аналитики">
+                    <button class="period-chip active" data-mode="day" type="button">День</button>
+                    <button class="period-chip" data-mode="week" type="button">Неделя</button>
+                    <button class="period-chip" data-mode="month" type="button">Месяц</button>
+                    <button class="period-chip" data-mode="year" type="button">Год</button>
+                    <button class="period-chip" data-mode="custom" type="button">Свой период</button>
+                </div>
+
+                <div class="custom-period-panel" id="customPeriodPanel" hidden>
+                    <div class="date-input-wrap">
+                        <label for="customStartDate">От</label>
+                        <input id="customStartDate" type="date" class="form-control">
+                    </div>
+                    <div class="date-input-wrap">
+                        <label for="customEndDate">До</label>
+                        <input id="customEndDate" type="date" class="form-control">
+                    </div>
+                </div>
+
+                <div class="analyze-view-switch" role="tablist" aria-label="Режим аналитики">
+                    <button id="reportViewBtn" class="view-switch-btn active" type="button" role="tab"
+                        aria-selected="true">
+                        <i class="fa-solid fa-table-list"></i>
+                        <span>Отчет</span>
+                    </button>
+                    <button id="graphViewBtn" class="view-switch-btn" type="button" role="tab"
+                        aria-selected="false">
+                        <i class="fa-solid fa-chart-line"></i>
+                        <span>График</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <div id="reportPanel">
+            <section class="analyze-summary-grid" id="analyzeSummaryGrid">
+                <article class="summary-card income-card">
+                    <div class="summary-label">Общий доход</div>
+                    <div class="summary-value" id="summaryIncome">0,00 ₽</div>
+                </article>
+                <article class="summary-card expense-card">
+                    <div class="summary-label">Общие расходы</div>
+                    <div class="summary-value" id="summaryExpense">0,00 ₽</div>
+                </article>
+                <article class="summary-card budget-card">
+                    <div class="summary-label">Баланс бюджета</div>
+                    <div class="summary-value" id="summaryBudget">0,00 ₽</div>
+                </article>
+            </section>
+
+            <section class="analyze-table-card">
+                <div class="analyze-table-head">
+                    <h2>Сводка по категориям</h2>
+                    <div class="period-labels">
+                        <span id="currentPeriodLabel">Текущий период</span>
+                        <span id="previousPeriodLabel">Предыдущий период</span>
+                    </div>
+                </div>
+
+                <div class="analyze-table" id="analyzeTable"></div>
+            </section>
+        </div>
+
+        <section class="charts-panel" id="chartsPanel" hidden>
+            <div class="charts-header">
+                <h2>Графики бюджета</h2>
+                <p>Динамика доходов, расходов и баланса за выбранный период</p>
+            </div>
+
+            <div class="charts-grid">
+                <div class="chart-card">
+                    <h3>Доходы и расходы</h3>
+                    <canvas id="flowChart"></canvas>
+                </div>
+                <div class="chart-card">
+                    <h3>Баланс</h3>
+                    <canvas id="budgetChart"></canvas>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        window.analyzePayload = {
+            transactions: {{.TransactionsJSON}},
+            categories: {{.CategoriesJSON}}
+        };
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="/static/js/analyze.js"></script>
     <script src="/static/js/theme-toggle.js"></script>
 </body>
 

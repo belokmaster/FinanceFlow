@@ -1388,6 +1388,11 @@ form button[type="submit"]:hover {
     border: none;
 }
 
+#editTransferModal .btn-primary,
+#editTransferModal .delete-button {
+    border: none;
+}
+
 .transaction-card::before {
     content: "";
     position: absolute;
@@ -1606,6 +1611,7 @@ form button[type="submit"]:hover {
     font-size: 18px;
     font-weight: bold;
     color: #333;
+    margin-top: 8px;
     margin-bottom: 15px;
     padding-bottom: 5px;
     cursor: pointer;
@@ -2556,12 +2562,427 @@ body.theme-dark .sort-buttons .sort-btn.active {
     border: none;
 }
 
+body.theme-dark #editTransferModal .btn-primary,
+body.theme-dark #editTransferModal .delete-button {
+    border: none;
+}
+
 body.theme-dark .transaction-main-category,
 body.theme-dark .transaction-subcategory,
 body.theme-dark .transaction-category,
 body.theme-dark .transaction-account,
 body.theme-dark .transaction-description {
     color: #edf1f6;
+}
+
+.analyze-page {
+    max-width: 1360px;
+    margin: 0 auto;
+    padding: 26px 30px 48px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.analyze-hero {
+    background: linear-gradient(120deg, #f7f8fb 0%, #eef6ff 100%);
+    border: 1px solid #dfe6ef;
+    padding: 22px;
+    box-shadow: 0 8px 28px rgba(31, 57, 89, 0.08);
+}
+
+.analyze-hero h1 {
+    margin: 0;
+    font-size: 30px;
+    line-height: 1.15;
+    color: #1d2a3a;
+}
+
+.analyze-hero p {
+    margin: 8px 0 0;
+    color: #586a81;
+    font-size: 15px;
+}
+
+.analyze-controls {
+    margin-top: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.period-mode-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.period-chip {
+    border: 1px solid #ced8e6;
+    background: #ffffff;
+    color: #2c3f59;
+    padding: 10px 14px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.period-chip:hover {
+    border-color: #4cd67a;
+    color: #205a36;
+}
+
+.period-chip.active {
+    background: #4cd67a;
+    border-color: #4cd67a;
+    color: #ffffff;
+}
+
+.custom-period-panel {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.date-input-wrap {
+    min-width: 160px;
+}
+
+.date-input-wrap label {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 12px;
+    color: #576987;
+    font-weight: 600;
+}
+
+.analyze-view-switch {
+    display: inline-flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.view-switch-btn {
+    border: 1px solid #c7d3e4;
+    background: #ffffff;
+    color: #21334c;
+    padding: 10px 16px;
+    font-size: 14px;
+    font-weight: 700;
+    display: inline-flex;
+    gap: 8px;
+    align-items: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.view-switch-btn:hover {
+    border-color: #16925d;
+    color: #0f6f46;
+}
+
+.view-switch-btn.active {
+    background: linear-gradient(135deg, #0a9f68 0%, #0f8763 100%);
+    border-color: #0f8763;
+    color: #ffffff;
+    box-shadow: 0 8px 18px rgba(9, 120, 86, 0.22);
+}
+
+.analyze-summary-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(200px, 1fr));
+    gap: 12px;
+}
+
+.summary-card {
+    background: #fff;
+    border: 1px solid #e1e8f1;
+    padding: 14px 16px;
+}
+
+.summary-label {
+    color: #6b778a;
+    font-weight: 600;
+    font-size: 13px;
+}
+
+.summary-value {
+    margin-top: 6px;
+    color: #1f2a3d;
+    font-weight: 700;
+    font-size: 22px;
+}
+
+.summary-value.negative {
+    color: #b23b3b;
+}
+
+.income-card {
+    border-top: 4px solid #4cd67a;
+}
+
+.expense-card {
+    border-top: 4px solid #e06161;
+}
+
+.budget-card {
+    border-top: 4px solid #2f5cb6;
+}
+
+.analyze-table-card {
+    background: #fff;
+    border: 1px solid #e1e8f1;
+    padding: 14px;
+}
+
+.analyze-table-head {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    border-bottom: 1px solid #e9edf4;
+    padding-bottom: 10px;
+    margin-bottom: 8px;
+}
+
+.analyze-table-head h2 {
+    margin: 0;
+    color: #1f2a3d;
+    font-size: 20px;
+}
+
+.period-labels {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    font-size: 18px;
+    color: #4d5d74;
+    font-weight: 700;
+    min-width: 380px;
+    text-align: right;
+}
+
+.analyze-section {
+    margin-top: 14px;
+}
+
+.analyze-section-title {
+    display: grid;
+    grid-template-columns: 1fr 180px 180px;
+    align-items: center;
+    font-size: 34px;
+    font-weight: 700;
+    background: #f7f8fa;
+    color: #111827;
+    padding: 12px 14px;
+}
+
+.analyze-section-title>span:first-child {
+    color: #111827;
+}
+
+.analyze-section-title.expense {
+    margin-top: 10px;
+}
+
+.section-amount {
+    text-align: right;
+    font-weight: 700;
+    color: #111827;
+}
+
+.section-amount.prev {
+    color: #374151;
+    font-weight: 500;
+}
+
+.analyze-row {
+    display: grid;
+    grid-template-columns: 1fr 180px 180px;
+    align-items: center;
+    padding: 12px 14px;
+    border-bottom: 1px solid #edf0f4;
+}
+
+.analyze-row:last-child {
+    border-bottom: none;
+}
+
+.analyze-row-name {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+}
+
+.analyze-row-name span:last-child {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 33px;
+    color: #2d3748;
+}
+
+.analyze-icon {
+    width: 34px;
+    height: 34px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    flex-shrink: 0;
+}
+
+.analyze-icon svg,
+.analyze-icon i {
+    width: 18px;
+    height: 18px;
+    display: inline-flex;
+    color: #fff !important;
+    fill: #fff !important;
+}
+
+.analyze-row-value {
+    text-align: right;
+    font-size: 34px;
+    font-weight: 700;
+    color: #111827;
+}
+
+.analyze-row-value.prev {
+    font-size: 33px;
+    color: #303948;
+    font-weight: 500;
+}
+
+.analyze-empty {
+    padding: 14px;
+    color: #718096;
+    font-weight: 500;
+}
+
+.charts-panel {
+    background: #fff;
+    border: 1px solid #e1e8f1;
+    padding: 16px;
+}
+
+.charts-header h2 {
+    margin: 0;
+    color: #1f2a3d;
+    font-size: 24px;
+}
+
+.charts-header p {
+    margin: 6px 0 0;
+    color: #5e6e84;
+}
+
+.charts-grid {
+    margin-top: 14px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+}
+
+.chart-card {
+    border: 1px solid #e6ecf4;
+    padding: 12px;
+    min-height: 320px;
+}
+
+.chart-card h3 {
+    margin: 0 0 8px;
+    font-size: 16px;
+    color: #27384c;
+}
+
+.chart-card canvas {
+    width: 100% !important;
+    height: 260px !important;
+}
+
+body.theme-dark .analyze-hero,
+body.theme-dark .summary-card,
+body.theme-dark .analyze-table-card,
+body.theme-dark .charts-panel,
+body.theme-dark .chart-card {
+    background: #222a35;
+    border-color: #354153;
+}
+
+body.theme-dark .analyze-hero {
+    background: linear-gradient(120deg, #202834 0%, #243142 100%);
+}
+
+body.theme-dark .analyze-hero h1,
+body.theme-dark .analyze-table-head h2,
+body.theme-dark .charts-header h2,
+body.theme-dark .summary-value,
+body.theme-dark .analyze-section-title,
+body.theme-dark .section-amount,
+body.theme-dark .analyze-row-value,
+body.theme-dark .chart-card h3 {
+    color: #e8edf6;
+}
+
+body.theme-dark .analyze-hero p,
+body.theme-dark .summary-label,
+body.theme-dark .period-labels,
+body.theme-dark .charts-header p,
+body.theme-dark .analyze-row-value.prev,
+body.theme-dark .section-amount.prev,
+body.theme-dark .analyze-empty {
+    color: #aeb8c8;
+}
+
+body.theme-dark .period-chip {
+    background: #2c3644;
+    border-color: #49586f;
+    color: #d9e0eb;
+}
+
+body.theme-dark .period-chip.active {
+    background: #4cd67a;
+    border-color: #4cd67a;
+    color: #fff;
+}
+
+body.theme-dark .view-switch-btn {
+    background: #2c3644;
+    border-color: #49586f;
+    color: #d9e0eb;
+}
+
+body.theme-dark .view-switch-btn.active {
+    background: linear-gradient(135deg, #0a9f68 0%, #0f8763 100%);
+    border-color: #0f8763;
+    color: #ffffff;
+}
+
+body.theme-dark .analyze-table-head,
+body.theme-dark .analyze-row {
+    border-color: #354153;
+}
+
+@media (max-width: 1100px) {
+    .analyze-summary-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .period-labels {
+        min-width: 0;
+        font-size: 12px;
+    }
+
+    .analyze-section-title,
+    .analyze-row {
+        grid-template-columns: 1fr 140px 140px;
+    }
+
+    .charts-grid {
+        grid-template-columns: 1fr;
+    }
 }
 
 @media (max-width: 900px) {

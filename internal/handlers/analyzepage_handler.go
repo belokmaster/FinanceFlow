@@ -1,7 +1,10 @@
 package handlers
 
 import (
+	"encoding/json"
 	"finance_flow/internal/database"
+	"fmt"
+	htmlTemplate "html/template"
 	"log"
 	"net/http"
 	"text/template"
@@ -71,11 +74,66 @@ func AnalyzePageHandler(w http.ResponseWriter, r *http.Request, db *gorm.DB, pat
 	subcategoriesByParent := convertSubcategoriesToView(subCategories)
 	categoriesForView := convertCategoriesToView(categories, subcategoriesByParent)
 
+	type analyzeTransaction struct {
+		Type         int     `json:"type"`
+		Amount       float64 `json:"amount"`
+		CategoryName string  `json:"categoryName"`
+		Date         string  `json:"date"`
+		Currency     string  `json:"currency"`
+	}
+
+	type analyzeCategory struct {
+		Name     string `json:"name"`
+		Color    string `json:"color"`
+		IconHTML string `json:"iconHtml"`
+	}
+
+	transactionsPayload := make([]analyzeTransaction, 0, len(transactionsForView))
+	for _, tx := range transactionsForView {
+		transactionsPayload = append(transactionsPayload, analyzeTransaction{
+			Type:         int(tx.Type),
+			Amount:       tx.Amount,
+			CategoryName: tx.CategoryName,
+			Date:         tx.Date.Format("2006-01-02"),
+			Currency:     tx.CurrencySymbol,
+		})
+	}
+
+	categoryMetaMap := make(map[string]analyzeCategory)
+	for _, cat := range categoriesForView {
+		categoryMetaMap[cat.Name] = analyzeCategory{
+			Name:     cat.Name,
+			Color:    fmt.Sprintf("#%s", cat.Color),
+			IconHTML: string(cat.IconHTML),
+		}
+	}
+
+	categoriesPayload := make([]analyzeCategory, 0, len(categoryMetaMap))
+	for _, meta := range categoryMetaMap {
+		categoriesPayload = append(categoriesPayload, meta)
+	}
+
+	transactionsJSONBytes, err := json.Marshal(transactionsPayload)
+	if err != nil {
+		log.Printf("AnalyzePageHandler: Error marshaling transactions payload: %v", err)
+		http.Error(w, "could not build analytics payload", http.StatusInternalServerError)
+		return
+	}
+
+	categoriesJSONBytes, err := json.Marshal(categoriesPayload)
+	if err != nil {
+		log.Printf("AnalyzePageHandler: Error marshaling categories payload: %v", err)
+		http.Error(w, "could not build analytics payload", http.StatusInternalServerError)
+		return
+	}
+
 	pageData := AnalyzePageData{
 		Accounts:            accountsForView,
 		Categories:          categoriesForView,
 		Transactions:        transactionsForView,
 		GroupedTransactions: groupedTransactions,
+		TransactionsJSON:    htmlTemplate.JS(transactionsJSONBytes),
+		CategoriesJSON:      htmlTemplate.JS(categoriesJSONBytes),
 	}
 
 	log.Printf("AnalyzePageHandler: Parsing template from path: %s", path)

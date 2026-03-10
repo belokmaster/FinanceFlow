@@ -110,4 +110,6 @@ type AnalyzePageData struct {
 	Categories          []CategoryView
 	Transactions        []TransactionView
 	GroupedTransactions []GroupedTransactions
+	TransactionsJSON    template.JS
+	CategoriesJSON      template.JS
 }
