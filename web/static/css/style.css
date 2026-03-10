@@ -932,10 +932,12 @@ form button[type="submit"]:hover {
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
     z-index: 1001;
     overflow-y: auto;
-    margin-top: 4px;
-    max-height: 300px;
+    margin-top: 5px;
+    max-height: min(52vh, 480px);
     font-weight: 500;
     color: #333;
+    padding: 6px 0;
+    overscroll-behavior: contain;
 }
 
 .select-account-options.show {
@@ -946,6 +948,7 @@ form button[type="submit"]:hover {
     display: flex;
     align-items: center;
     padding: 12px 16px;
+    min-height: 52px;
     cursor: pointer;
     transition: all 0.2s ease;
     border-bottom: 1px solid #f1f3f4;
@@ -981,12 +984,16 @@ form button[type="submit"]:hover {
     display: flex;
     flex-direction: column;
     gap: 2px;
+    min-width: 0;
 }
 
 .option-account-name {
     font-weight: 600;
     color: #2d3748;
     font-size: 16px;
+    line-height: 1.35;
+    white-space: normal;
+    word-break: break-word;
 }
 
 .option-account-balance {
@@ -1920,9 +1927,11 @@ form button[type="submit"]:hover {
     border-radius: 8px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     z-index: 1000;
-    max-height: 200px;
+    max-height: min(52vh, 480px);
     overflow-y: auto;
     margin-top: 5px;
+    padding: 6px 0;
+    overscroll-behavior: contain;
 }
 
 .select-type-options.show {
@@ -1933,6 +1942,7 @@ form button[type="submit"]:hover {
     display: flex;
     align-items: center;
     padding: 12px 16px;
+    min-height: 52px;
     cursor: pointer;
     gap: 12px;
 
@@ -1940,6 +1950,10 @@ form button[type="submit"]:hover {
     transition: all 0.2s ease;
     border-bottom: 1px solid #f1f3f4;
     gap: 12px;
+}
+
+.select-type-option:last-child {
+    border-bottom: none;
 }
 
 .select-type-option:hover {
@@ -1965,11 +1979,15 @@ form button[type="submit"]:hover {
     flex: 1;
     display: flex;
     flex-direction: column;
+    min-width: 0;
 }
 
 .option-type-name {
     font-weight: 500;
     color: #333;
+    line-height: 1.35;
+    white-space: normal;
+    word-break: break-word;
 }
 
 .sorting-controls {
@@ -2040,7 +2058,7 @@ form button[type="submit"]:hover {
 .custom-category-filter-select {
     position: relative;
     width: 100%;
-    margin-bottom: 15px;
+    margin-bottom: 20px;
 }
 
 .select-selected-category-filter {
@@ -2099,9 +2117,11 @@ form button[type="submit"]:hover {
     border-radius: 8px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     z-index: 1000;
-    max-height: 300px;
+    max-height: min(52vh, 480px);
     overflow-y: auto;
     margin-top: 5px;
+    padding: 6px 0;
+    overscroll-behavior: contain;
 }
 
 .select-category-filter-options.show {
@@ -2112,10 +2132,15 @@ form button[type="submit"]:hover {
     display: flex;
     align-items: center;
     padding: 12px 16px;
+    min-height: 52px;
     cursor: pointer;
     gap: 12px;
     transition: all 0.2s ease;
     border-bottom: 1px solid #f1f3f4;
+}
+
+.select-category-filter-option:last-child {
+    border-bottom: none;
 }
 
 .select-category-filter-option:hover {
@@ -2142,16 +2167,20 @@ form button[type="submit"]:hover {
     flex: 1;
     display: flex;
     flex-direction: column;
+    min-width: 0;
 }
 
 .option-category-filter-name {
     font-weight: 500;
     color: #333;
+    line-height: 1.35;
+    white-space: normal;
+    word-break: break-word;
 }
 
 .subcategory-option .option-category-filter-icon,
 .subcategory-option .option-category-filter-name {
-    margin-left: 20px;
+    margin-left: 10px !important;
 }
 
 .all-categories-option .option-category-filter-icon {
