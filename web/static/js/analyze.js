@@ -287,7 +287,16 @@ function buildGroupedRows(keys, currentMap, previousMap, categoryMeta, categoryM
                 `)
                 .join("");
 
-            return `${categoryRow}${subRows}`;
+            const subRowsBlock = subRows
+                ? `<div class="analyze-subcategory-list">${subRows}</div>`
+                : "";
+
+            return `
+                <div class="analyze-category-group">
+                    ${categoryRow}
+                    ${subRowsBlock}
+                </div>
+            `;
         })
         .join("");
 }
