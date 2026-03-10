@@ -595,6 +595,8 @@ form button[type="submit"]:hover {
     gap: 15px;
     margin-left: 40px;
     padding-left: 20px;
+    padding-bottom: 12px;
+    margin-bottom: 6px;
     border-left: 2px dashed #e0e0e0;
 }
 
@@ -662,7 +664,9 @@ form button[type="submit"]:hover {
     border-radius: 8px;
     padding: 12px 15px;
     height: 30px;
+    display: flex;
     align-items: center;
+    gap: 8px;
     width: 300px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     font-weight: bold;
@@ -2177,4 +2181,317 @@ form button[type="submit"]:hover {
     fill: white !important;
     width: 16px !important;
     height: 16px !important;
+}
+
+.header-actions {
+    margin-left: auto;
+}
+
+.theme-toggle-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.28);
+    background: rgba(255, 255, 255, 0.08);
+    color: #ffffff;
+    border-radius: 999px;
+    padding: 8px 14px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+}
+
+.theme-toggle-btn:hover {
+    background: rgba(255, 255, 255, 0.16);
+    border-color: rgba(255, 255, 255, 0.5);
+}
+
+.theme-toggle-btn:active {
+    transform: translateY(1px);
+}
+
+body.theme-dark {
+    background-color: #1f2125;
+    color: #e1e5eb;
+}
+
+body.theme-dark .header {
+    background-color: #2a2d33;
+    border-bottom-color: #3a3e46;
+}
+
+body.theme-dark nav a {
+    color: #e1e5eb;
+}
+
+body.theme-dark nav a.active {
+    background-color: #2f7b58;
+}
+
+body.theme-dark nav a:hover {
+    background-color: rgba(76, 214, 122, 0.35);
+}
+
+body.theme-dark .theme-toggle-btn {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(226, 232, 240, 0.26);
+}
+
+body.theme-dark .theme-toggle-btn:hover {
+    background: rgba(255, 255, 255, 0.18);
+}
+
+body.theme-dark .new_account-card,
+body.theme-dark .new_category-card,
+body.theme-dark .new_subcategory-card,
+body.theme-dark .new_transaction-card,
+body.theme-dark .transactions-filter-container,
+body.theme-dark .transactions-container,
+body.theme-dark .transaction-card,
+body.theme-dark .transaction-date-header,
+body.theme-dark .category-section,
+body.theme-dark .modal-content,
+body.theme-dark .select-account-options,
+body.theme-dark .select-category-options,
+body.theme-dark .select-subcategory-options,
+body.theme-dark .select-type-options,
+body.theme-dark .select-icon-options,
+body.theme-dark .select-category-filter-options,
+body.theme-dark .select-selected-account,
+body.theme-dark .select-selected-category,
+body.theme-dark .select-selected-subcategory,
+body.theme-dark .select-selected-type,
+body.theme-dark .select-selected-icon,
+body.theme-dark .select-selected-category-filter,
+body.theme-dark .form-control,
+body.theme-dark input,
+body.theme-dark select,
+body.theme-dark textarea {
+    background-color: #212a35;
+    border-color: #334252;
+    color: #d8dee6;
+}
+
+body.theme-dark .select-account-option,
+body.theme-dark .select-category-option,
+body.theme-dark .select-subcategory-option,
+body.theme-dark .select-type-option,
+body.theme-dark .select-icon-option,
+body.theme-dark .select-category-filter-option {
+    border-bottom-color: #314050;
+}
+
+body.theme-dark .select-account-option:hover,
+body.theme-dark .select-category-option:hover,
+body.theme-dark .select-subcategory-option:hover,
+body.theme-dark .select-type-option:hover,
+body.theme-dark .select-icon-option:hover,
+body.theme-dark .select-category-filter-option:hover,
+body.theme-dark .new_account-card:hover,
+body.theme-dark .new_category-card:hover,
+body.theme-dark .new_subcategory-card:hover,
+body.theme-dark .new_transaction-card:hover {
+    background-color: #283443;
+    color: #eef3f8;
+}
+
+body.theme-dark .form-group label,
+body.theme-dark .option-account-name,
+body.theme-dark .option-category-name,
+body.theme-dark .option-subcategory-name,
+body.theme-dark .option-type-name,
+body.theme-dark .option-icon-key,
+body.theme-dark .option-category-filter-name,
+body.theme-dark .selected-account-name,
+body.theme-dark .selected-category-name,
+body.theme-dark .selected-subcategory-name,
+body.theme-dark .selected-type-name,
+body.theme-dark .selected-icon-key,
+body.theme-dark .selected-category-filter-name,
+body.theme-dark .transaction-label,
+body.theme-dark .current-sort-indicator,
+body.theme-dark .close,
+body.theme-dark p,
+body.theme-dark h1,
+body.theme-dark h2,
+body.theme-dark h3,
+body.theme-dark h4 {
+    color: #d8dee6;
+}
+
+body.theme-dark .close:hover {
+    color: #ffffff;
+}
+
+body.theme-dark .account-card,
+body.theme-dark .category-card,
+body.theme-dark .subcategory-card,
+body.theme-dark .transaction-card,
+body.theme-dark .transfer-card,
+body.theme-dark .new_account-card,
+body.theme-dark .new_category-card,
+body.theme-dark .new_subcategory-card,
+body.theme-dark .new_transaction-card {
+    box-shadow: 0 6px 20px rgba(7, 12, 19, 0.45);
+    border-color: #3a4a5c;
+}
+
+body.theme-dark .account-card:hover,
+body.theme-dark .category-card:hover,
+body.theme-dark .subcategory-card:hover,
+body.theme-dark .transaction-card:hover,
+body.theme-dark .transfer-card:hover,
+body.theme-dark .new_account-card:hover,
+body.theme-dark .new_category-card:hover,
+body.theme-dark .new_subcategory-card:hover,
+body.theme-dark .new_transaction-card:hover {
+    border-color: #55c188;
+    box-shadow: 0 10px 26px rgba(12, 20, 30, 0.55), 0 0 0 1px rgba(85, 193, 136, 0.35);
+}
+
+body.theme-dark .transactions-filter-container,
+body.theme-dark .transactions-container,
+body.theme-dark .modal-content,
+body.theme-dark .transaction-date-header,
+body.theme-dark .sorting-controls,
+body.theme-dark .filter-actions {
+    background-color: #2a2e36;
+    border-color: #444b57;
+}
+
+body.theme-dark .transaction-date-header::after {
+    background-color: #55c188;
+}
+
+body.theme-dark .form-control,
+body.theme-dark input,
+body.theme-dark select,
+body.theme-dark textarea,
+body.theme-dark .transaction-filter,
+body.theme-dark .color-display,
+body.theme-dark .form-group select,
+body.theme-dark .form-group input[type="date"],
+body.theme-dark .form-control[readonly] {
+    background-color: #323740 !important;
+    border-color: #505867 !important;
+    color: #e1e5eb !important;
+}
+
+body.theme-dark .form-control::placeholder,
+body.theme-dark input::placeholder,
+body.theme-dark .transaction-filter::placeholder {
+    color: #a7afbc;
+}
+
+body.theme-dark .toggle-subcategories-btn,
+body.theme-dark .toggle-transactions-btn,
+body.theme-dark .sort-btn,
+body.theme-dark .type-btn,
+body.theme-dark .btn-secondary,
+body.theme-dark .btn-primary,
+body.theme-dark .delete-button,
+body.theme-dark form button[type="submit"] {
+    background-color: #373c46;
+    border: 1px solid #565e6d;
+    color: #e1e5eb;
+    box-shadow: 0 4px 14px rgba(8, 14, 22, 0.4);
+}
+
+body.theme-dark .toggle-subcategories-btn i,
+body.theme-dark .toggle-transactions-btn i,
+body.theme-dark .sort-btn i,
+body.theme-dark .btn-secondary i,
+body.theme-dark .transaction-time,
+body.theme-dark .date-total-amount {
+    color: #c7ced8;
+}
+
+body.theme-dark .sort-btn:hover,
+body.theme-dark .type-btn:hover,
+body.theme-dark .toggle-subcategories-btn:hover,
+body.theme-dark .toggle-transactions-btn:hover,
+body.theme-dark .btn-secondary:hover {
+    background-color: #444b57;
+    border-color: #55c188;
+    color: #ecf3fa;
+}
+
+body.theme-dark .sort-btn.active {
+    background: #2f7b58;
+    border-color: #55c188;
+    color: #ffffff;
+}
+
+body.theme-dark .type-buttons .type-btn {
+    background-color: #373c46;
+    border-color: #565e6d;
+    color: #e1e5eb;
+}
+
+body.theme-dark .type-buttons .type-btn.active,
+body.theme-dark .type-buttons .income-btn.active,
+body.theme-dark .type-buttons .expense-btn.active,
+body.theme-dark .type-buttons .transfer-btn.active,
+body.theme-dark .btn-primary,
+body.theme-dark form button[type="submit"] {
+    color: #ffffff;
+}
+
+body.theme-dark .btn-primary,
+body.theme-dark form button[type="submit"] {
+    background-color: #2f7b58;
+    border-color: #55c188;
+}
+
+body.theme-dark .btn-primary:hover,
+body.theme-dark form button[type="submit"]:hover {
+    background-color: #3b966b;
+    border-color: #6ad39a;
+}
+
+body.theme-dark .delete-button {
+    background-color: #8d4a55;
+    border-color: #b56773;
+}
+
+body.theme-dark .delete-button:hover {
+    background-color: #a65a67;
+    border-color: #cf7988;
+}
+
+body.theme-dark .date-total-amount,
+body.theme-dark .date-total-amount.zero,
+body.theme-dark .current-sort-indicator {
+    background-color: #373c46;
+    border-color: #565e6d;
+}
+
+body.theme-dark .sort-btn,
+body.theme-dark .current-sort-indicator,
+body.theme-dark .btn-secondary {
+    background: #373c46;
+    border-color: #565e6d;
+}
+
+body.theme-dark .transaction-main-category,
+body.theme-dark .transaction-subcategory,
+body.theme-dark .transaction-category,
+body.theme-dark .transaction-account,
+body.theme-dark .transaction-date,
+body.theme-dark .transaction-description {
+    color: #edf1f6;
+}
+
+@media (max-width: 900px) {
+    .header {
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .header-actions {
+        width: 100%;
+        display: flex;
+        justify-content: flex-end;
+    }
 }

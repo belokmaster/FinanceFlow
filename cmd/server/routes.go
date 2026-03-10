@@ -93,4 +93,8 @@ func setupRoutes(db *gorm.DB) {
 	http.HandleFunc("/update_transfer", func(w http.ResponseWriter, r *http.Request) {
 		handlers.UpdateTransferHandler(w, r, db)
 	})
+
+	http.HandleFunc("/generate_test_data", func(w http.ResponseWriter, r *http.Request) {
+		handlers.GenerateTestDataHandler(w, r, db)
+	})
 }
